@@ -1,0 +1,47 @@
+{
+  "expo": {
+    "name": "Court-Ready",
+    "slug": "court-ready",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "courtready",
+    "userInterfaceStyle": "dark",
+    "ios": {
+      "bundleIdentifier": "com.larrymijo.courtready",
+      "supportsTablet": false
+    },
+    "android": {
+      "package": "com.larrymijo.courtready",
+      "adaptiveIcon": {
+        "backgroundColor": "#0E1838",
+        "foregroundImage": "./assets/images/android-icon-foreground.png",
+        "backgroundImage": "./assets/images/android-icon-background.png",
+        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false,
+      "softwareKeyboardLayoutMode": "pan"
+    },
+    "web": {
+      "output": "single",
+      "favicon": "./assets/images/favicon.png",
+      "backgroundColor": "#0B0D12"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#0B0D12",
+          "image": "./assets/images/splash-icon.png",
+          "imageWidth": 180
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": false,
+      "reactCompiler": true
+    },
+    "backgroundColor": "#0B0D12"
+  }
+}
