@@ -25,7 +25,8 @@ It runs on iPhone and Android. It's built with Expo (React Native + TypeScript) 
 
 It opens full screen like a normal app and works offline once it has loaded. Workouts are stored in the app on your
 phone. Use **Settings → Export backup** now and then to save a copy to Files, in case you delete the app or clear
-Safari's data.
+Safari's data. iPhones don't let web apps vibrate, so the rest timer can't buzz. The screen stays on during a workout so
+you can see the countdown.
 
 > The web app is published by the CI workflow. GitHub Pages has to be switched on once: **Settings → Pages → Build and
 > deployment → Source: GitHub Actions**.
