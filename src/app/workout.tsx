@@ -108,6 +108,7 @@ export default function WorkoutScreen() {
 
       <ScrollView
         contentContainerStyle={{ padding: S.md, gap: S.md, paddingBottom: (rest ? 140 : 60) + insets.bottom }}
+        automaticallyAdjustKeyboardInsets
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="on-drag">
         <View style={{ gap: 6 }}>

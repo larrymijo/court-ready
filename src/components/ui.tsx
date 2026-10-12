@@ -66,6 +66,7 @@ export function Screen({
     <ScrollView
       style={{ flex: 1, backgroundColor: C.bg }}
       contentContainerStyle={[pad, contentStyle]}
+      automaticallyAdjustKeyboardInsets
       keyboardShouldPersistTaps="handled"
       keyboardDismissMode="on-drag">
       {children}
