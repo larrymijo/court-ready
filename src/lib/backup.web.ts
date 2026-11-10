@@ -2,16 +2,17 @@ import { todayISO } from '@/lib/dates';
 
 /**
  * Web: share the backup as a .json file where the browser can (iPhone and Android show the share
- * sheet: Save to Files, Drive, AirDrop…), otherwise download it.
+ * sheet: Save to Files, Drive, AirDrop…), otherwise download it. Resolves false when the share
+ * sheet was closed without saving.
  */
-export async function saveBackup(json: string): Promise<void> {
+export async function saveBackup(json: string): Promise<boolean> {
   const file = new File([json], `court-ready-backup-${todayISO()}.json`, { type: 'application/json' });
   if (typeof navigator !== 'undefined' && navigator.canShare?.({ files: [file] })) {
     try {
       await navigator.share({ files: [file], title: 'Court-Ready backup' });
-      return;
+      return true;
     } catch (e) {
-      if (e instanceof DOMException && e.name === 'AbortError') return; // closed the share sheet
+      if (e instanceof DOMException && e.name === 'AbortError') return false; // closed the share sheet
     }
   }
   const url = URL.createObjectURL(file);
@@ -22,6 +23,7 @@ export async function saveBackup(json: string): Promise<void> {
   a.click();
   a.remove();
   setTimeout(() => URL.revokeObjectURL(url), 10_000);
+  return true;
 }
 
 export const canPickBackupFile = true;

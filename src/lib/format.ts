@@ -65,6 +65,13 @@ export function formatTime(ts: number): string {
   return `${d.getHours()}:${m < 10 ? '0' : ''}${m}`;
 }
 
+/** Bytes → "under 1 KB", "132 KB", "1.4 MB". */
+export function formatDataSize(bytes: number): string {
+  if (bytes < 1024) return 'under 1 KB';
+  if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
 /** "1 set", "3 sets". */
 export function plural(n: number, word: string, pluralWord = `${word}s`): string {
   return `${n} ${n === 1 ? word : pluralWord}`;

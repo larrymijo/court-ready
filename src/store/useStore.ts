@@ -5,6 +5,7 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 
 import { EXERCISE_BY_ID, getExercise } from '@/data/exercises';
 import { getRoutine } from '@/data/routines';
+import { STORE_KEY } from '@/lib/channel';
 import { mondayOfISO, todayISO } from '@/lib/dates';
 import { uid } from '@/lib/id';
 import { prescribe, programPosition } from '@/lib/program';
@@ -18,6 +19,8 @@ import type {
   WorkoutExercise,
   WorkoutSet,
 } from '@/lib/types';
+import { DATA_VERSION, isNewerData, migrate } from '@/store/migrations';
+import { keepSafetyCopy, readSafetyCopy } from '@/store/safetyCopy';
 
 export interface RestState {
   endsAt: number;
@@ -27,7 +30,8 @@ export interface RestState {
 
 export interface ExportData {
   app: 'court-ready';
-  version: 1;
+  /** Data version the file was written at (see store/migrations.ts). */
+  version: number;
   exportedAt: string;
   settings: Settings;
   workouts: Workout[];
@@ -78,9 +82,16 @@ interface State {
   deleteBody: (date: string) => void;
   updateSettings: (patch: Partial<Settings>) => void;
   exportData: () => string;
-  importData: (json: string) => { ok: true; workouts: number } | { ok: false; error: string };
+  importData: (json: string) => RestoreResult;
+  /** Puts back the data as it was before the last app update changed its shape. */
+  restoreSafetyCopy: () => Promise<RestoreResult>;
   resetAll: () => void;
 }
+
+export type RestoreResult = { ok: true; workouts: number } | { ok: false; error: string };
+
+/** The part of the state that is saved on the phone. */
+type Saved = Pick<State, 'settings' | 'workouts' | 'active' | 'warmupChecked' | 'body' | 'rest'>;
 
 function defaultSettings(): Settings {
   return {
@@ -88,6 +99,7 @@ function defaultSettings(): Settings {
     restTimer: true,
     vibrate: true,
     keepAwake: true,
+    lastExportAt: null,
   };
 }
 
@@ -365,7 +377,7 @@ export const useStore = create<State>()(
         const { settings, workouts, body } = get();
         const data: ExportData = {
           app: 'court-ready',
-          version: 1,
+          version: DATA_VERSION,
           exportedAt: new Date().toISOString(),
           settings,
           workouts,
@@ -380,25 +392,70 @@ export const useStore = create<State>()(
           if (data.app !== 'court-ready' || !Array.isArray(data.workouts) || !Array.isArray(data.body)) {
             return { ok: false, error: 'This doesn’t look like a Court-Ready export.' };
           }
+          const version = typeof data.version === 'number' ? data.version : 1;
+          if (isNewerData(version)) {
+            return {
+              ok: false,
+              error: 'This backup comes from a newer version of the app. Update the app, then import it again.',
+            };
+          }
+          const current = migrate(
+            { settings: data.settings, workouts: data.workouts, body: data.body },
+            version,
+          ) as unknown as Pick<Saved, 'settings' | 'workouts' | 'body'>;
+          // The phone now holds exactly what the file holds, so it counts as backed up when the file was made.
+          const exportedAt = typeof data.exportedAt === 'string' ? Date.parse(data.exportedAt) : NaN;
           set({
-            settings: { ...defaultSettings(), ...data.settings },
-            workouts: [...data.workouts].sort((a, b) => b.startedAt - a.startedAt),
-            body: data.body,
+            settings: {
+              ...defaultSettings(),
+              ...current.settings,
+              lastExportAt: Number.isFinite(exportedAt) ? exportedAt : null,
+            },
+            workouts: [...current.workouts].sort((a, b) => b.startedAt - a.startedAt),
+            body: current.body,
           });
-          return { ok: true, workouts: data.workouts.length };
+          return { ok: true, workouts: current.workouts.length };
         } catch {
           return { ok: false, error: 'Couldn’t read that text. Paste the whole export.' };
         }
+      },
+
+      restoreSafetyCopy: async () => {
+        const copy = await readSafetyCopy();
+        if (!copy) return { ok: false, error: 'There is no earlier copy on this phone.' };
+        const saved = migrate(copy.state, copy.version) as unknown as Partial<Saved>;
+        if (!Array.isArray(saved.workouts) || !Array.isArray(saved.body)) {
+          return { ok: false, error: 'The earlier copy can’t be read.' };
+        }
+        set({
+          settings: { ...defaultSettings(), ...saved.settings },
+          workouts: saved.workouts,
+          body: saved.body,
+          active: saved.active ?? null,
+          warmupChecked: saved.warmupChecked ?? [],
+          rest: null,
+        });
+        return { ok: true, workouts: saved.workouts.length };
       },
 
       resetAll: () =>
         set({ settings: defaultSettings(), workouts: [], active: null, warmupChecked: [], body: [], rest: null }),
     }),
     {
-      name: 'court-ready',
-      version: 1,
+      name: STORE_KEY,
+      version: DATA_VERSION,
       storage: createJSONStorage(() => AsyncStorage),
-      partialize: (s) => ({
+      // An app update that changes the data's shape arrives here once, with what the phone had saved.
+      migrate: async (persisted, version) => {
+        if (version < DATA_VERSION) await keepSafetyCopy(persisted, version);
+        return migrate(persisted, version) as unknown as Saved;
+      },
+      // A setting added later gets its default instead of being missing from older saved data.
+      merge: (persisted, current) => {
+        const saved = (persisted ?? {}) as Partial<Saved>;
+        return { ...current, ...saved, settings: { ...current.settings, ...saved.settings } };
+      },
+      partialize: (s): Saved => ({
         settings: s.settings,
         workouts: s.workouts,
         active: s.active,

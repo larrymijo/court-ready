@@ -152,4 +152,6 @@ export interface Settings {
   restTimer: boolean;
   vibrate: boolean;
   keepAwake: boolean;
+  /** When the last backup was exported (ms since 1970); null if never. */
+  lastExportAt: number | null;
 }

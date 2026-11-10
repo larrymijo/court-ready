@@ -22,7 +22,9 @@ import { WeekStrip } from '@/components/WeekStrip';
 import { getExercise } from '@/data/exercises';
 import { getRoutine } from '@/data/routines';
 import { DAILY_TARGETS, DAY_LONG } from '@/data/schedule';
+import { backupStatus, daysAgoText } from '@/lib/backupStatus';
 import { isoFromTimestamp, mondayOfISO, todayISO, weekdayIndex } from '@/lib/dates';
+import { exportBackup } from '@/lib/exportBackup';
 import { formatDate, formatDuration, formatElapsed, formatKg, formatVolume, plural } from '@/lib/format';
 import { hardSetCount, PHASES, planForDate, programPosition } from '@/lib/program';
 import { startRoutineFlow } from '@/lib/startWorkout';
@@ -51,6 +53,7 @@ export default function TodayScreen() {
   const weekSets = weekWorkouts.reduce((a, w) => a + workoutSetCount(w), 0);
   const [gameMode, setGameMode] = useState(false);
   const todayWeight = body.find((b) => b.date === today)?.weight ?? null;
+  const backup = backupStatus(workouts, settings.lastExportAt, now);
 
   return (
     <Screen bottomPad={active ? 170 : 110}>
@@ -147,6 +150,22 @@ export default function TodayScreen() {
         )}
         <Txt v="tiny">After the toilet, before eating. The weekly average is what counts.</Txt>
       </Card>
+
+      {backup.remind ? (
+        <Card>
+          <Row gap={S.md} align="flex-start">
+            <Ionicons name="save-outline" size={22} color={C.muted} style={{ marginTop: 2 }} />
+            <View style={{ flex: 1, gap: 2 }}>
+              <Txt v="h2">Back up your workouts</Txt>
+              <Txt v="small">
+                {plural(backup.unsaved, 'workout')} {backup.unsaved === 1 ? 'is' : 'are'} saved only on this phone
+                {settings.lastExportAt ? `; your last backup was ${daysAgoText(settings.lastExportAt, now)}` : ''}.
+              </Txt>
+            </View>
+          </Row>
+          <Button small variant="secondary" icon="share-outline" title="Export backup" onPress={exportBackup} />
+        </Card>
+      ) : null}
     </Screen>
   );
 }

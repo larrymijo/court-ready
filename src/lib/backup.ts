@@ -2,9 +2,13 @@ import { Share } from 'react-native';
 
 import { todayISO } from '@/lib/dates';
 
-/** Native: hand the backup to the share sheet (Notes, Files, Mail, AirDrop…). */
-export async function saveBackup(json: string): Promise<void> {
-  await Share.share({ message: json, title: `Court-Ready backup ${todayISO()}` });
+/**
+ * Native: hand the backup to the share sheet (Notes, Files, Mail, AirDrop…). Resolves false when
+ * the sheet was closed without sharing (only iPhone reports that).
+ */
+export async function saveBackup(json: string): Promise<boolean> {
+  const result = await Share.share({ message: json, title: `Court-Ready backup ${todayISO()}` });
+  return result.action !== Share.dismissedAction;
 }
 
 /** Native: no file picker in Expo Go, so backups are pasted into the text box instead. */

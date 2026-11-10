@@ -1,0 +1,89 @@
+{
+  "app": "court-ready",
+  "version": 1,
+  "exportedAt": "2026-10-28T18:30:00.000Z",
+  "settings": {
+    "programStart": "2026-10-12",
+    "restTimer": true,
+    "vibrate": false,
+    "keepAwake": true
+  },
+  "workouts": [
+    {
+      "id": "w-lower",
+      "name": "Lower + Core (game mode)",
+      "routineId": "lower",
+      "startedAt": 1791997800000,
+      "finishedAt": 1792000920000,
+      "week": 1,
+      "phase": "learn",
+      "gameMode": true,
+      "exercises": [
+        {
+          "id": "w-lower-e1",
+          "exerciseId": "legpress",
+          "itemKey": "1",
+          "restSec": 150,
+          "target": { "sets": 2, "repsMin": 6, "repsMax": 10, "rir": "3" },
+          "sets": [
+            { "id": "w-lower-s1", "type": "normal", "weight": 120, "reps": 8, "rir": 3, "done": true },
+            { "id": "w-lower-s2", "type": "normal", "weight": 120, "reps": 8, "rir": 2, "done": true }
+          ],
+          "pain": 2,
+          "note": ""
+        },
+        {
+          "id": "w-lower-e2",
+          "exerciseId": "pallof",
+          "itemKey": "5b",
+          "group": "l5",
+          "restSec": 60,
+          "target": { "sets": 1, "repsMin": 10, "repsMax": 10, "rir": "Controlled" },
+          "sets": [{ "id": "w-lower-s3", "type": "normal", "weight": 10, "reps": 10, "rir": null, "done": true }],
+          "pain": null,
+          "note": "Left side is weaker"
+        }
+      ],
+      "prs": [{ "exerciseId": "legpress", "kind": "weight", "value": 120, "weight": 120, "reps": 8 }]
+    },
+    {
+      "id": "w-upper-a",
+      "name": "Upper A",
+      "routineId": "uppera",
+      "startedAt": 1791824400000,
+      "finishedAt": 1791827880000,
+      "week": 1,
+      "phase": "learn",
+      "gameMode": false,
+      "exercises": [
+        {
+          "id": "w-upper-a-e1",
+          "exerciseId": "incline",
+          "itemKey": "1",
+          "restSec": 150,
+          "target": { "sets": 2, "repsMin": 6, "repsMax": 10, "rir": "3" },
+          "sets": [
+            { "id": "w-upper-a-s1", "type": "warmup", "weight": 10, "reps": 10, "rir": null, "done": true },
+            { "id": "w-upper-a-s2", "type": "normal", "weight": 20, "reps": 10, "rir": 3, "done": true },
+            { "id": "w-upper-a-s3", "type": "normal", "weight": 20, "reps": 9, "rir": 2, "done": true }
+          ],
+          "pain": 0,
+          "note": "Bench at notch 2"
+        },
+        {
+          "id": "w-upper-a-e2",
+          "exerciseId": "pushup",
+          "restSec": 90,
+          "sets": [{ "id": "w-upper-a-s4", "type": "normal", "weight": null, "reps": 14, "rir": null, "done": true }],
+          "pain": null,
+          "note": ""
+        }
+      ],
+      "prs": []
+    }
+  ],
+  "body": [
+    { "date": "2026-10-13", "weight": 80.2 },
+    { "date": "2026-10-14", "weight": 79.9, "waist": 86 }
+  ]
+}
