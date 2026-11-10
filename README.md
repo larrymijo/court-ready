@@ -71,9 +71,9 @@ the web app or the APK.
 **Train**
 
 - **Today:** where you are in the 12-week plan, your week (gym days around volleyball and basketball), today's session,
-  this week's numbers and your daily targets.
-- **Routines:** Upper A (chest focus), Lower + Core, Upper B and an optional Bonus session, each with sets, reps, effort
-  (RIR), rest time and a coaching cue per exercise. Supersets are grouped.
+  this week's numbers and your daily targets. **Choose another day** starts any session, whatever today is.
+- **Plan:** Upper A (chest focus), Lower + Core, Upper B and an optional Bonus session, each with sets, reps, effort
+  (RIR), rest time and a coaching cue per exercise. Supersets are grouped. Any of them can be started from here.
 - **12-week plan built in:** Learn (weeks 1–2: one set less, easy effort), Build (3–6), Deload (7), Push (8–11: an extra
   set on the main lifts), Deload (12), then it repeats. Targets adjust by themselves each week.
 - **Game mode** for the Lower session when you have a match the next day: fewer sets, easier effort, no split squats.
@@ -94,7 +94,7 @@ the web app or the APK.
 - 49 exercises with setup, how to do it, what to avoid and what to change if it hurts: 23 from the program, 7
   shoulder-care drills and 19 swaps. Each one has its history, a progress chart and records (best weight, estimated
   1-rep max, best volume).
-- History of every workout, with volume, duration and new personal records.
+- History of every workout (opened from Progress), with volume, duration and new personal records.
 - Progress: morning weigh-ins, weekly average weight and waist charts, a weekly check-in that tells you whether to change
   your food, hard sets per muscle against the plan, and workouts per week.
 - The full guide in 18 short articles: how the plan works, your week, the 12 weeks, RIR, pain rules, shoulder and
@@ -140,7 +140,7 @@ npm test             # Jest: program weeks, progression, stats, weekly check-in,
 ```
 src/
   app/          Screens (Expo Router: every file is a route)
-    (tabs)/     Today, Routines, History, Progress, Guide
+    (tabs)/     Today, Plan, Progress, Library (exercises and the guide)
     workout.tsx The live workout
   components/   UI pieces; workout/ holds the set table, rest timer, pain picker
   data/         The program and guide content

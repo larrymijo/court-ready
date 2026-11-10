@@ -34,7 +34,7 @@ Monochrome, iPhone first. The screens are drawn on the [Court-Ready Monochrome c
 
 **Shape and spacing:** screen gutter 20. Card padding 16 (hero card 20). Radius 24 hero card, 20 card, 16 primary button, 14 control, 12 small button, pill for chips. No shadows, no borders on cards.
 
-**Touch:** every target at least 44 px. Primary button 56 px tall, pinned to the bottom with the safe-area inset. Stepper buttons 44 px.
+**Touch:** every target at least 44 px. Primary button 56 px tall, pinned to the bottom with the safe-area inset. Stepper buttons 44 px. The web app ignores `hitSlop`, so the area that takes the tap must itself measure 44 px.
 
 **Meaning without colour**
 
@@ -44,8 +44,11 @@ Monochrome, iPhone first. The screens are drawn on the [Court-Ready Monochrome c
 | Selected, today | White fill with black text |
 | Gym day, sport day | Filled dot, ring |
 | Warm-up set | Outlined "W" badge |
+| Superset partner | Outlined exercise badge ("5a"); a straight set's badge is filled |
 | Record | Small outlined "PR" tag |
 | Phase | Text label, no colour |
+| Good, careful, stop (guide notes and tables) | A small icon before the text; red only for pain 4+ |
+| Link in text | Underlined |
 | Up or down | Sign and number, never red or green |
 | Chart series | White line or bar; grey for reference and targets |
 
