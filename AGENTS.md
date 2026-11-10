@@ -39,3 +39,11 @@ Docs: https://docs.expo.dev/eas/index.md
 - If `ios/` and `android/` directories do not exist, they are generated (Continuous Native Generation). Never create or edit them by hand — configure native behavior in `app.json` and config plugins.
 - Expo Go only includes its bundled native modules. After adding a library with native code, the app needs a development build: `npx expo run:ios|android` locally, or `eas build --profile development`.
 - Prefer recommended Expo modules over third-party libraries, and check your available skills before adding dependencies. Docs: https://docs.expo.dev/versions/latest/index.md
+
+## This project: shipping and saved data
+
+- The plan is `docs/polish-plan.md` and the design system is `docs/design.md`. Read both before changing screens.
+- `main` is the app the owner trains with. A push to `main` runs CI and then the Pages workflow, and the result is live on their phone. A push to `beta` publishes the beta copy at `/court-ready/beta/`, which keeps its own saved data. Build a new phase on `beta` first, and never push either branch without the owner's explicit OK.
+- The owner's training history exists only in the app's storage on their phone. Any change to the shape of saved data needs a step in `src/store/migrations.ts`, a raised `DATA_VERSION`, and a test in `src/store/__tests__/migrations.test.ts`.
+- Never commit a real backup file: the repository is public. Test data is made up (`src/store/__tests__/fixtures/`).
+- GitHub Actions can't be run locally. After a push, check that the CI and Pages runs passed and open the published app before saying it shipped.
