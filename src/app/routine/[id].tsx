@@ -1,11 +1,10 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { Pressable, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { View } from 'react-native';
 
 import { ItemBadge } from '@/components/ItemBadge';
-import { Button, Card, Chip, Row, Screen, ToggleRow, Txt } from '@/components/ui';
+import { BOTTOM_BAR_SPACE, BottomBar, Button, Card, ListRow, Row, RowBadge, Screen, Tag, ToggleRow, Txt } from '@/components/ui';
 import { getExercise } from '@/data/exercises';
 import { WARMUPS } from '@/data/guide';
 import { ROUTINE_BY_ID } from '@/data/routines';
@@ -23,7 +22,6 @@ export default function RoutineScreen() {
   const routine = ROUTINE_BY_ID[id as RoutineId];
   const settings = useStore((s) => s.settings);
   const workouts = useStore((s) => s.workouts);
-  const insets = useSafeAreaInsets();
   const [gameMode, setGameMode] = useState(false);
   if (!routine) return null;
   const pos = programPosition(settings.programStart, todayISO());
@@ -33,18 +31,22 @@ export default function RoutineScreen() {
   return (
     <View style={{ flex: 1, backgroundColor: C.bg }}>
       <Stack.Screen options={{ title: routine.name }} />
-      <Screen edgesTop={false} bottomPad={100}>
-        <Txt v="label">{routine.day}</Txt>
-        <Txt v="title">{routine.title}</Txt>
-        <Row gap={S.sm}>
-          <Chip label={`Week ${pos.week} · ${PHASES[pos.phase].name}`} tone={pos.phase === 'push' ? 'orange' : pos.phase === 'deload' ? 'ok' : 'info'} />
-          <Chip label={`${sets} sets`} />
-          <Chip label={`~${routine.minutes} min`} />
-        </Row>
-        <Txt v="small">{routine.intro}</Txt>
-        <Txt v="small" color={C.text}>
-          {PHASES[pos.phase].rule}
-        </Txt>
+      <Screen edgesTop={false} bottomPad={BOTTOM_BAR_SPACE}>
+        <View style={{ gap: S.sm }}>
+          <View style={{ gap: 2 }}>
+            <Txt v="label">{routine.day}</Txt>
+            <Txt v="title">{routine.title}</Txt>
+          </View>
+          <Row gap={6} style={{ flexWrap: 'wrap' }}>
+            <Tag label={`Week ${pos.week} · ${PHASES[pos.phase].name}`} />
+            <Tag label={`${sets} sets`} />
+            <Tag label={`about ${routine.minutes} min`} />
+            {routine.optional ? <Tag label="Optional" /> : null}
+          </Row>
+          <Txt color={C.textMuted}>{routine.intro}</Txt>
+          <Txt v="small">{PHASES[pos.phase].rule}</Txt>
+        </View>
+
         {routine.id === 'lower' ? (
           <Card>
             <ToggleRow
@@ -56,12 +58,15 @@ export default function RoutineScreen() {
           </Card>
         ) : null}
 
-        <Card onPress={() => router.push('/guide/warmups')}>
-          <Row style={{ justifyContent: 'space-between' }}>
-            <Txt v="h2">{WARMUPS[routine.warmup].title}</Txt>
-            <Ionicons name="chevron-forward" size={18} color={C.faint} />
-          </Row>
-          <Txt v="small">{WARMUPS[routine.warmup].steps.map((s) => s.text.split(' — ')[0]).join(' · ')}</Txt>
+        <Card variant="list">
+          <ListRow
+            leading={<RowBadge icon="flame-outline" />}
+            title={WARMUPS[routine.warmup].title}
+            subtitle={WARMUPS[routine.warmup].steps.map((s) => s.text.split(' — ')[0]).join(' · ')}
+            subtitleLines={2}
+            chevron
+            onPress={() => router.push('/guide/warmups')}
+          />
         </Card>
 
         {routine.items.map((item, i) => {
@@ -71,61 +76,53 @@ export default function RoutineScreen() {
           const sug = suggestNext(ex, p, last);
           const groupHeader =
             item.group && item.group !== routine.items[i - 1]?.group ? routine.groups[item.group] : null;
+          const addWeight = sug.kind === 'increase' && pos.phase !== 'deload';
           return (
             <View key={item.key} style={{ gap: S.sm }}>
               {groupHeader ? (
-                <Txt v="small" color={C.orange} style={{ fontWeight: '700', marginTop: S.xs }}>
+                <Txt v="small" color={C.text} style={{ fontWeight: '600', paddingHorizontal: S.xs, marginTop: S.xs }}>
                   {groupHeader}
                 </Txt>
               ) : null}
-              <Card style={p.skip ? { opacity: 0.45 } : null} onPress={() => router.push(`/exercise/${ex.id}`)}>
+              <Card
+                style={p.skip ? { opacity: 0.45 } : null}
+                onPress={() => router.push(`/exercise/${ex.id}`)}
+                accessibilityLabel={`${ex.name}: how to do it`}>
                 <Row gap={S.md} align="flex-start">
                   <ItemBadge label={item.key} superset={!!item.group} />
-                  <View style={{ flex: 1, gap: 3 }}>
+                  <View style={{ flex: 1, gap: 4 }}>
                     <Txt v="h2">{ex.name}</Txt>
-                    <Txt v="small" color={C.accent} style={{ fontWeight: '700' }}>
+                    <Txt v="small" color={C.text} style={{ fontWeight: '600' }}>
                       {p.skip
                         ? 'Skipped in game mode'
-                        : `${p.sets} × ${repsText(p, item.perSide)} · RIR ${p.rir} · Rest ${formatClock(item.restSec)}`}
+                        : `${p.sets} × ${repsText(p, item.perSide)} · RIR ${p.rir} · rest ${formatClock(item.restSec)}`}
                     </Txt>
-                    <Txt v="small" color={C.text}>
-                      {item.cue}
-                    </Txt>
+                    <Txt v="small">{item.cue}</Txt>
                     {!p.skip ? (
-                      <Txt v="tiny" color={sug.kind === 'increase' ? C.green : C.muted}>
+                      <Txt v="caption" color={addWeight ? C.text : undefined}>
                         {pos.phase === 'deload' && last
                           ? `Deload: keep ${formatKg(Math.max(...last.sets.map((s) => s.weight ?? 0)))} kg, easy reps.`
                           : sug.message}
                       </Txt>
                     ) : null}
                   </View>
-                  <Ionicons name="information-circle-outline" size={20} color={C.faint} />
+                  <Ionicons name="chevron-forward" size={18} color={C.textFaint} style={{ marginTop: 3 }} />
                 </Row>
               </Card>
             </View>
           );
         })}
         {routine.shortOnTime ? <Txt v="small">{routine.shortOnTime}</Txt> : null}
-        <Pressable onPress={() => router.push('/guide/pain')}>
-          <Txt v="tiny" style={{ textAlign: 'center' }}>
-            Pain above 3/10 or sharp → stop that exercise and use the swap. Tap for the pain rules.
-          </Txt>
-        </Pressable>
+        <Button
+          variant="ghost"
+          title="Pain above 3 of 10, or sharp: stop and swap. See the pain rules"
+          iconRight="chevron-forward"
+          onPress={() => router.push('/guide/pain')}
+        />
       </Screen>
-      <View
-        style={{
-          position: 'absolute',
-          left: 0,
-          right: 0,
-          bottom: 0,
-          padding: S.lg,
-          paddingBottom: insets.bottom + S.md,
-          backgroundColor: C.bg,
-          borderTopWidth: 1,
-          borderTopColor: C.border,
-        }}>
+      <BottomBar>
         <Button title={`Start ${routine.name}${gm ? ' (game mode)' : ''}`} icon="play" onPress={() => startRoutineFlow(routine.id, { gameMode: gm })} />
-      </View>
+      </BottomBar>
     </View>
   );
 }

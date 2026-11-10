@@ -1,12 +1,10 @@
-import Ionicons from '@expo/vector-icons/Ionicons';
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
-import { ActionSheet, type SheetAction } from '@/components/ActionSheet';
 import { ItemBadge } from '@/components/ItemBadge';
-import { Chip, Row, Txt } from '@/components/ui';
-import { PainPicker, painColor } from '@/components/workout/PainPicker';
+import { Button, Check, Chip, IconButton, Row, Sheet, Txt, fieldStyle, type SheetAction } from '@/components/ui';
+import { PainPicker, painTone } from '@/components/workout/PainPicker';
 import { SetHeader, SetRow, type SetGuess } from '@/components/workout/SetRow';
 import { EXERCISE_BY_ID, getExercise } from '@/data/exercises';
 import { getRoutine } from '@/data/routines';
@@ -15,7 +13,7 @@ import { repsText } from '@/lib/program';
 import { lastPerformance, rampUpSets, suggestNext, type PerformedSet } from '@/lib/progression';
 import type { PhaseId, Workout, WorkoutExercise, WorkoutSet } from '@/lib/types';
 import { useStore } from '@/store/useStore';
-import { C, R, S } from '@/theme';
+import { C, R, S, T } from '@/theme';
 
 export function WorkoutExerciseCard({
   we,
@@ -98,34 +96,41 @@ export function WorkoutExerciseCard({
   ];
 
   const pain = we.pain;
+  const addWeight = suggestion?.kind === 'increase' && phase !== 'deload';
 
   return (
     <View style={styles.card}>
       <Row gap={S.md} align="flex-start">
-        {we.itemKey ? <ItemBadge label={we.itemKey} superset={!!we.group} /> : null}
-        <Pressable style={{ flex: 1 }} onPress={() => router.push(`/exercise/${ex.id}`)}>
+        {we.itemKey ? (
+          <View style={styles.badge}>
+            <ItemBadge label={we.itemKey} superset={!!we.group} />
+          </View>
+        ) : null}
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={`${ex.name}: how to do it`}
+          style={styles.heading}
+          onPress={() => router.push(`/exercise/${ex.id}`)}>
           <Text style={styles.name}>{ex.name}</Text>
           {target ? (
             <Text style={styles.target}>
-              {target.sets} × {repsText(target, ex.perSide)} · RIR {target.rir} · Rest {formatClock(we.restSec)}
+              {target.sets} × {repsText(target, ex.perSide)} · RIR {target.rir} · rest {formatClock(we.restSec)}
             </Text>
           ) : (
             <Text style={styles.target}>Rest {formatClock(we.restSec)}</Text>
           )}
         </Pressable>
-        <Pressable onPress={() => setMenu(true)} hitSlop={10} style={styles.more} accessibilityLabel="Exercise options">
-          <Ionicons name="ellipsis-horizontal" size={20} color={C.text} />
-        </Pressable>
+        <IconButton icon="ellipsis-horizontal" size={20} label={`Options for ${ex.name}`} onPress={() => setMenu(true)} />
       </Row>
 
       {cue ? (
-        <Txt v="small" color={C.text}>
-          <Text style={{ fontWeight: '700' }}>Key: </Text>
+        <Txt v="small">
+          <Text style={styles.cueLabel}>Key: </Text>
           {cue}
         </Txt>
       ) : null}
       {suggestion ? (
-        <Txt v="small" color={suggestion.kind === 'increase' && phase !== 'deload' ? C.green : C.muted}>
+        <Txt v="small" color={addWeight ? C.text : C.textFaint} style={addWeight ? { fontWeight: '600' } : null}>
           {phase === 'deload' && last
             ? `Deload week: same weight as last time, stop at RIR 3–4.`
             : suggestion.message}
@@ -136,14 +141,16 @@ export function WorkoutExerciseCard({
         <Chip
           icon="medkit-outline"
           label={pain == null ? 'Pain: –' : `Pain: ${pain}/10`}
-          tone={pain == null ? 'plain' : pain <= 2 ? 'ok' : pain === 3 ? 'warn' : 'bad'}
+          tone={painTone(pain)}
+          accessibilityLabel={pain == null ? 'Rate pain' : `Pain ${pain} of 10. Tap to change.`}
           onPress={() => setPainOpen(!painOpen)}
         />
         {ramp.length > 0 && !hasWarmups && doneCount === 0 ? (
           <Chip
             icon="trending-up"
             label={`Ramp-up: ${ramp.map((r) => `${formatKg(r.weight)}×${r.reps}`).join(' · ')}`}
-            tone="info"
+            accessibilityLabel="Add ramp-up warm-up sets"
+            style={{ flexShrink: 1 }}
             onPress={() => insertWarmups(we.id, ramp)}
           />
         ) : null}
@@ -152,13 +159,13 @@ export function WorkoutExerciseCard({
       {painOpen ? (
         <View style={{ gap: S.sm }}>
           <PainPicker value={pain} onChange={(v) => setPain(we.id, v)} />
-          <Txt v="tiny">0–2 train as planned · 3 dull ache: OK, don’t add weight · 4+ or sharp: stop and swap</Txt>
+          <Txt v="caption">0–2 train as planned · 3 dull ache: OK, don’t add weight · 4+ or sharp: stop and swap</Txt>
         </View>
       ) : null}
 
       {pain != null && pain >= 4 ? (
-        <View style={[styles.alert, { borderColor: painColor(pain) }]}>
-          <Txt v="h2" color={C.red}>
+        <View style={styles.alert}>
+          <Txt v="h2" color={C.danger}>
             Stop this exercise today
           </Txt>
           <Txt v="small" color={C.text}>
@@ -171,97 +178,76 @@ export function WorkoutExerciseCard({
               .filter(Boolean)
               .slice(0, 3)
               .map((s) => (
-                <Chip key={s.id} icon="swap-horizontal" label={s.name} tone="info" onPress={() => swapExercise(we.id, s.id)} />
+                <Chip key={s.id} icon="swap-horizontal" label={s.name} style={{ flexShrink: 1 }} onPress={() => swapExercise(we.id, s.id)} />
               ))}
-            <Chip label="Pain rules" tone="plain" onPress={() => router.push('/guide/pain')} />
+            <Chip label="Pain rules" onPress={() => router.push('/guide/pain')} />
           </Row>
         </View>
       ) : null}
 
-      <SetHeader weight={weight} />
-      {we.sets.map((s, i) => {
-        return (
-          <SetRow
-            key={s.id}
-            set={s}
-            label={labels[i]}
-            prev={prevs[i]}
-            above={above[i]}
-            weight={weight}
-            bodyweight={ex.equipment === 'bodyweight'}
-            repsPlaceholder={repsPlaceholder}
-            onChange={(patch) => updateSet(we.id, s.id, patch)}
-            onToggleType={() => toggleSetType(we.id, s.id)}
-            onRemove={() => removeSet(we.id, s.id)}
-            onUncomplete={() => uncompleteSet(we.id, s.id)}
-            onComplete={(fill) => {
-              const rest = completeSet(we.id, s.id, fill);
-              if (settings.restTimer && s.type === 'normal') startRest(rest, ex.name);
-            }}
-          />
-        );
-      })}
-      <Pressable onPress={() => addSet(we.id)} style={({ pressed }) => [styles.addSet, pressed && { opacity: 0.7 }]}>
-        <Ionicons name="add" size={18} color={C.text} />
-        <Text style={styles.addSetText}>Add set</Text>
-      </Pressable>
+      <View style={styles.sets}>
+        <SetHeader weight={weight} />
+        {we.sets.map((s, i) => {
+          return (
+            <SetRow
+              key={s.id}
+              set={s}
+              label={labels[i]}
+              prev={prevs[i]}
+              above={above[i]}
+              weight={weight}
+              bodyweight={ex.equipment === 'bodyweight'}
+              repsPlaceholder={repsPlaceholder}
+              onChange={(patch) => updateSet(we.id, s.id, patch)}
+              onToggleType={() => toggleSetType(we.id, s.id)}
+              onRemove={() => removeSet(we.id, s.id)}
+              onUncomplete={() => uncompleteSet(we.id, s.id)}
+              onComplete={(fill) => {
+                const rest = completeSet(we.id, s.id, fill);
+                if (settings.restTimer && s.type === 'normal') startRest(rest, ex.name);
+              }}
+            />
+          );
+        })}
+      </View>
+      <Button small variant="secondary" icon="add" title="Add set" onPress={() => addSet(we.id)} />
 
       {noteOpen ? (
         <TextInput
           value={we.note}
           onChangeText={(t) => setNote(we.id, t)}
           placeholder="Note (seat height, grip, how it felt…)"
-          placeholderTextColor={C.faint}
+          placeholderTextColor={C.textFaint}
+          accessibilityLabel={`Note for ${ex.name}`}
           multiline
-          style={styles.note}
+          style={fieldStyle}
         />
       ) : null}
 
       {doneCount > 0 && doneCount === we.sets.length ? (
-        <Row gap={6}>
-          <Ionicons name="checkmark-circle" size={16} color={C.green} />
-          <Txt v="tiny" color={C.green}>
+        <Row gap={S.sm}>
+          <Check done size={16} />
+          <Txt v="small" color={C.text}>
             All sets done
           </Txt>
         </Row>
       ) : null}
 
-      <ActionSheet visible={menu} title={ex.name} actions={actions} onClose={() => setMenu(false)} />
-      <ActionSheet visible={swapMenu} title={`Swap ${ex.name}`} actions={swapActions} onClose={() => setSwapMenu(false)} />
+      <Sheet visible={menu} title={ex.name} actions={actions} onClose={() => setMenu(false)} />
+      <Sheet visible={swapMenu} title={`Swap ${ex.name}`} actions={swapActions} onClose={() => setSwapMenu(false)} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  card: {
-    backgroundColor: C.surface,
-    borderRadius: R.lg,
-    padding: S.md,
-    gap: S.sm,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: C.border,
-  },
-  name: { color: C.accent, fontSize: 17, fontWeight: '800' },
-  target: { color: C.muted, fontSize: 13, fontWeight: '600', marginTop: 2 },
-  more: { width: 34, height: 34, borderRadius: 17, backgroundColor: C.surface2, alignItems: 'center', justifyContent: 'center' },
-  alert: { borderWidth: 1.5, borderRadius: R.md, padding: S.md, gap: S.sm, backgroundColor: C.redSoft },
-  addSet: {
-    flexDirection: 'row',
-    gap: 6,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: C.surface2,
-    borderRadius: R.sm,
-    paddingVertical: 9,
-    marginTop: 2,
-  },
-  addSetText: { color: C.text, fontWeight: '700', fontSize: 14 },
-  note: {
-    backgroundColor: C.surface2,
-    color: C.text,
-    borderRadius: R.sm,
-    padding: S.sm,
-    minHeight: 40,
-    fontSize: 14,
-  },
+  card: { backgroundColor: C.surface, borderRadius: R.card, padding: S.lg, gap: S.md },
+  // Lines the round badge up with the first line of the exercise name.
+  badge: { marginTop: 8 },
+  heading: { flex: 1, minHeight: 44, justifyContent: 'center', gap: 2 },
+  name: { ...T.button, color: C.text },
+  target: { ...T.secondary, color: C.textMuted },
+  cueLabel: { fontWeight: '600', color: C.text },
+  // Pain 4+ is the one place besides delete where the app uses red.
+  alert: { borderWidth: 1, borderColor: C.danger, borderRadius: R.control, padding: S.md, gap: S.sm },
+  sets: { gap: 6 },
 });

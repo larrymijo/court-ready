@@ -3,24 +3,26 @@ import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { NumInput } from '@/components/NumInput';
+import { Check } from '@/components/ui';
 import { formatKg, formatSet } from '@/lib/format';
 import { confirm, tapFeedback } from '@/lib/platform';
 import type { PerformedSet } from '@/lib/progression';
 import type { WorkoutSet } from '@/lib/types';
-import { C, R } from '@/theme';
+import { C, R, SIZE, T } from '@/theme';
 
-export const COL = { set: 30, prev: 70, kg: 62, reps: 60, rir: 38, check: 40 };
+/** Column widths. Everything you tap is a full 44 px wide; "previous" takes what is left. */
+export const COL = { set: SIZE.touch, prev: 56, kg: 64, reps: 56, rir: SIZE.touch, check: SIZE.touch };
 
 export function SetHeader({ weight }: { weight: boolean }) {
   return (
     <View style={styles.row}>
-      <Text style={[styles.head, { width: COL.set }]}>SET</Text>
-      <Text style={[styles.head, { flex: 1, minWidth: COL.prev }]}>PREVIOUS</Text>
-      {weight ? <Text style={[styles.head, { width: COL.kg }]}>KG</Text> : null}
-      <Text style={[styles.head, { width: COL.reps }]}>REPS</Text>
+      <Text style={[styles.head, { width: COL.set }]}>Set</Text>
+      <Text style={[styles.head, { flex: 1, minWidth: COL.prev }]}>Previous</Text>
+      {weight ? <Text style={[styles.head, { width: COL.kg }]}>kg</Text> : null}
+      <Text style={[styles.head, { width: COL.reps }]}>Reps</Text>
       <Text style={[styles.head, { width: COL.rir }]}>RIR</Text>
       <View style={{ width: COL.check, alignItems: 'center' }}>
-        <Ionicons name="checkmark" size={14} color={C.faint} />
+        <Ionicons name="checkmark" size={14} color={C.textFaint} />
       </View>
     </View>
   );
@@ -96,18 +98,23 @@ export function SetRow({
   };
 
   return (
-    <View style={[styles.row, styles.setRow, set.done && styles.doneRow]}>
+    <View style={styles.row}>
       <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={warm ? 'Warm-up set. Tap to make it a working set, hold to remove it.' : `Set ${label}. Tap to make it a warm-up, hold to remove it.`}
         onPress={onToggleType}
         onLongPress={async () => {
           if (await confirm('Remove set?', 'This set will be deleted.', 'Remove', true)) onRemove();
         }}
-        hitSlop={6}
-        style={{ width: COL.set, alignItems: 'center' }}>
-        <Text style={[styles.setLabel, warm && { color: C.amber }]}>{warm ? 'W' : label}</Text>
+        style={styles.target}>
+        <View style={styles.badge}>
+          <Text style={styles.badgeText}>{warm ? 'W' : label}</Text>
+        </View>
       </Pressable>
       <Pressable
-        style={{ flex: 1, minWidth: COL.prev }}
+        accessibilityRole="button"
+        accessibilityLabel={prev ? `Use last time's numbers: ${prevText(prev, weight, bodyweight)}` : 'No previous set'}
+        style={styles.prevCell}
         disabled={!prev || set.done}
         onPress={() => onChange({ weight: weight ? (prev?.weight ?? null) : null, reps: prev?.reps ?? null })}>
         <Text style={styles.prev} numberOfLines={1}>
@@ -132,13 +139,17 @@ export function SetRow({
           placeholder={repsGuess != null ? String(repsGuess) : repsPlaceholder}
           decimal={false}
           done={set.done}
-          style={missing ? { borderWidth: 1.5, borderColor: C.red } : undefined}
+          style={missing ? styles.missing : undefined}
           accessibilityLabel={`Set ${label} reps`}
         />
       </View>
-      <Pressable onPress={cycleRir} style={{ width: COL.rir, alignItems: 'center' }} hitSlop={4}>
-        <View style={[styles.rir, set.rir != null && { backgroundColor: C.accentSoft }]}>
-          <Text style={[styles.rirText, set.rir != null && { color: C.accent }]}>{set.rir ?? '–'}</Text>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={`Reps in reserve for set ${label}: ${set.rir ?? 'not set'}. Tap to change.`}
+        onPress={cycleRir}
+        style={styles.target}>
+        <View style={[styles.rir, set.done && { backgroundColor: 'transparent' }]}>
+          <Text style={[styles.rirText, set.rir != null && { color: C.text }]}>{set.rir ?? '–'}</Text>
         </View>
       </Pressable>
       <Pressable
@@ -146,32 +157,33 @@ export function SetRow({
         accessibilityState={{ checked: set.done }}
         accessibilityLabel={`Complete set ${label}`}
         onPress={tick}
-        hitSlop={6}
-        style={{ width: COL.check, alignItems: 'center' }}>
-        <View style={[styles.check, set.done && styles.checkOn]}>
-          <Ionicons name="checkmark" size={20} color={set.done ? '#06150D' : C.faint} />
-        </View>
+        style={styles.target}>
+        <Check done={set.done} size={28} />
       </Pressable>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  row: { flexDirection: 'row', alignItems: 'center' },
-  setRow: { paddingVertical: 4, borderRadius: R.sm },
-  doneRow: { backgroundColor: 'rgba(52,199,123,0.10)' },
-  head: { color: C.faint, fontSize: 10, fontWeight: '800', letterSpacing: 0.6, textAlign: 'center' },
-  setLabel: { color: C.text, fontWeight: '800', fontSize: 15 },
-  prev: { color: C.muted, fontSize: 13, textAlign: 'center', fontVariant: ['tabular-nums'] },
-  rir: { width: 32, height: 32, borderRadius: 8, backgroundColor: C.surface2, alignItems: 'center', justifyContent: 'center' },
-  rirText: { color: C.faint, fontWeight: '700', fontSize: 14 },
-  check: {
-    width: 34,
-    height: 34,
-    borderRadius: 9,
-    backgroundColor: C.surface2,
+  // The row reaches 8 px into the card's padding on both sides, so the first and last columns can
+  // be full-size targets while the badge and the check still line up with the card's content.
+  row: { flexDirection: 'row', alignItems: 'center', marginHorizontal: -8 },
+  head: { ...T.smallest, fontWeight: '600', letterSpacing: 0.66, textTransform: 'uppercase', color: C.textFaint, textAlign: 'center' },
+  target: { width: SIZE.touch, height: SIZE.touch, alignItems: 'center', justifyContent: 'center' },
+  badge: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: C.outline,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  checkOn: { backgroundColor: C.green },
+  badgeText: { fontSize: 12, lineHeight: 16, fontWeight: '600', color: C.textMuted, fontVariant: ['tabular-nums'] },
+  prevCell: { flex: 1, minWidth: COL.prev, height: SIZE.touch, justifyContent: 'center' },
+  prev: { ...T.secondary, color: C.textMuted, textAlign: 'center' },
+  rir: { width: 38, height: SIZE.touch, borderRadius: R.small, backgroundColor: C.control, alignItems: 'center', justifyContent: 'center' },
+  rirText: { ...T.rowTitle, color: C.textFaint },
+  // An empty reps field when you tick the set: the field lights up so you see what is missing.
+  missing: { borderWidth: 1.5, borderColor: C.text },
 });

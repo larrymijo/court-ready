@@ -12,16 +12,14 @@ export interface ChartPoint {
   y: number;
 }
 
-/** Small line chart: time on x, one measure on y, labels at the extremes. */
+/** Small line chart: time on x, one measure on y, labels at the extremes. The series is white. */
 export function LineChart({
   points,
   height = 160,
-  color = C.accent,
   formatY = (v: number) => String(Math.round(v)),
 }: {
   points: ChartPoint[];
   height?: number;
-  color?: string;
   formatY?: (v: number) => string;
 }) {
   const [width, setWidth] = useState(0);
@@ -65,35 +63,37 @@ export function LineChart({
             x2={padL + w}
             y1={padT + f * h}
             y2={padT + f * h}
-            stroke={C.border}
+            stroke={C.track}
             strokeWidth={1}
           />
         ))}
-        <SvgText x={padL + w + 6} y={sy(hi) + 4} fill={C.muted} fontSize={11} fontFamily={FONT}>
+        <SvgText x={padL + w + 6} y={sy(hi) + 4} fill={C.textMuted} fontSize={11} fontFamily={FONT}>
           {formatY(hi)}
         </SvgText>
         {lo !== hi ? (
-          <SvgText x={padL + w + 6} y={sy(lo) + 4} fill={C.muted} fontSize={11} fontFamily={FONT}>
+          <SvgText x={padL + w + 6} y={sy(lo) + 4} fill={C.textMuted} fontSize={11} fontFamily={FONT}>
             {formatY(lo)}
           </SvgText>
         ) : null}
-        {points.length > 1 ? <Path d={d} stroke={color} strokeWidth={2.5} fill="none" strokeLinejoin="round" /> : null}
+        {points.length > 1 ? (
+          <Path d={d} stroke={C.text} strokeWidth={2} fill="none" strokeLinejoin="round" strokeLinecap="round" />
+        ) : null}
         {points.map((p, i) => (
           <Circle
             key={i}
             cx={sx(p.x)}
             cy={sy(p.y)}
-            r={p === last ? 4.5 : 3}
-            fill={p === last ? color : C.bg}
-            stroke={color}
-            strokeWidth={2}
+            r={p === last ? 4 : 2.5}
+            fill={p === last ? C.text : C.surface}
+            stroke={C.text}
+            strokeWidth={p === last ? 0 : 1.5}
           />
         ))}
-        <SvgText x={padL} y={height - 5} fill={C.faint} fontSize={11} fontFamily={FONT}>
+        <SvgText x={padL} y={height - 5} fill={C.textFaint} fontSize={11} fontFamily={FONT}>
           {formatShortDate(minX)}
         </SvgText>
         {maxX !== minX ? (
-          <SvgText x={padL + w} y={height - 5} fill={C.faint} fontSize={11} fontFamily={FONT} textAnchor="end">
+          <SvgText x={padL + w} y={height - 5} fill={C.textFaint} fontSize={11} fontFamily={FONT} textAnchor="end">
             {formatShortDate(maxX)}
           </SvgText>
         ) : null}

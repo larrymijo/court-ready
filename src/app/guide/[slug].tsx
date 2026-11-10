@@ -21,16 +21,16 @@ export default function ArticleScreen() {
   return (
     <>
       <Stack.Screen options={{ title: article.section }} />
-      <Screen edgesTop={false} bottomPad={40}>
-        <Txt v="title" style={{ marginBottom: S.xs }}>
+      <Screen edgesTop={false}>
+        <Txt v="title" accessibilityRole="header">
           {article.title}
         </Txt>
         <GuideBlocks blocks={article.blocks} />
         {next ? (
           <Button
-            style={{ marginTop: S.lg }}
+            style={{ marginTop: S.md }}
             variant="secondary"
-            icon="arrow-forward"
+            iconRight="arrow-forward"
             title={`Next: ${next.title}`}
             onPress={() => router.replace(`/guide/${next.slug}`)}
           />

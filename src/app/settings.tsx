@@ -1,9 +1,9 @@
 import Constants from 'expo-constants';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Platform, StyleSheet, TextInput } from 'react-native';
+import { Platform, TextInput, View } from 'react-native';
 
-import { Button, Card, Divider, Row, Screen, SectionTitle, ToggleRow, Txt } from '@/components/ui';
+import { Button, Card, Divider, Row, Screen, SectionTitle, Stepper, ToggleRow, Txt, fieldStyle } from '@/components/ui';
 import { canPickBackupFile, pickBackupFile } from '@/lib/backup';
 import { backupStatus, daysAgoText } from '@/lib/backupStatus';
 import { IS_BETA } from '@/lib/channel';
@@ -15,7 +15,7 @@ import { PHASES, programPosition } from '@/lib/program';
 import { useNow } from '@/lib/useNow';
 import { readSafetyCopy, savedDataLength, type SafetyCopy } from '@/store/safetyCopy';
 import { useStore } from '@/store/useStore';
-import { C, R, S } from '@/theme';
+import { C, S } from '@/theme';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 /** Browsers give a web app about this much room for saved data. Text is stored as 2 bytes a character. */
@@ -107,33 +107,39 @@ export default function SettingsScreen() {
   };
 
   return (
-    <Screen edgesTop={false} bottomPad={40}>
+    <Screen edgesTop={false}>
       <SectionTitle title="12-week plan" />
       <Card>
-        <Txt v="h2">
-          {pos.started ? `Week ${pos.week} of 12 · ${PHASES[pos.phase].name}` : `Starts in ${pos.daysUntilStart} days`}
-        </Txt>
-        <Txt v="small">Week 1 started on {formatDateLong(parseISODate(settings.programStart).getTime())}.</Txt>
-        <Row gap={S.sm}>
-          <Button flex small variant="secondary" title="− 1 week" onPress={() => setStart(addDaysISO(settings.programStart, 7))} />
-          <Button flex small variant="secondary" title="+ 1 week" onPress={() => setStart(addDaysISO(settings.programStart, -7))} />
-        </Row>
-        <Button small variant="secondary" title="Start week 1 this Monday" onPress={() => setStart(today)} />
+        <View style={{ gap: 2 }}>
+          <Txt v="h2">
+            {pos.started ? `Week ${pos.week} of 12 · ${PHASES[pos.phase].name}` : `Starts in ${plural(pos.daysUntilStart, 'day')}`}
+          </Txt>
+          <Txt v="small">Week 1 started on {formatDateLong(parseISODate(settings.programStart).getTime())}.</Txt>
+        </View>
+        {/* One week back in the plan means week 1 began a week later, and the other way round. */}
+        <Stepper
+          value={pos.started ? `Week ${pos.week}` : 'Not started'}
+          decrementLabel="One week back in the plan"
+          incrementLabel="One week forward in the plan"
+          onDecrement={() => setStart(addDaysISO(settings.programStart, 7))}
+          onIncrement={() => setStart(addDaysISO(settings.programStart, -7))}
+        />
+        <Button variant="secondary" title="Start week 1 this Monday" onPress={() => setStart(today)} />
         <Divider />
-        <Txt v="tiny">Or type the date week 1 began (YYYY-MM-DD). It snaps to that week’s Monday.</Txt>
+        <Txt v="caption">Or type the date week 1 began (YYYY-MM-DD). It snaps to that week’s Monday.</Txt>
         <Row gap={S.sm}>
           <TextInput
             value={dateText}
             onChangeText={setDateText}
-            style={[styles.input, { flex: 1 }]}
+            style={[fieldStyle, { flex: 1 }]}
             placeholder="2026-10-05"
-            placeholderTextColor={C.faint}
+            placeholderTextColor={C.textFaint}
+            accessibilityLabel="Date week 1 began"
             autoCapitalize="none"
             autoCorrect={false}
           />
-          <Button small title="Set" disabled={!isISODate(dateText)} onPress={() => setStart(dateText)} />
+          <Button variant="secondary" title="Set" disabled={!isISODate(dateText)} onPress={() => setStart(dateText)} />
         </Row>
-        <Txt v="tiny">“− 1 week” moves you back a week in the plan; “+ 1 week” moves you forward.</Txt>
       </Card>
 
       <SectionTitle title="Workout" />
@@ -157,23 +163,25 @@ export default function SettingsScreen() {
 
       <SectionTitle title="Your data" />
       <Card>
-        <Txt v="small">Everything is stored on this phone only. Export a backup now and then.</Txt>
-        <Txt v="small" color={C.text}>
-          {settings.lastExportAt
-            ? `Last backup: ${formatDateLong(settings.lastExportAt)} (${daysAgoText(settings.lastExportAt, now)}).`
-            : 'No backup made yet.'}
-          {backup.unsaved > 0
-            ? settings.lastExportAt
-              ? ` ${plural(backup.unsaved, 'workout')} since then.`
-              : ` ${plural(backup.unsaved, 'workout')} only on this phone.`
-            : ''}
-        </Txt>
-        {savedBytes != null ? (
-          <Txt v="small">
-            Saved data: {formatDataSize(savedBytes)}
-            {Platform.OS === 'web' ? `, ${shareOfStorage(savedBytes)} of the room the browser gives the app.` : '.'}
+        <View style={{ gap: S.xs }}>
+          <Txt v="small">Everything is stored on this phone only. Export a backup now and then.</Txt>
+          <Txt v="small" color={C.text}>
+            {settings.lastExportAt
+              ? `Last backup: ${formatDateLong(settings.lastExportAt)} (${daysAgoText(settings.lastExportAt, now)}).`
+              : 'No backup made yet.'}
+            {backup.unsaved > 0
+              ? settings.lastExportAt
+                ? ` ${plural(backup.unsaved, 'workout')} since then.`
+                : ` ${plural(backup.unsaved, 'workout')} only on this phone.`
+              : ''}
           </Txt>
-        ) : null}
+          {savedBytes != null ? (
+            <Txt v="small">
+              Saved data: {formatDataSize(savedBytes)}
+              {Platform.OS === 'web' ? `, ${shareOfStorage(savedBytes)} of the room the browser gives the app.` : '.'}
+            </Txt>
+          ) : null}
+        </View>
         <Button variant="secondary" icon="share-outline" title="Export backup" onPress={exportBackup} />
         {canPickBackupFile ? (
           <Button variant="secondary" icon="folder-open-outline" title="Import backup file" onPress={onImportFile} />
@@ -182,9 +190,10 @@ export default function SettingsScreen() {
           value={importText}
           onChangeText={setImportText}
           placeholder="Paste a backup here to import it"
-          placeholderTextColor={C.faint}
+          placeholderTextColor={C.textFaint}
+          accessibilityLabel="Paste a backup here to import it"
           multiline
-          style={[styles.input, { minHeight: 80, textAlignVertical: 'top' }]}
+          style={[fieldStyle, { minHeight: 88, textAlignVertical: 'top' }]}
         />
         <Button
           variant="secondary"
@@ -209,7 +218,7 @@ export default function SettingsScreen() {
 
       <SectionTitle title="About" />
       <Card>
-        <Txt>
+        <Txt v="h2">
           Court-Ready {Constants.expoConfig?.version ?? ''}
           {IS_BETA ? ' · beta' : ''}
         </Txt>
@@ -222,7 +231,7 @@ export default function SettingsScreen() {
           Workout tracker built around the Court-Ready Muscle guide: 3 gym sessions around volleyball and basketball,
           chest priority, shoulder- and elbow-friendly exercises.
         </Txt>
-        <Txt v="tiny">General training advice, not medical advice.</Txt>
+        <Txt v="caption">General training advice, not medical advice.</Txt>
       </Card>
     </Screen>
   );
@@ -233,14 +242,3 @@ function shareOfStorage(bytes: number): string {
   const percent = (bytes / WEB_STORAGE_BYTES) * 100;
   return percent < 1 ? 'under 1%' : `${Math.round(percent)}%`;
 }
-
-const styles = StyleSheet.create({
-  input: {
-    backgroundColor: C.surface2,
-    color: C.text,
-    borderRadius: R.sm,
-    paddingHorizontal: S.md,
-    paddingVertical: 10,
-    fontSize: 15,
-  },
-});

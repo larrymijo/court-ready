@@ -7,7 +7,10 @@ import { formatClock } from '@/lib/format';
 import { restDoneFeedback } from '@/lib/platform';
 import { useNow } from '@/lib/useNow';
 import { useStore } from '@/store/useStore';
-import { C, R, S } from '@/theme';
+import { C, R, S, SIZE, T } from '@/theme';
+
+/** Height the workout list keeps free at the bottom while the bar is showing. */
+export const REST_BAR_SPACE = 104;
 
 /** Countdown that starts when you tick a set. Buzzes at zero. */
 export function RestTimerBar() {
@@ -30,23 +33,27 @@ export function RestTimerBar() {
   if (!rest || finished) return null;
 
   return (
-    <View style={[styles.bar, { paddingBottom: insets.bottom + S.sm }]}>
-      <View style={{ flex: 1, gap: 4 }}>
-        <Text style={styles.time}>{formatClock(left)}</Text>
-        <Text style={styles.label} numberOfLines={1}>
-          Rest · {rest.label}
-        </Text>
-        <ProgressBar value={1 - left / rest.duration} color={C.accent} height={4} />
+    <View style={[styles.bar, { paddingBottom: Math.max(insets.bottom, S.md) }]}>
+      <View style={styles.row}>
+        <View style={{ flex: 1 }}>
+          <Text style={styles.time} accessibilityLabel={`${formatClock(left)} of rest left`}>
+            {formatClock(left)}
+          </Text>
+          <Text style={styles.label} numberOfLines={1}>
+            Rest · {rest.label}
+          </Text>
+        </View>
+        <Pressable accessibilityRole="button" accessibilityLabel="15 seconds less rest" onPress={() => adjustRest(-15)} style={styles.btn}>
+          <Text style={styles.btnText}>−15</Text>
+        </Pressable>
+        <Pressable accessibilityRole="button" accessibilityLabel="15 seconds more rest" onPress={() => adjustRest(15)} style={styles.btn}>
+          <Text style={styles.btnText}>+15</Text>
+        </Pressable>
+        <Pressable accessibilityRole="button" accessibilityLabel="Skip the rest" onPress={clearRest} style={[styles.btn, styles.skip]}>
+          <Text style={[styles.btnText, { color: C.onAccent }]}>Skip</Text>
+        </Pressable>
       </View>
-      <Pressable onPress={() => adjustRest(-15)} style={styles.btn} hitSlop={4}>
-        <Text style={styles.btnText}>−15</Text>
-      </Pressable>
-      <Pressable onPress={() => adjustRest(15)} style={styles.btn} hitSlop={4}>
-        <Text style={styles.btnText}>+15</Text>
-      </Pressable>
-      <Pressable onPress={clearRest} style={[styles.btn, { backgroundColor: C.accent }]} hitSlop={4}>
-        <Text style={[styles.btnText, { color: '#fff' }]}>Skip</Text>
-      </Pressable>
+      <ProgressBar value={1 - left / rest.duration} height={3} />
     </View>
   );
 }
@@ -57,19 +64,25 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: C.surface2,
-    borderTopLeftRadius: R.xl,
-    borderTopRightRadius: R.xl,
+    backgroundColor: C.control,
+    borderTopLeftRadius: R.hero,
+    borderTopRightRadius: R.hero,
     paddingTop: S.md,
-    paddingHorizontal: S.lg,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: S.sm,
-    borderTopWidth: 1,
-    borderColor: C.border,
+    paddingHorizontal: S.gutter,
+    gap: S.md,
   },
-  time: { color: C.text, fontSize: 26, lineHeight: 30, fontWeight: '800', fontVariant: ['tabular-nums'] },
-  label: { color: C.muted, fontSize: 12 },
-  btn: { backgroundColor: C.surface3, borderRadius: R.sm, paddingHorizontal: 12, paddingVertical: 10 },
-  btnText: { color: C.text, fontWeight: '800', fontSize: 14 },
+  row: { flexDirection: 'row', alignItems: 'center', gap: S.sm },
+  time: { ...T.hero, color: C.text },
+  label: { ...T.secondary, color: C.textMuted },
+  btn: {
+    minWidth: 52,
+    height: SIZE.touch,
+    borderRadius: R.small,
+    backgroundColor: C.track,
+    paddingHorizontal: S.md,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  skip: { backgroundColor: C.text },
+  btnText: { ...T.pill, color: C.text },
 });

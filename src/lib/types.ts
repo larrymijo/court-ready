@@ -71,6 +71,8 @@ export interface Routine {
   id: RoutineId;
   name: string;
   title: string;
+  /** What the session is about, in a few words: "Chest focus". */
+  focus: string;
   day: string;
   minutes: number;
   intro: string;

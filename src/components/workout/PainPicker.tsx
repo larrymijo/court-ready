@@ -1,44 +1,54 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { C } from '@/theme';
+import { C, R, SIZE, T, TONE } from '@/theme';
 
-export function painColor(p: number): string {
-  if (p <= 2) return C.green;
-  if (p === 3) return C.amber;
-  return C.red;
+/** From the guide's pain rules: 0–2 train as planned, 3 careful, 4 or more stop. Only 4+ is red. */
+export function painTone(pain: number | null): 'plain' | 'danger' {
+  return pain != null && pain >= 4 ? 'danger' : 'plain';
 }
 
-/** 0–10 pain scale from the guide's pain rules. */
+const ROWS = [
+  [0, 1, 2, 3, 4, 5],
+  [6, 7, 8, 9, 10],
+];
+
+/** 0–10 pain scale. Two rows, so every number is a full-size target. */
 export function PainPicker({ value, onChange }: { value: number | null; onChange: (v: number | null) => void }) {
   return (
-    <View style={styles.row}>
-      {Array.from({ length: 11 }, (_, i) => {
-        const on = value === i;
-        const color = painColor(i);
-        return (
-          <Pressable
-            key={i}
-            accessibilityLabel={`Pain ${i}`}
-            onPress={() => onChange(on ? null : i)}
-            style={[styles.dot, { borderColor: color }, on && { backgroundColor: color }]}>
-            <Text style={[styles.num, { color: on ? '#0B0D12' : color }]}>{i}</Text>
-          </Pressable>
-        );
-      })}
+    <View style={styles.wrap}>
+      {ROWS.map((row) => (
+        <View key={row[0]} style={styles.row}>
+          {row.map((i) => {
+            const on = value === i;
+            const stop = i >= 4;
+            return (
+              <Pressable
+                key={i}
+                accessibilityRole="button"
+                accessibilityLabel={`Pain ${i}`}
+                accessibilityState={{ selected: on }}
+                onPress={() => onChange(on ? null : i)}
+                style={[styles.cell, on && { backgroundColor: stop ? C.danger : TONE.strong.bg }]}>
+                <Text style={[styles.num, on && { color: C.onAccent }]}>{i}</Text>
+              </Pressable>
+            );
+          })}
+        </View>
+      ))}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  row: { flexDirection: 'row', justifyContent: 'space-between', gap: 3 },
-  dot: {
+  wrap: { gap: 6 },
+  row: { flexDirection: 'row', gap: 6 },
+  cell: {
     flex: 1,
-    aspectRatio: 1,
-    maxWidth: 30,
-    borderRadius: 15,
-    borderWidth: 1.5,
+    height: SIZE.touch,
+    borderRadius: R.small,
+    backgroundColor: C.control,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  num: { fontSize: 12, fontWeight: '800' },
+  num: { ...T.body, fontWeight: '600', color: C.text },
 });

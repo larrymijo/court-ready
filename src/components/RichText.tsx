@@ -3,7 +3,7 @@ import { Text, type StyleProp, type TextStyle } from 'react-native';
 
 import { EXERCISE_BY_ID } from '@/data/exercises';
 import { ARTICLE_BY_SLUG } from '@/data/guide';
-import { C } from '@/theme';
+import { C, T } from '@/theme';
 
 /** Opens a guide article or an exercise page from a [[target|label]] link. */
 export function openTarget(target: string): void {
@@ -39,7 +39,7 @@ export function RichText({
 }) {
   const parts = parseRich(text);
   return (
-    <Text style={[{ color: C.text, fontSize: 15, lineHeight: 22 }, style]} numberOfLines={numberOfLines}>
+    <Text style={[{ ...T.body, lineHeight: 22, color: C.text }, style]} numberOfLines={numberOfLines}>
       {parts.map((p, i) => {
         if (p.kind === 'bold')
           return (
@@ -49,10 +49,12 @@ export function RichText({
           );
         if (p.kind === 'link')
           return (
+            // No colour to mark a link with, so it is underlined.
             <Text
               key={i}
+              accessibilityRole="link"
               onPress={() => openTarget(p.target!)}
-              style={{ color: C.accent, fontWeight: '600' }}
+              style={{ color: C.text, fontWeight: '600', textDecorationLine: 'underline' }}
               suppressHighlighting>
               {p.text}
             </Text>

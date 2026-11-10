@@ -1,9 +1,11 @@
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { Pressable, View } from 'react-native';
+import { View } from 'react-native';
 
 import { LineChart } from '@/components/LineChart';
-import { Bullet, Card, Chip, EmptyState, Row, Screen, Segmented, Stat, Txt } from '@/components/ui';
+import { Bullet, Button, Card, Chip, EmptyState, Row, Screen, Segmented, StatTile, Tag, Txt } from '@/components/ui';
+import { painTone } from '@/components/workout/PainPicker';
 import { EXERCISE_BY_ID } from '@/data/exercises';
 import { ROUTINES } from '@/data/routines';
 import { formatDate, formatKg, formatSet } from '@/lib/format';
@@ -14,16 +16,10 @@ import { C, S } from '@/theme';
 
 type Tab = 'how' | 'history' | 'records';
 
-const LABEL_COLOR: Record<string, string> = {
-  SETUP: C.accent,
-  'DO IT': C.accent,
-  HOW: C.accent,
-  AVOID: C.red,
-  'IF IT HURTS': C.amber,
-  OPTIONS: C.muted,
-  WHY: C.green,
-  'WHY NOT BARBELL SQUATS?': C.green,
-};
+/** "dumbbell" → "Dumbbell" */
+function capitalise(word: string): string {
+  return word.charAt(0).toUpperCase() + word.slice(1);
+}
 
 export default function ExerciseScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -62,23 +58,33 @@ export default function ExerciseScreen() {
   return (
     <>
       <Stack.Screen options={{ title: '' }} />
-      <Screen edgesTop={false} bottomPad={40}>
-        <Txt v="label">{ex.kind === 'care' ? 'Shoulder care' : ex.kind === 'alternative' ? 'Swap option' : 'In your plan'}</Txt>
-        <Txt v="title">{ex.name}</Txt>
-        <Txt v="small">{ex.muscles}</Txt>
-        <Row gap={S.sm} style={{ flexWrap: 'wrap' }}>
-          <Chip label={ex.equipment} />
-          {ex.isolation ? <Chip label="Isolation" tone="info" /> : <Chip label="Big lift" tone="info" />}
-          {ex.dose ? <Chip label={ex.dose} tone="ok" /> : null}
-          {usedIn.map(({ routine, item }) => (
-            <Chip
-              key={routine.id + item.key}
-              label={`${routine.name} · ${item.sets} × ${repsText(item, item.perSide)}`}
-              tone="orange"
-              onPress={() => router.push(`/routine/${routine.id}`)}
-            />
-          ))}
-        </Row>
+      <Screen edgesTop={false}>
+        <View style={{ gap: S.sm }}>
+          <View style={{ gap: 2 }}>
+            <Txt v="label">{ex.kind === 'care' ? 'Shoulder care' : ex.kind === 'alternative' ? 'Swap option' : 'In your plan'}</Txt>
+            <Txt v="title">{ex.name}</Txt>
+          </View>
+          <Txt color={C.textMuted}>{ex.muscles}</Txt>
+          <Row gap={6} style={{ flexWrap: 'wrap' }}>
+            <Tag label={capitalise(ex.equipment)} />
+            <Tag label={ex.isolation ? 'Isolation' : 'Big lift'} />
+            {ex.dose ? <Tag label={ex.dose} /> : null}
+          </Row>
+        </View>
+
+        {usedIn.length > 0 ? (
+          <Row gap={S.sm} style={{ flexWrap: 'wrap' }}>
+            {usedIn.map(({ routine, item }) => (
+              <Chip
+                key={routine.id + item.key}
+                label={`${routine.name} · ${item.sets} × ${repsText(item, item.perSide)}`}
+                accessibilityLabel={`Open ${routine.name}`}
+                style={{ flexShrink: 1 }}
+                onPress={() => router.push(`/routine/${routine.id}`)}
+              />
+            ))}
+          </Row>
+        ) : null}
 
         <Segmented<Tab>
           value={tab}
@@ -93,22 +99,23 @@ export default function ExerciseScreen() {
         {tab === 'how' ? (
           <>
             {ex.warning ? (
-              <Card tone="warn">
-                <Txt style={{ fontWeight: '700' }} color={C.amber}>
-                  {ex.warning}
-                </Txt>
+              <Card>
+                <Row gap={S.md} align="flex-start">
+                  <Ionicons name="alert-circle-outline" size={22} color={C.text} style={{ marginTop: 1 }} />
+                  <Txt style={{ flex: 1, fontWeight: '600' }}>{ex.warning}</Txt>
+                </Row>
               </Card>
             ) : null}
             {ex.sections.map((sec) => (
               <Card key={sec.label}>
-                <Txt v="label" color={LABEL_COLOR[sec.label] ?? C.muted}>
-                  {sec.label}
-                </Txt>
-                {sec.items.map((it, i) => (
-                  <Bullet key={i} color={LABEL_COLOR[sec.label] ?? C.muted}>
-                    <Txt>{it}</Txt>
-                  </Bullet>
-                ))}
+                <Txt v="label">{sec.label}</Txt>
+                <View style={{ gap: S.sm }}>
+                  {sec.items.map((it, i) => (
+                    <Bullet key={i}>
+                      <Txt>{it}</Txt>
+                    </Bullet>
+                  ))}
+                </View>
               </Card>
             ))}
             {ex.swaps.length ? (
@@ -119,16 +126,17 @@ export default function ExerciseScreen() {
                     .map((s) => EXERCISE_BY_ID[s])
                     .filter(Boolean)
                     .map((s) => (
-                      <Chip key={s.id} label={s.name} tone="info" onPress={() => router.push(`/exercise/${s.id}`)} />
+                      <Chip key={s.id} label={s.name} style={{ flexShrink: 1 }} onPress={() => router.push(`/exercise/${s.id}`)} />
                     ))}
                 </Row>
               </Card>
             ) : null}
-            <Pressable onPress={() => router.push('/guide/technique')}>
-              <Txt v="tiny" style={{ textAlign: 'center' }}>
-                Every rep: 2–3 s down, short pause in the stretch, controlled up. Tap for the rules.
-              </Txt>
-            </Pressable>
+            <Button
+              variant="ghost"
+              title="Every rep: 2–3 s down, a short pause in the stretch, controlled up. See the rules"
+              iconRight="chevron-forward"
+              onPress={() => router.push('/guide/technique')}
+            />
           </>
         ) : null}
 
@@ -138,16 +146,16 @@ export default function ExerciseScreen() {
           ) : (
             sessions.map(({ w, sets, pain }) => (
               <Card key={w.id} onPress={() => router.push(`/history/${w.id}`)}>
-                <Row style={{ justifyContent: 'space-between' }}>
-                  <Txt v="h2">{formatDate(w.startedAt)}</Txt>
-                  <Row gap={S.sm}>
-                    {pain != null ? (
-                      <Chip label={`Pain ${pain}`} tone={pain <= 2 ? 'ok' : pain === 3 ? 'warn' : 'bad'} />
-                    ) : null}
-                    <Txt v="small">{w.name}</Txt>
-                  </Row>
+                <Row style={{ justifyContent: 'space-between' }} gap={S.md}>
+                  <View style={{ flex: 1, gap: 2 }}>
+                    <Txt v="h2">{formatDate(w.startedAt)}</Txt>
+                    <Txt v="small" numberOfLines={1}>
+                      {w.name}
+                    </Txt>
+                  </View>
+                  {pain != null ? <Tag label={`Pain ${pain}`} tone={painTone(pain)} /> : null}
                 </Row>
-                <Txt style={{ fontVariant: ['tabular-nums'] }}>
+                <Txt>
                   {sets
                     .map((s) => formatSet(ex, s.weight, s.reps, true))
                     .join('   ·   ')}
@@ -162,19 +170,17 @@ export default function ExerciseScreen() {
             <EmptyState icon="trophy-outline" title="No records yet" body="Log this exercise and your bests and progress chart show up here." />
           ) : (
             <>
-              <Card>
-                <Row gap={S.md}>
-                  {weight ? (
-                    <>
-                      <Stat value={`${formatKg(bests.weight?.value ?? 0)} kg`} label="heaviest" />
-                      <Stat value={`${formatKg(Math.round((bests.e1rm?.value ?? 0) * 10) / 10)} kg`} label="best est. 1RM" />
-                      <Stat value={`${Math.round(bests.volume?.value ?? 0)} kg`} label="best set volume" />
-                    </>
-                  ) : (
-                    <Stat value={String(bests.reps?.value ?? 0)} label="most reps in a set" />
-                  )}
-                </Row>
-              </Card>
+              <Row gap={S.sm} align="stretch">
+                {weight ? (
+                  <>
+                    <StatTile label="Heaviest" value={`${formatKg(bests.weight?.value ?? 0)} kg`} />
+                    <StatTile label="Best est. 1RM" value={`${formatKg(Math.round((bests.e1rm?.value ?? 0) * 10) / 10)} kg`} />
+                    <StatTile label="Best set" value={`${Math.round(bests.volume?.value ?? 0)} kg`} caption="weight × reps" />
+                  </>
+                ) : (
+                  <StatTile label="Most reps in a set" value={String(bests.reps?.value ?? 0)} />
+                )}
+              </Row>
               <Card>
                 <Txt v="label">{weight ? 'Estimated 1RM' : 'Best set (reps)'}</Txt>
                 <LineChart
@@ -182,19 +188,18 @@ export default function ExerciseScreen() {
                   formatY={(v) => (weight ? `${formatKg(Math.round(v * 10) / 10)}` : String(Math.round(v)))}
                 />
                 {weight ? (
-                  <Txt v="tiny">Estimated from your best set each session (weight × reps). Going up = getting stronger.</Txt>
+                  <Txt v="caption">Estimated from your best set each session (weight × reps). Going up means getting stronger.</Txt>
                 ) : null}
               </Card>
               {weight ? (
                 <Card>
                   <Txt v="label">Top weight</Txt>
-                  <LineChart points={series.map((p) => ({ x: p.date, y: p.topWeight }))} color={C.orange} formatY={(v) => formatKg(Math.round(v * 10) / 10)} />
+                  <LineChart points={series.map((p) => ({ x: p.date, y: p.topWeight }))} formatY={(v) => formatKg(Math.round(v * 10) / 10)} />
                 </Card>
               ) : null}
             </>
           )
         ) : null}
-        <View style={{ height: S.md }} />
       </Screen>
     </>
   );

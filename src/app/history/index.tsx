@@ -1,15 +1,15 @@
 import { View } from 'react-native';
 
-import { EmptyState, PageHeader, Screen, SectionTitle } from '@/components/ui';
+import { EmptyState, Screen, SectionTitle, Txt } from '@/components/ui';
 import { WorkoutCard } from '@/components/WorkoutCard';
-import { formatMonth } from '@/lib/format';
+import { formatMonth, plural } from '@/lib/format';
 import type { Workout } from '@/lib/types';
 import { useStore } from '@/store/useStore';
 import { S } from '@/theme';
 
+/** Every finished workout, newest first, by month. Opened from Progress. */
 export default function HistoryScreen() {
   const workouts = useStore((s) => s.workouts);
-  const active = useStore((s) => s.active);
 
   const groups: { month: string; items: Workout[] }[] = [];
   for (const w of workouts) {
@@ -20,18 +20,19 @@ export default function HistoryScreen() {
   }
 
   return (
-    <Screen bottomPad={active ? 170 : 110}>
-      <PageHeader subtitle={`${workouts.length} workout${workouts.length === 1 ? '' : 's'}`} title="History" />
+    <Screen edgesTop={false}>
       {workouts.length === 0 ? (
         <EmptyState
           icon="time-outline"
           title="No workouts yet"
           body="Finish your first session and it shows up here, with every set, your volume and your PRs."
         />
-      ) : null}
+      ) : (
+        <Txt v="small">{plural(workouts.length, 'workout')} logged</Txt>
+      )}
       {groups.map((g) => (
         <View key={g.month} style={{ gap: S.md }}>
-          <SectionTitle title={g.month} />
+          <SectionTitle title={g.month} right={<Txt v="caption">{plural(g.items.length, 'workout')}</Txt>} />
           {g.items.map((w) => (
             <WorkoutCard key={w.id} w={w} />
           ))}

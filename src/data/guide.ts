@@ -2,7 +2,8 @@
 // Inline syntax inside text: **bold** and [[target|label]] links, where target is
 // another article slug or an exercise id.
 
-export type Tone = 'info' | 'ok' | 'warn' | 'bad';
+/** What a callout or a table row means. `stop` is pain 4+: the one tone the app draws in red. */
+export type Tone = 'info' | 'ok' | 'warn' | 'bad' | 'stop';
 
 export type Block =
   | { t: 'lead'; text: string }
@@ -232,7 +233,7 @@ export const ARTICLES: Article[] = [
             'Or any pain that is sharp, pinching, or worse the next morning. **Stop that exercise today.** Next time use less weight, a shorter range, or the swap. If it keeps happening for 2–3 sessions, see a physiotherapist.',
           ],
         ],
-        tones: ['ok', 'warn', 'bad'],
+        tones: ['ok', 'warn', 'stop'],
       },
       {
         t: 'callout',
