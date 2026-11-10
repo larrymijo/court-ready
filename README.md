@@ -28,8 +28,13 @@ phone. Use **Settings → Export backup** now and then to save a copy to Files, 
 Safari's data. iPhones don't let web apps vibrate, so the rest timer can't buzz. The screen stays on during a workout so
 you can see the countdown.
 
-> The web app is published by the CI workflow. GitHub Pages has to be switched on once: **Settings → Pages → Build and
-> deployment → Source: GitHub Actions**.
+> The web app is published by the Pages workflow once CI has passed. GitHub Pages has to be switched on once:
+> **Settings → Pages → Build and deployment → Source: GitHub Actions**.
+
+**Beta copy.** Changes can be tried first on a second copy of the app, published from the `beta` branch at
+**https://larrymijo.github.io/court-ready/beta/**. Add it to the home screen the same way: it shows up as "CR Beta" and
+keeps its own data, so nothing you do there touches your real workouts. To test with real numbers, export a backup from
+the main app and import it in the beta copy.
 
 ### Android: install the APK
 
@@ -38,8 +43,9 @@ On your Android phone, download
 it. Allow installing from your browser when Android asks. If Play Protect warns about an unknown app, choose
 **Install anyway**: the APK is built by this repo's GitHub Actions and signed with a development key, not a Play Store key.
 
-Every push to `main` builds a new APK and replaces that download. Installing a newer one over the old one keeps your
-data. The web app link above works on Android too.
+The APK is not rebuilt on every push: start the **CI** workflow by hand on `main` (Actions → CI → Run workflow) to
+build a new one and replace that download. Installing a newer one over the old one keeps your data. The web app link
+above works on Android too.
 
 ### Run it from the code with Expo Go (for developing)
 
@@ -103,6 +109,11 @@ Nothing leaves your phone: there's no account and no server. Everything is saved
 iPhone and Android, browser storage in the web app). **Export backup** gives you a JSON file you can keep anywhere, and
 **Import** restores it, also from one version of the app to another (for example from Expo Go to the APK).
 
+Saved data and backup files carry a version number (`src/store/migrations.ts`). When an update changes how data is
+saved, the app upgrades it the first time it opens, keeps a copy of the data from just before (Settings offers to go
+back to it for 30 days), and still imports backups made by older versions. Today shows a reminder once workouts have
+gone two weeks without being in a backup.
+
 ## Change the program
 
 Everything the app shows comes from plain TypeScript files in `src/data/`:
@@ -123,7 +134,7 @@ in `src/lib/progression.ts`.
 npm start            # Expo dev server (press w for the web version)
 npm run lint         # ESLint (expo lint)
 npm run typecheck    # TypeScript
-npm test             # Jest: program weeks, progression, stats, weekly check-in
+npm test             # Jest: program weeks, progression, stats, weekly check-in, data migrations
 ```
 
 ```
@@ -134,7 +145,7 @@ src/
   components/   UI pieces; workout/ holds the set table, rest timer, pain picker
   data/         The program and guide content
   lib/          Program weeks, progression, stats, dates, formatting (with tests)
-  store/        App state (Zustand, saved to the device)
+  store/        App state (Zustand, saved to the device) and data migrations
 scripts/        Turns the web export into an installable, offline web app
 ```
 
@@ -143,13 +154,18 @@ without a custom build. `android/` and `ios/` aren't in the repo: Expo generates
 
 ### CI
 
-`.github/workflows/ci.yml` runs on every push and pull request:
+`.github/workflows/ci.yml` runs on pushes to `main` and `beta` and on pull requests:
 
 1. **Lint, typecheck, test.**
-2. **Web app:** `expo export --platform web`, then `scripts/finish-web-build.mjs` adds the home-screen tags, an offline
-   service worker and a 404 fallback for deep links. Pushes to `main` deploy it to GitHub Pages.
-3. **Android APK:** `expo prebuild` and `./gradlew assembleRelease`. The APK is uploaded as a workflow artifact, and pushes
-   to `main` also publish it as the `android-latest` release (the download link above).
+2. **Web app (pull requests and manual runs):** `expo export --platform web` and `scripts/finish-web-build.mjs`, so a
+   change that breaks the web build is caught before it is merged.
+3. **Android APK (manual runs only):** `expo prebuild` and `./gradlew assembleRelease`. The APK is uploaded as a workflow
+   artifact, and a run on `main` also publishes it as the `android-latest` release (the download link above).
+
+`.github/workflows/pages.yml` publishes the site once CI has passed on `main` or `beta`. It builds the main app from
+`main` and, when a `beta` branch exists, the beta copy into `beta/`, then deploys both to GitHub Pages.
+`scripts/finish-web-build.mjs` adds the home-screen tags, an offline service worker and a 404 fallback for deep links to
+each build.
 
 ### Other ways to build Android
 

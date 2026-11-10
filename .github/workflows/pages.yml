@@ -1,0 +1,124 @@
+name: Pages
+
+# Publishes the web app to GitHub Pages once CI has passed on main or beta:
+#   - the main app, built from main, at https://<owner>.github.io/<repo>/
+#   - the beta copy, built from the beta branch when there is one, at .../<repo>/beta/
+# Both are built every time, because a Pages deployment replaces the whole site.
+#
+# A workflow_run workflow always runs from the default branch. That matters here: the github-pages
+# environment only lets the default branch deploy, so a push to beta could not publish by itself.
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main, beta]
+  workflow_dispatch:
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build the web app
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push')
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      # GitHub Pages serves the site at https://<owner>.github.io/<repo>/
+      SITE_BASE: /${{ github.event.repository.name }}
+    steps:
+      - name: Check out main
+        uses: actions/checkout@v5
+        with:
+          ref: main
+          path: main
+
+      - name: Look for a beta branch
+        id: beta
+        run: |
+          if git ls-remote --exit-code --heads "https://github.com/${GITHUB_REPOSITORY}.git" beta > /dev/null; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Check out beta
+        if: steps.beta.outputs.exists == 'true'
+        uses: actions/checkout@v5
+        with:
+          ref: beta
+          path: beta
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: '*/package-lock.json'
+
+      - name: Build the main app
+        working-directory: main
+        env:
+          EXPO_PUBLIC_BASE_URL: ${{ env.SITE_BASE }}
+        run: |
+          npm ci
+          npx expo export --platform web
+          node scripts/finish-web-build.mjs dist
+
+      # A beta branch that doesn't build must not hold back the main app.
+      - name: Build the beta copy
+        id: beta_build
+        if: steps.beta.outputs.exists == 'true'
+        continue-on-error: true
+        working-directory: beta
+        env:
+          EXPO_PUBLIC_BASE_URL: ${{ env.SITE_BASE }}/beta
+          EXPO_PUBLIC_CHANNEL: beta
+        run: |
+          npm ci
+          npx expo export --platform web
+          node scripts/finish-web-build.mjs dist
+
+      - name: Put the beta copy under /beta
+        if: steps.beta_build.outcome == 'success'
+        run: |
+          rm -rf main/dist/beta
+          cp -r beta/dist main/dist/beta
+
+      - name: Say so when the beta copy was left out
+        if: steps.beta_build.outcome == 'failure'
+        run: echo "::warning title=Beta copy not published::The beta branch failed to build, so only the main app was published."
+
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: main/dist
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      # Pages has to be switched on once by hand; until then, skip with a hint instead of failing.
+      - name: Check that GitHub Pages is switched on
+        id: pages
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh api "repos/${GITHUB_REPOSITORY}/pages" --silent; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "::notice title=Web app not published yet::Turn on GitHub Pages once: repo Settings → Pages → Build and deployment → Source: GitHub Actions. Then re-run this workflow."
+          fi
+
+      - id: deployment
+        if: steps.pages.outputs.enabled == 'true'
+        uses: actions/deploy-pages@v4

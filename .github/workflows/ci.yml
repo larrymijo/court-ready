@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, beta]
   pull_request:
   workflow_dispatch:
 
@@ -28,9 +28,13 @@ jobs:
       - run: npm run typecheck
       - run: npm test -- --ci
 
+  # Pushes to main and beta are built and published by pages.yml once this workflow has passed.
+  # Pull requests and manual runs get a build here, so a change that breaks the web export is
+  # caught before it is merged.
   web:
-    name: Web app
+    name: Web app builds
     needs: check
+    if: github.event_name != 'push'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
@@ -50,46 +54,16 @@ jobs:
       - name: Make it installable and offline-ready
         run: node scripts/finish-web-build.mjs dist
 
-      - uses: actions/upload-pages-artifact@v4
-        with:
-          path: dist
-
-  deploy-web:
-    name: Deploy web app to GitHub Pages
-    needs: web
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    permissions:
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      # Pages has to be switched on once by hand; until then, skip with a hint instead of failing.
-      - name: Check that GitHub Pages is switched on
-        id: pages
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          if gh api "repos/${GITHUB_REPOSITORY}/pages" --silent; then
-            echo "enabled=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "enabled=false" >> "$GITHUB_OUTPUT"
-            echo "::notice title=Web app not published yet::Turn on GitHub Pages once: repo Settings → Pages → Build and deployment → Source: GitHub Actions. Then re-run this workflow."
-          fi
-
-      - id: deployment
-        if: steps.pages.outputs.enabled == 'true'
-        uses: actions/deploy-pages@v4
-
+  # The web app is the one in daily use, so the APK is only built when this workflow is started by
+  # hand (Actions → CI → Run workflow).
   android:
     name: Android APK
     needs: check
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 60
     permissions:
-      contents: write # publish the APK as a GitHub release on pushes to main
+      contents: write # publish the APK as a GitHub release when run on main
     steps:
       - uses: actions/checkout@v5
 
@@ -128,11 +102,11 @@ jobs:
           path: court-ready.apk
           if-no-files-found: error
 
-      # Keeps one release, "android-latest", always pointing at the newest build on main, so the
-      # phone download link never changes:
+      # Keeps one release, "android-latest", always pointing at the newest build made from main, so
+      # the phone download link never changes:
       # https://github.com/<owner>/<repo>/releases/download/android-latest/court-ready.apk
       - name: Publish the "android-latest" release
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
