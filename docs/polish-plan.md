@@ -2,7 +2,7 @@
 
 This is the Court-Ready polish plan (first written 9 Nov 2026), revised on 11 Nov 2026 for a broader direction: the app becomes **Hybrid**, one place for sport and gym training in the same weekly plan. The file keeps its name so existing links still work.
 
-**Status on 11 Nov:** phase 0 is live in your main app. Phase 1 is built and live on the beta copy, not yet in your main app. Nothing in the new direction is built yet; it starts after you approve this revision.
+**Status on 11 Nov:** this revision was approved on 11 Nov, keeping the current web address. Phase 0 is live in your main app. Phase 1 is built and live on the beta copy, not yet in your main app. Nothing in the new direction is built yet.
 
 Design reference: [Court-Ready Monochrome canvas](https://claude.ai/artifact/2C6G8CAQJLNT8wrDwTv3LU) with eight screens. The new screens (plan list, week view, week editor, sport session) are drawn there at the start of their phase and agreed before they are built.
 
@@ -35,7 +35,7 @@ Design reference: [Court-Ready Monochrome canvas](https://claude.ai/artifact/2C6
 ## 1. Scope
 
 - **Goal:** Hybrid is a workout tracker for people who play sport and train in the gym. You follow a plan whose week mixes gym workouts and sport sessions, you can start any workout on any day, and you can build your own plans from a large exercise library. Three example plans come ready to use: Court-Ready, Muscle Mass Building and Definition.
-- **Target:** the web app at `larrymijo.github.io/court-ready`, installed on the iPhone home screen. Whether the address changes with the name is decision 1 (section 13).
+- **Target:** the web app at `larrymijo.github.io/court-ready`, installed on the iPhone home screen. The address stays the same after the rename (decided 11 Nov, section 13).
 - **Not a target:** polishing the Android APK, a native iPhone build, accounts, a server, or GPS tracking. Data stays on the phone.
 - **Stays as it is:** logging sets, the rest timer, the warm-up checklists and ramp-up sets, pain ratings and swaps, game mode, the 12-week cycle, history and records, the guide, backups, working offline, and the beta copy. Later phases change these only where their own section says so.
 - **Agreed design decisions:**
@@ -536,7 +536,7 @@ Data checks: the only new saved data is the on/off setting and which hints you d
 
 - **Health sync for steps, weight and sleep.** A web app cannot read Apple Health. The routes are a Shortcut that hands the numbers to the app, a native iPhone build (needs a paid Apple developer account), or staying manual. Decide after a few weeks of using the check-in.
 - **Sport sessions from your watch** (Apple Health workouts). Also needs a native iPhone build.
-- **A Hybrid web address**, if the address stays `/court-ready/` now: possible later with the same backup move as the icon.
+- **A Hybrid web address.** The address stays `/court-ready/` for now; moving it later is possible with the same backup move as the icon.
 - **Sharing a plan** as a file or link, so a plan you built can be given to someone else.
 - **Light theme.** Cheap once the tokens exist.
 - **Photos for your own exercises.**
@@ -665,15 +665,11 @@ stress?: Partial<Record<'shoulder' | 'elbow' | 'knee' | 'lowback', 1 | 2 | 3>>;
 | This roadmap ran Mass and Definition "next day in order" | Every plan is a weekly split now | Placed on weekdays (section 6); the "in order" option is dropped | 3 |
 | "Court-Ready" is in the storage keys, backup files, the home-screen name and the CR icon | Renaming must not separate you from your data | Only visible names change; internal names stay; the icon moves with a backup | 2 |
 
-### Decision I need from you
+### Decided
 
-1. **The web address after the rename.**
-   - **Keep `larrymijo.github.io/court-ready/` (my recommendation).** The app is called Hybrid everywhere you see it, your current icon and its data keep working, and the beta link stays the same.
-   - **Move to `larrymijo.github.io/hybrid/`** by renaming the repository. The address matches the name, but the old address stops working, so your data moves with a backup into a new icon, the beta link changes too, and the build settings change with it.
+1. **The web address stays `larrymijo.github.io/court-ready/`** (11 Nov). The app is called Hybrid everywhere you see it, your current icon and its data keep working, and the beta link stays the same. A home-screen icon named Hybrid still means adding the icon again with the backup move of phase 2; without the move, the icon keeps saying Court-Ready.
 
-   Either way, a home-screen icon named Hybrid means adding the icon again with the backup move of phase 2. If you skip the move, the icon keeps saying Court-Ready.
-
-### Assumptions I'll use unless you say otherwise
+### Assumptions, approved with the roadmap on 11 Nov
 
 1. The examples stay ordinary plans in your list: use them, edit them, delete them, restore them (as in the earlier plan).
 2. Muscle Mass Building and Definition go on the weekdays in section 6. Their exercises don't change.
