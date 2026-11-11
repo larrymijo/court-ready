@@ -2,7 +2,7 @@
 
 This is the Court-Ready polish plan (first written 9 Nov 2026), revised on 11 Nov 2026 for a broader direction: the app becomes **Hybrid**, one place for sport and gym training in the same weekly plan. The file keeps its name so existing links still work.
 
-**Status on 11 Nov:** this revision was approved on 11 Nov, keeping the current web address. Phase 0 is live in your main app. Phase 1 has been live in your main app since 11 Nov, after one session on the beta copy. Nothing in the new direction is built yet.
+**Status on 11 Nov:** this revision was approved on 11 Nov, keeping the current web address. Phases 0, 1 and 2 are live in your main app, and the app has been called Hybrid since 11 Nov. Plans, weekly splits and sports are not built yet.
 
 Design reference: [Court-Ready Monochrome canvas](https://claude.ai/artifact/2C6G8CAQJLNT8wrDwTv3LU) with eight screens. The new screens (plan list, week view, week editor, sport session) are drawn there at the start of their phase and agreed before they are built.
 
@@ -21,7 +21,7 @@ Design reference: [Court-Ready Monochrome canvas](https://claude.ai/artifact/2C6
 |---|---|---|
 | 0. Safety net | 0. Safety net | Live since 10 Nov |
 | 1. Monochrome shell | 1. Monochrome shell | Live in the main app since 11 Nov |
-| | 2. Hybrid name | New |
+| | 2. Hybrid name | Live in the main app since 11 Nov |
 | 3. Plans | 3. Plans and weekly splits, and 6. Custom and hybrid plans | Split in two |
 | | 4. Sports sessions | New |
 | 2. Exercise library | 5. Exercise library | Moved after plans and sports |
@@ -46,7 +46,7 @@ Design reference: [Court-Ready Monochrome canvas](https://claude.ai/artifact/2C6
 
 ## 2. What you asked for and where it lands
 
-"Now" means your main app, which has had phase 1 since 11 Nov.
+"Now" means your main app as it was before phases 1 and 2, which have both been live since 11 Nov.
 
 | You asked for | Now | What changes | Phase |
 |---|---|---|---|
@@ -293,7 +293,7 @@ Remaining: nothing. It was tried in one session on the beta copy and has been li
 
 Done when: no hue is left except `danger`, every screen matches [design.md](design.md), no target is under 44 px, and you have used the beta for a normal session.
 
-### Phase 2. Hybrid name
+### Phase 2. Hybrid name (live in the main app since 11 Nov)
 
 You get: the app is called Hybrid wherever you see its name, with a new icon. Court-Ready stays the name of the example plan. Nothing about your data changes.
 
