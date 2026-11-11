@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { DATA_VERSION } from '@/store/migrations';
+import { keepSafetyCopy } from '@/store/safetyCopy';
 import { useStore } from '@/store/useStore';
 
 // Made-up backups, one in each shape the app has written. Not anyone's real data.
@@ -41,6 +42,12 @@ describe('names the saved data hangs on', () => {
   it('keeps the main copy under court-ready and the beta copy under court-ready-beta', () => {
     expect(storeKeyFor('main')).toBe('court-ready');
     expect(storeKeyFor('beta')).toBe('court-ready-beta');
+  });
+
+  it('saves under the storage key, with the safety copy next to it', async () => {
+    expect(useStore.persist.getOptions().name).toBe('court-ready');
+    await keepSafetyCopy({ workouts: [] }, DATA_VERSION);
+    expect(await AsyncStorage.getAllKeys()).toContain('court-ready:before-update');
   });
 
   it('still marks exports as court-ready', () => {

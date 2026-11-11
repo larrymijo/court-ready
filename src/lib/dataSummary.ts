@@ -2,10 +2,22 @@ import { formatDateLong, plural } from '@/lib/format';
 import { workoutSetCount } from '@/lib/stats';
 import type { BodyEntry, Workout } from '@/lib/types';
 
+type SavedSet = Workout['exercises'][number]['sets'][number];
+
+/**
+ * What the summary counts as a set: ticked, a normal set (not a warm-up), with reps. This is the
+ * rule the history cards use today, written out here on purpose. The owner compares this number
+ * before and after app updates, so it must not move when the stats code changes: don't swap it for
+ * a helper from stats.ts.
+ */
+function countsAsSet(s: SavedSet): boolean {
+  return s.done && s.type === 'normal' && s.reps != null && s.reps > 0;
+}
+
 export interface DataSummary {
   /** Finished workouts. */
   workouts: number;
-  /** Done working sets across them, counted the way the history screens count them. */
+  /** Ticked normal sets with reps across them; warm-ups don't count. The rule is fixed in countsAsSet. */
   sets: number;
   /** Body entries that have a weight (an entry can hold only a waist). */
   weighIns: number;
@@ -21,7 +33,7 @@ export function summarizeData(workouts: readonly Workout[], body: readonly BodyE
   for (const w of workouts) {
     if (!w.finishedAt) continue;
     count += 1;
-    sets += workoutSetCount(w);
+    sets += w.exercises.reduce((n, ex) => n + ex.sets.filter(countsAsSet).length, 0);
     if (last == null || w.startedAt > last) last = w.startedAt;
   }
   return {
