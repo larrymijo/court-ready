@@ -1,12 +1,13 @@
 import Constants from 'expo-constants';
 import { router } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Platform, TextInput, View } from 'react-native';
 
 import { Button, Card, Divider, Row, Screen, SectionTitle, Stepper, ToggleRow, Txt, fieldStyle } from '@/components/ui';
 import { canPickBackupFile, pickBackupFile } from '@/lib/backup';
 import { backupStatus, daysAgoText } from '@/lib/backupStatus';
 import { IS_BETA } from '@/lib/channel';
+import { summarizeData, summaryLines } from '@/lib/dataSummary';
 import { addDaysISO, isISODate, mondayOfISO, parseISODate, todayISO } from '@/lib/dates';
 import { exportBackup } from '@/lib/exportBackup';
 import { formatDataSize, formatDateLong, plural } from '@/lib/format';
@@ -22,6 +23,12 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 const WEB_STORAGE_BYTES = 5 * 1024 * 1024;
 /** How long after an update the "go back to the earlier copy" option stays on screen. */
 const SAFETY_COPY_DAYS = 30;
+const ICON_STEPS = [
+  'Here: Export backup, and note the data summary at the top of Your data.',
+  'In Safari, open the app’s address, then Share → Add to Home Screen.',
+  'Open the new icon. If your workouts aren’t there, go to Settings → Import backup file.',
+  'Check that the summary matches. Then delete the old icon and use only the new one: two icons can keep two separate copies of your data.',
+];
 
 export default function SettingsScreen() {
   const settings = useStore((s) => s.settings);
@@ -30,6 +37,9 @@ export default function SettingsScreen() {
   const restoreSafetyCopy = useStore((s) => s.restoreSafetyCopy);
   const resetAll = useStore((s) => s.resetAll);
   const workouts = useStore((s) => s.workouts);
+  const body = useStore((s) => s.body);
+  const summary = useMemo(() => summarizeData(workouts, body), [workouts, body]);
+  const [iconOpen, setIconOpen] = useState(false);
   const [dateText, setDateText] = useState(settings.programStart);
   const [importText, setImportText] = useState('');
   const [savedBytes, setSavedBytes] = useState<number | null>(null);
@@ -163,6 +173,13 @@ export default function SettingsScreen() {
 
       <SectionTitle title="Your data" />
       <Card>
+        <View style={{ gap: 2 }}>
+          {summaryLines(summary).map((line, i) => (
+            <Txt key={line} v={i === 0 ? 'h2' : 'small'} color={i === 0 ? C.text : C.textMuted}>
+              {line}
+            </Txt>
+          ))}
+        </View>
         <View style={{ gap: S.xs }}>
           <Txt v="small">Everything is stored on this phone only. Export a backup now and then.</Txt>
           <Txt v="small" color={C.text}>
@@ -216,10 +233,48 @@ export default function SettingsScreen() {
         <Button variant="danger" icon="trash-outline" title="Delete all data" onPress={onReset} />
       </Card>
 
+      {Platform.OS === 'web' ? (
+        <>
+          <SectionTitle title="Home-screen icon" />
+          <Card>
+            <Txt v="small">
+              iPhone sets an icon’s name and picture when it is added, so the current icon keeps its old name and picture
+              until it is added again. Inside, the app says Hybrid either way.
+            </Txt>
+            <Button
+              variant="secondary"
+              icon="phone-portrait-outline"
+              iconRight={iconOpen ? 'chevron-up' : 'chevron-down'}
+              title={iconOpen ? 'Hide the steps' : 'Get the Hybrid icon'}
+              onPress={() => setIconOpen((v) => !v)}
+            />
+            {iconOpen ? (
+              <>
+                <Divider />
+                <Txt v="small" color={C.text}>
+                  An icon added again can start with empty data, so the move goes through a backup. The new icon is named{' '}
+                  {IS_BETA ? 'Hybrid Beta' : 'Hybrid'} (now {IS_BETA ? 'CR Beta' : 'Court-Ready'}).
+                </Txt>
+                {ICON_STEPS.map((step, i) => (
+                  <Row key={step} gap={S.sm} style={{ alignItems: 'flex-start' }}>
+                    <Txt v="small" color={C.text} style={{ width: 18 }}>
+                      {i + 1}.
+                    </Txt>
+                    <Txt v="small" style={{ flex: 1 }}>
+                      {step}
+                    </Txt>
+                  </Row>
+                ))}
+              </>
+            ) : null}
+          </Card>
+        </>
+      ) : null}
+
       <SectionTitle title="About" />
       <Card>
         <Txt v="h2">
-          Court-Ready {Constants.expoConfig?.version ?? ''}
+          Hybrid {Constants.expoConfig?.version ?? ''}
           {IS_BETA ? ' · beta' : ''}
         </Txt>
         {IS_BETA ? (
@@ -228,8 +283,9 @@ export default function SettingsScreen() {
           </Txt>
         ) : null}
         <Txt v="small">
-          Workout tracker built around the Court-Ready Muscle guide: 3 gym sessions around volleyball and basketball,
-          chest priority, shoulder- and elbow-friendly exercises.
+          A workout tracker for sport and gym training. Its example plan, Court-Ready, follows the Court-Ready Muscle
+          guide: 3 gym sessions around volleyball and basketball, chest priority, shoulder- and elbow-friendly
+          exercises.
         </Txt>
         <Txt v="caption">General training advice, not medical advice.</Txt>
       </Card>
