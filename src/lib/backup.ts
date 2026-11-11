@@ -7,7 +7,7 @@ import { todayISO } from '@/lib/dates';
  * the sheet was closed without sharing (only iPhone reports that).
  */
 export async function saveBackup(json: string): Promise<boolean> {
-  const result = await Share.share({ message: json, title: `Court-Ready backup ${todayISO()}` });
+  const result = await Share.share({ message: json, title: `Hybrid backup ${todayISO()}` });
   return result.action !== Share.dismissedAction;
 }
 

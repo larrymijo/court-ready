@@ -1,6 +1,6 @@
 {
-  "name": "Court-Ready",
-  "short_name": "Court-Ready",
+  "name": "Hybrid",
+  "short_name": "Hybrid",
   "description": "Workout tracker and training guide for a gym routine built around volleyball and basketball.",
   "start_url": "./",
   "scope": "./",

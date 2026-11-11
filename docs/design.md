@@ -1,4 +1,4 @@
-# Court-Ready design system
+# Hybrid design system
 
 Monochrome, iPhone first. The screens are drawn on the [Court-Ready Monochrome canvas](https://claude.ai/artifact/2C6G8CAQJLNT8wrDwTv3LU); this file is their written form, so the build does not depend on opening it. The plan that applies it is in [polish-plan.md](polish-plan.md).
 

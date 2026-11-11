@@ -1,4 +1,4 @@
-# Court-Ready
+# Hybrid
 
 A workout tracker in the style of Hevy, built around the **Court-Ready Muscle** program: three gym sessions a week
 around volleyball and basketball, with extra chest work and exercises that go easy on the shoulders and elbows. The
@@ -32,7 +32,7 @@ you can see the countdown.
 > **Settings → Pages → Build and deployment → Source: GitHub Actions**.
 
 **Beta copy.** Changes can be tried first on a second copy of the app, published from the `beta` branch at
-**https://larrymijo.github.io/court-ready/beta/**. Add it to the home screen the same way: it shows up as "CR Beta" and
+**https://larrymijo.github.io/court-ready/beta/**. Add it to the home screen the same way: it shows up as "Hybrid Beta" and
 keeps its own data, so nothing you do there touches your real workouts. To test with real numbers, export a backup from
 the main app and import it in the beta copy.
 

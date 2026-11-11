@@ -1,0 +1,107 @@
+{
+  "app": "court-ready",
+  "version": 2,
+  "exportedAt": "2026-11-05T09:00:00.000Z",
+  "settings": {
+    "programStart": "2026-10-12",
+    "restTimer": true,
+    "vibrate": false,
+    "keepAwake": true,
+    "lastExportAt": 1793000000000
+  },
+  "workouts": [
+    {
+      "id": "w2-upper-b",
+      "name": "Upper B",
+      "routineId": "upperb",
+      "startedAt": 1793260800000,
+      "finishedAt": 1793264100000,
+      "week": 4,
+      "phase": "build",
+      "gameMode": false,
+      "exercises": [
+        {
+          "id": "w2-upper-b-e1",
+          "exerciseId": "incline",
+          "itemKey": "1",
+          "restSec": 150,
+          "target": { "sets": 3, "repsMin": 6, "repsMax": 10, "rir": "2" },
+          "sets": [
+            { "id": "w2-upper-b-s1", "type": "normal", "weight": 22, "reps": 10, "rir": 2, "done": true },
+            { "id": "w2-upper-b-s2", "type": "normal", "weight": 22, "reps": 9, "rir": 2, "done": true },
+            { "id": "w2-upper-b-s3", "type": "normal", "weight": 22, "reps": 8, "rir": 1, "done": true }
+          ],
+          "pain": 0,
+          "note": ""
+        }
+      ],
+      "prs": [{ "exerciseId": "incline", "kind": "weight", "value": 22, "weight": 22, "reps": 10 }]
+    },
+    {
+      "id": "w2-lower",
+      "name": "Lower + Core",
+      "routineId": "lower",
+      "startedAt": 1793088000000,
+      "finishedAt": 1793091300000,
+      "week": 4,
+      "phase": "build",
+      "gameMode": false,
+      "exercises": [
+        {
+          "id": "w2-lower-e1",
+          "exerciseId": "legpress",
+          "itemKey": "1",
+          "restSec": 150,
+          "target": { "sets": 3, "repsMin": 6, "repsMax": 10, "rir": "2" },
+          "sets": [
+            { "id": "w2-lower-s1", "type": "normal", "weight": 130, "reps": 9, "rir": 2, "done": true },
+            { "id": "w2-lower-s2", "type": "normal", "weight": 130, "reps": 8, "rir": 2, "done": true }
+          ],
+          "pain": null,
+          "note": "Felt strong"
+        },
+        {
+          "id": "w2-lower-e2",
+          "exerciseId": "pallof",
+          "itemKey": "5b",
+          "group": "l5",
+          "restSec": 60,
+          "target": { "sets": 1, "repsMin": 10, "repsMax": 10, "rir": "Controlled" },
+          "sets": [{ "id": "w2-lower-s3", "type": "normal", "weight": 10, "reps": 10, "rir": null, "done": true }],
+          "pain": null,
+          "note": ""
+        }
+      ],
+      "prs": []
+    },
+    {
+      "id": "w2-upper-a",
+      "name": "Upper A",
+      "routineId": "uppera",
+      "startedAt": 1792915200000,
+      "finishedAt": 1792918380000,
+      "week": 4,
+      "phase": "build",
+      "gameMode": false,
+      "exercises": [
+        {
+          "id": "w2-upper-a-e1",
+          "exerciseId": "pushup",
+          "restSec": 90,
+          "sets": [
+            { "id": "w2-upper-a-s1", "type": "normal", "weight": null, "reps": 15, "rir": null, "done": true },
+            { "id": "w2-upper-a-s2", "type": "normal", "weight": null, "reps": 13, "rir": null, "done": true }
+          ],
+          "pain": 1,
+          "note": ""
+        }
+      ],
+      "prs": []
+    }
+  ],
+  "body": [
+    { "date": "2026-10-30", "weight": 79.4 },
+    { "date": "2026-11-02", "weight": 79.1, "waist": 85.5 },
+    { "date": "2026-11-04", "weight": 78.9 }
+  ]
+}

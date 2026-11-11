@@ -20,8 +20,8 @@ import { join, relative, sep } from 'node:path';
 const dist = process.argv[2] ?? 'dist';
 const base = (process.env.EXPO_PUBLIC_BASE_URL ?? '').replace(/\/+$/, '');
 const beta = process.env.EXPO_PUBLIC_CHANNEL === 'beta';
-// The home screen cuts long names off, so the beta copy gets a short one that still reads as its own app.
-const homeScreenName = beta ? 'CR Beta' : 'Court-Ready';
+// The beta copy gets its own name, so the two icons on the home screen can be told apart.
+const homeScreenName = beta ? 'Hybrid Beta' : 'Hybrid';
 // Each copy only cleans up caches it made itself, so the two never delete each other's files.
 const cachePrefix = beta ? 'court-ready-beta-' : 'court-ready-app-';
 
@@ -65,7 +65,7 @@ writeFileSync(indexPath, html);
 const manifestPath = join(dist, 'manifest.json');
 if (beta && existsSync(manifestPath)) {
   const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
-  const named = { ...manifest, name: 'Court-Ready Beta', short_name: homeScreenName };
+  const named = { ...manifest, name: 'Hybrid Beta', short_name: homeScreenName };
   writeFileSync(manifestPath, `${JSON.stringify(named, null, 2)}\n`);
 }
 

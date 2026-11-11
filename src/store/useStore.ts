@@ -390,7 +390,7 @@ export const useStore = create<State>()(
         try {
           const data = JSON.parse(json) as Partial<ExportData>;
           if (data.app !== 'court-ready' || !Array.isArray(data.workouts) || !Array.isArray(data.body)) {
-            return { ok: false, error: 'This doesn’t look like a Court-Ready export.' };
+            return { ok: false, error: 'This doesn’t look like a Hybrid backup.' };
           }
           const version = typeof data.version === 'number' ? data.version : 1;
           if (isNewerData(version)) {

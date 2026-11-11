@@ -6,10 +6,10 @@ import { todayISO } from '@/lib/dates';
  * sheet was closed without saving.
  */
 export async function saveBackup(json: string): Promise<boolean> {
-  const file = new File([json], `court-ready-backup-${todayISO()}.json`, { type: 'application/json' });
+  const file = new File([json], `hybrid-backup-${todayISO()}.json`, { type: 'application/json' });
   if (typeof navigator !== 'undefined' && navigator.canShare?.({ files: [file] })) {
     try {
-      await navigator.share({ files: [file], title: 'Court-Ready backup' });
+      await navigator.share({ files: [file], title: 'Hybrid backup' });
       return true;
     } catch (e) {
       if (e instanceof DOMException && e.name === 'AbortError') return false; // closed the share sheet
