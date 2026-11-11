@@ -2,7 +2,7 @@
 
 This is the Court-Ready polish plan (first written 9 Nov 2026), revised on 11 Nov 2026 for a broader direction: the app becomes **Hybrid**, one place for sport and gym training in the same weekly plan. The file keeps its name so existing links still work.
 
-**Status on 11 Nov:** this revision was approved on 11 Nov, keeping the current web address. Phase 0 is live in your main app. Phase 1 is built and live on the beta copy, not yet in your main app. Nothing in the new direction is built yet.
+**Status on 11 Nov:** this revision was approved on 11 Nov, keeping the current web address. Phase 0 is live in your main app. Phase 1 has been live in your main app since 11 Nov, after one session on the beta copy. Nothing in the new direction is built yet.
 
 Design reference: [Court-Ready Monochrome canvas](https://claude.ai/artifact/2C6G8CAQJLNT8wrDwTv3LU) with eight screens. The new screens (plan list, week view, week editor, sport session) are drawn there at the start of their phase and agreed before they are built.
 
@@ -20,7 +20,7 @@ Design reference: [Court-Ready Monochrome canvas](https://claude.ai/artifact/2C6
 | Before | Now | Status |
 |---|---|---|
 | 0. Safety net | 0. Safety net | Live since 10 Nov |
-| 1. Monochrome shell | 1. Monochrome shell | Live on the beta copy since 10 Nov |
+| 1. Monochrome shell | 1. Monochrome shell | Live in the main app since 11 Nov |
 | | 2. Hybrid name | New |
 | 3. Plans | 3. Plans and weekly splits, and 6. Custom and hybrid plans | Split in two |
 | | 4. Sports sessions | New |
@@ -46,7 +46,7 @@ Design reference: [Court-Ready Monochrome canvas](https://claude.ai/artifact/2C6
 
 ## 2. What you asked for and where it lands
 
-"Now" means your main app; the beta copy already has phase 1.
+"Now" means your main app, which has had phase 1 since 11 Nov.
 
 | You asked for | Now | What changes | Phase |
 |---|---|---|---|
@@ -285,11 +285,11 @@ Every phase that changes saved data also follows section 11.
 
 Built: versioned saved data with tested upgrades (`src/store/migrations.ts`), a safety copy of the data from before each upgrade (Settings offers to go back to it for 30 days), a backup reminder on Today, backup status and storage use in Settings, and the beta copy at `/court-ready/beta/` with its own name and data. The Android APK is built only on request. Every later phase relies on these.
 
-### Phase 1. Monochrome shell (on the beta copy since 10 Nov)
+### Phase 1. Monochrome shell (live in the main app since 11 Nov)
 
 Built: the monochrome theme and components, four tabs (Today, Plan, Progress, Library), the new Today with "Choose another day", the restyled workout, exercise, routine, history and settings screens, black launch colours, the "new version" notice that never interrupts a workout, and the monochrome icon.
 
-Remaining: you use the beta copy for one normal session. Then it is released to your main app (export a backup on the phone first).
+Remaining: nothing. It was tried in one session on the beta copy and has been live in your main app since 11 Nov.
 
 Done when: no hue is left except `danger`, every screen matches [design.md](design.md), no target is under 44 px, and you have used the beta for a normal session.
 
