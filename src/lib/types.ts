@@ -11,7 +11,7 @@ export type MuscleGroup =
   | 'core'
   | 'mobility';
 
-export type Equipment = 'dumbbell' | 'cable' | 'machine' | 'bodyweight' | 'band';
+export type Equipment = 'dumbbell' | 'barbell' | 'cable' | 'machine' | 'bodyweight' | 'band';
 
 /** weight_reps: log kg × reps. reps: bodyweight/band moves, reps only. */
 export type TrackingType = 'weight_reps' | 'reps';
@@ -86,6 +86,102 @@ export interface Routine {
 
 export type PhaseId = 'learn' | 'build' | 'deload' | 'push';
 
+// Plans are saved data from data version 3: a plan holds its gym workouts, its sport sessions and
+// its week (docs/polish-plan.md, sections 3 and 12). Plan, workout and sport session ids never
+// change once they have shipped, because history points to them.
+
+export type SportId = 'volleyball' | 'basketball' | 'football' | 'running';
+
+/** The built-in example plans. Also their plan ids. */
+export type ExamplePlanId = 'court-ready' | 'muscle-mass' | 'definition';
+
+/** A gym workout of a plan: what Routine is for Court-Ready, with a string id and its rules as settings. */
+export interface GymWorkout {
+  id: string;
+  name: string;
+  /** Long name for the workout's own page: "Upper A — Chest focus". Without one, `name` is shown. */
+  title?: string;
+  focus: string;
+  minutes: number;
+  intro?: string;
+  /** Warm-up checklist id: 'upper' or 'lower' until checklists become data (phase 4). */
+  warmup: string;
+  /** Cool-down checklist id (phase 4). */
+  cooldown?: string;
+  items: RoutineItem[];
+  /** Instructions per superset group. */
+  groups: Record<string, string>;
+  shortOnTime?: string;
+  /** Left out when the week's planned sessions and sets are counted. */
+  optional?: boolean;
+  /**
+   * How the plan's phases change this workout. 'full' (the default): every phase rule applies.
+   * 'deloadOnly': the written sets in every week, halved in deload weeks (Court-Ready's Bonus).
+   */
+  cycleRule?: 'full' | 'deloadOnly';
+  /** Offers game mode: at most 2 sets per exercise, RIR 3, without the items marked skipInGameMode. */
+  gameMode?: boolean;
+}
+
+/** A sport in a plan's week. It can be started and logged from phase 4. */
+export interface SportSession {
+  id: string;
+  sport: SportId;
+  name: string;
+  minutes?: number;
+  /** Checklist ids (phase 4). Without them, the sport's own warm-up and cool-down. */
+  warmup?: string;
+  cooldown?: string;
+}
+
+/** What a day points to: one of the plan's gym workouts or one of its sport sessions. */
+export type SessionRef = { kind: 'gym'; workoutId: string } | { kind: 'sport'; sessionId: string };
+
+export interface PlanDay {
+  /** In the order they are shown. None means a rest day. */
+  sessions: { ref: SessionRef; optional?: boolean }[];
+  /** A line about the day: "Volleyball some weeks, or the Bonus session". */
+  note?: string;
+}
+
+export interface PlanTargets {
+  kcal?: number;
+  kcalRestDay?: number;
+  proteinG?: number;
+  steps?: number;
+  stepsSportDay?: number;
+  /** Aimed change in bodyweight per week, in percent: [from, to]. */
+  weightPctPerWeek?: [number, number];
+}
+
+export interface Plan {
+  id: string;
+  name: string;
+  /** Set on the built-in examples: the original to restore or reset to. */
+  example?: ExamplePlanId;
+  workouts: GymWorkout[];
+  sports: SportSession[];
+  /** Seven days, Monday first. */
+  week: PlanDay[];
+  /** One phase per week. After the last week the plan goes on from week `repeatFrom` (counted from 1). */
+  cycle?: { phases: PhaseId[]; repeatFrom: number };
+  /** Without a cycle: every Nth week is a lighter week, with the deload rule. */
+  lighterWeekEvery?: number;
+  /** 'progress': add reps, then weight. 'maintain': aim to match last time. */
+  progression: 'progress' | 'maintain';
+  targets?: PlanTargets;
+  /** Slugs of the guide pages that belong to this plan. */
+  articles?: string[];
+}
+
+/** Where a plan stands. Saved per plan id. */
+export interface PlanState {
+  /** YYYY-MM-DD, the Monday of the plan's week 1. */
+  start: string;
+  /** The week the plan was in when you switched away from it, to offer "Continue at week N". */
+  leftAtWeek?: number;
+}
+
 export type SetType = 'normal' | 'warmup';
 
 export interface WorkoutSet {
@@ -131,6 +227,13 @@ export interface PR {
 export interface Workout {
   id: string;
   name: string;
+  /** The plan the session was started from. Missing on empty workouts. */
+  planId?: string;
+  /** That plan's name at the time, so history still reads well after the plan is renamed or deleted. */
+  planName?: string;
+  /** The workout of that plan (from phase 4, also a sport session). */
+  sessionId?: string;
+  /** Which Court-Ready session it was. From before plans; still written for Court-Ready for one more release. */
   routineId?: RoutineId;
   startedAt: number;
   finishedAt?: number;
