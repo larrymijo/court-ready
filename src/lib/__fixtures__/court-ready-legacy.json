@@ -1,0 +1,3242 @@
+{
+ "source": "Generated from src/lib/program.ts, src/data/routines.ts and src/data/exercises.ts at commit 3a10328.",
+ "start": "2026-10-05",
+ "notStarted": {
+  "today": "2026-10-04",
+  "position": {
+   "week": 1,
+   "cycle": 1,
+   "phase": "learn",
+   "started": false,
+   "daysUntilStart": 1
+  }
+ },
+ "weeks": [
+  {
+   "absolute": 1,
+   "monday": "2026-10-05",
+   "sunday": "2026-10-11",
+   "position": {
+    "week": 1,
+    "cycle": 1,
+    "phase": "learn",
+    "started": true,
+    "daysUntilStart": 0
+   }
+  },
+  {
+   "absolute": 2,
+   "monday": "2026-10-12",
+   "sunday": "2026-10-18",
+   "position": {
+    "week": 2,
+    "cycle": 1,
+    "phase": "learn",
+    "started": true,
+    "daysUntilStart": 0
+   }
+  },
+  {
+   "absolute": 3,
+   "monday": "2026-10-19",
+   "sunday": "2026-10-25",
+   "position": {
+    "week": 3,
+    "cycle": 1,
+    "phase": "build",
+    "started": true,
+    "daysUntilStart": 0
+   }
+  },
+  {
+   "absolute": 4,
+   "monday": "2026-10-26",
+   "sunday": "2026-11-01",
+   "position": {
+    "week": 4,
+    "cycle": 1,
+    "phase": "build",
+    "started": true,
+    "daysUntilStart": 0
+   }
+  },
+  {
+   "absolute": 5,
+   "monday": "2026-11-02",
+   "sunday": "2026-11-08",
+   "position": {
+    "week": 5,
+    "cycle": 1,
+    "phase": "build",
+    "started": true,
+    "daysUntilStart": 0
+   }
+  },
+  {
+   "absolute": 6,
+   "monday": "2026-11-09",
+   "sunday": "2026-11-15",
+   "position": {
+    "week": 6,
+    "cycle": 1,
+    "phase": "build",
+    "started": true,
+    "daysUntilStart": 0
+   }
+  },
+  {
+   "absolute": 7,
+   "monday": "2026-11-16",
+   "sunday": "2026-11-22",
+   "position": {
+    "week": 7,
+    "cycle": 1,
+    "phase": "deload",
+    "started": true,
+    "daysUntilStart": 0
+   }
+  },
+  {
+   "absolute": 8,
+   "monday": "2026-11-23",
+   "sunday": "2026-11-29",
+   "position": {
+    "week": 8,
+    "cycle": 1,
+    "phase": "push",
+    "started": true,
+    "daysUntilStart": 0
+   }
+  },
+  {
+   "absolute": 9,
+   "monday": "2026-11-30",
+   "sunday": "2026-12-06",
+   "position": {
+    "week": 9,
+    "cycle": 1,
+    "phase": "push",
+    "started": true,
+    "daysUntilStart": 0
+   }
+  },
+  {
+   "absolute": 10,
+   "monday": "2026-12-07",
+   "sunday": "2026-12-13",
+   "position": {
+    "week": 10,
+    "cycle": 1,
+    "phase": "push",
+    "started": true,
+    "daysUntilStart": 0
+   }
+  },
+  {
+   "absolute": 11,
+   "monday": "2026-12-14",
+   "sunday": "2026-12-20",
+   "position": {
+    "week": 11,
+    "cycle": 1,
+    "phase": "push",
+    "started": true,
+    "daysUntilStart": 0
+   }
+  },
+  {
+   "absolute": 12,
+   "monday": "2026-12-21",
+   "sunday": "2026-12-27",
+   "position": {
+    "week": 12,
+    "cycle": 1,
+    "phase": "deload",
+    "started": true,
+    "daysUntilStart": 0
+   }
+  },
+  {
+   "absolute": 13,
+   "monday": "2026-12-28",
+   "sunday": "2027-01-03",
+   "position": {
+    "week": 3,
+    "cycle": 2,
+    "phase": "build",
+    "started": true,
+    "daysUntilStart": 0
+   }
+  },
+  {
+   "absolute": 14,
+   "monday": "2027-01-04",
+   "sunday": "2027-01-10",
+   "position": {
+    "week": 4,
+    "cycle": 2,
+    "phase": "build",
+    "started": true,
+    "daysUntilStart": 0
+   }
+  },
+  {
+   "absolute": 15,
+   "monday": "2027-01-11",
+   "sunday": "2027-01-17",
+   "position": {
+    "week": 5,
+    "cycle": 2,
+    "phase": "build",
+    "started": true,
+    "daysUntilStart": 0
+   }
+  },
+  {
+   "absolute": 16,
+   "monday": "2027-01-18",
+   "sunday": "2027-01-24",
+   "position": {
+    "week": 6,
+    "cycle": 2,
+    "phase": "build",
+    "started": true,
+    "daysUntilStart": 0
+   }
+  },
+  {
+   "absolute": 17,
+   "monday": "2027-01-25",
+   "sunday": "2027-01-31",
+   "position": {
+    "week": 7,
+    "cycle": 2,
+    "phase": "deload",
+    "started": true,
+    "daysUntilStart": 0
+   }
+  },
+  {
+   "absolute": 18,
+   "monday": "2027-02-01",
+   "sunday": "2027-02-07",
+   "position": {
+    "week": 8,
+    "cycle": 2,
+    "phase": "push",
+    "started": true,
+    "daysUntilStart": 0
+   }
+  },
+  {
+   "absolute": 19,
+   "monday": "2027-02-08",
+   "sunday": "2027-02-14",
+   "position": {
+    "week": 9,
+    "cycle": 2,
+    "phase": "push",
+    "started": true,
+    "daysUntilStart": 0
+   }
+  },
+  {
+   "absolute": 20,
+   "monday": "2027-02-15",
+   "sunday": "2027-02-21",
+   "position": {
+    "week": 10,
+    "cycle": 2,
+    "phase": "push",
+    "started": true,
+    "daysUntilStart": 0
+   }
+  },
+  {
+   "absolute": 21,
+   "monday": "2027-02-22",
+   "sunday": "2027-02-28",
+   "position": {
+    "week": 11,
+    "cycle": 2,
+    "phase": "push",
+    "started": true,
+    "daysUntilStart": 0
+   }
+  },
+  {
+   "absolute": 22,
+   "monday": "2027-03-01",
+   "sunday": "2027-03-07",
+   "position": {
+    "week": 12,
+    "cycle": 2,
+    "phase": "deload",
+    "started": true,
+    "daysUntilStart": 0
+   }
+  },
+  {
+   "absolute": 23,
+   "monday": "2027-03-08",
+   "sunday": "2027-03-14",
+   "position": {
+    "week": 3,
+    "cycle": 3,
+    "phase": "build",
+    "started": true,
+    "daysUntilStart": 0
+   }
+  },
+  {
+   "absolute": 24,
+   "monday": "2027-03-15",
+   "sunday": "2027-03-21",
+   "position": {
+    "week": 4,
+    "cycle": 3,
+    "phase": "build",
+    "started": true,
+    "daysUntilStart": 0
+   }
+  },
+  {
+   "absolute": 25,
+   "monday": "2027-03-22",
+   "sunday": "2027-03-28",
+   "position": {
+    "week": 5,
+    "cycle": 3,
+    "phase": "build",
+    "started": true,
+    "daysUntilStart": 0
+   }
+  },
+  {
+   "absolute": 26,
+   "monday": "2027-03-29",
+   "sunday": "2027-04-04",
+   "position": {
+    "week": 6,
+    "cycle": 3,
+    "phase": "build",
+    "started": true,
+    "daysUntilStart": 0
+   }
+  },
+  {
+   "absolute": 27,
+   "monday": "2027-04-05",
+   "sunday": "2027-04-11",
+   "position": {
+    "week": 7,
+    "cycle": 3,
+    "phase": "deload",
+    "started": true,
+    "daysUntilStart": 0
+   }
+  },
+  {
+   "absolute": 28,
+   "monday": "2027-04-12",
+   "sunday": "2027-04-18",
+   "position": {
+    "week": 8,
+    "cycle": 3,
+    "phase": "push",
+    "started": true,
+    "daysUntilStart": 0
+   }
+  },
+  {
+   "absolute": 29,
+   "monday": "2027-04-19",
+   "sunday": "2027-04-25",
+   "position": {
+    "week": 9,
+    "cycle": 3,
+    "phase": "push",
+    "started": true,
+    "daysUntilStart": 0
+   }
+  },
+  {
+   "absolute": 30,
+   "monday": "2027-04-26",
+   "sunday": "2027-05-02",
+   "position": {
+    "week": 10,
+    "cycle": 3,
+    "phase": "push",
+    "started": true,
+    "daysUntilStart": 0
+   }
+  },
+  {
+   "absolute": 31,
+   "monday": "2027-05-03",
+   "sunday": "2027-05-09",
+   "position": {
+    "week": 11,
+    "cycle": 3,
+    "phase": "push",
+    "started": true,
+    "daysUntilStart": 0
+   }
+  },
+  {
+   "absolute": 32,
+   "monday": "2027-05-10",
+   "sunday": "2027-05-16",
+   "position": {
+    "week": 12,
+    "cycle": 3,
+    "phase": "deload",
+    "started": true,
+    "daysUntilStart": 0
+   }
+  },
+  {
+   "absolute": 33,
+   "monday": "2027-05-17",
+   "sunday": "2027-05-23",
+   "position": {
+    "week": 3,
+    "cycle": 4,
+    "phase": "build",
+    "started": true,
+    "daysUntilStart": 0
+   }
+  },
+  {
+   "absolute": 34,
+   "monday": "2027-05-24",
+   "sunday": "2027-05-30",
+   "position": {
+    "week": 4,
+    "cycle": 4,
+    "phase": "build",
+    "started": true,
+    "daysUntilStart": 0
+   }
+  },
+  {
+   "absolute": 35,
+   "monday": "2027-05-31",
+   "sunday": "2027-06-06",
+   "position": {
+    "week": 5,
+    "cycle": 4,
+    "phase": "build",
+    "started": true,
+    "daysUntilStart": 0
+   }
+  },
+  {
+   "absolute": 36,
+   "monday": "2027-06-07",
+   "sunday": "2027-06-13",
+   "position": {
+    "week": 6,
+    "cycle": 4,
+    "phase": "build",
+    "started": true,
+    "daysUntilStart": 0
+   }
+  },
+  {
+   "absolute": 37,
+   "monday": "2027-06-14",
+   "sunday": "2027-06-20",
+   "position": {
+    "week": 7,
+    "cycle": 4,
+    "phase": "deload",
+    "started": true,
+    "daysUntilStart": 0
+   }
+  },
+  {
+   "absolute": 38,
+   "monday": "2027-06-21",
+   "sunday": "2027-06-27",
+   "position": {
+    "week": 8,
+    "cycle": 4,
+    "phase": "push",
+    "started": true,
+    "daysUntilStart": 0
+   }
+  },
+  {
+   "absolute": 39,
+   "monday": "2027-06-28",
+   "sunday": "2027-07-04",
+   "position": {
+    "week": 9,
+    "cycle": 4,
+    "phase": "push",
+    "started": true,
+    "daysUntilStart": 0
+   }
+  },
+  {
+   "absolute": 40,
+   "monday": "2027-07-05",
+   "sunday": "2027-07-11",
+   "position": {
+    "week": 10,
+    "cycle": 4,
+    "phase": "push",
+    "started": true,
+    "daysUntilStart": 0
+   }
+  }
+ ],
+ "prescriptions": {
+  "learn": {
+   "uppera": {
+    "normal": [
+     {
+      "key": "1",
+      "exerciseId": "incline",
+      "sets": 2,
+      "repsMin": 6,
+      "repsMax": 10,
+      "repsLabel": null,
+      "rir": "3",
+      "skip": false
+     },
+     {
+      "key": "2",
+      "exerciseId": "csrow",
+      "sets": 2,
+      "repsMin": 8,
+      "repsMax": 12,
+      "repsLabel": null,
+      "rir": "3",
+      "skip": false
+     },
+     {
+      "key": "3",
+      "exerciseId": "cablefly",
+      "sets": 2,
+      "repsMin": 10,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "3",
+      "skip": false
+     },
+     {
+      "key": "4",
+      "exerciseId": "pulldown",
+      "sets": 2,
+      "repsMin": 8,
+      "repsMax": 12,
+      "repsLabel": null,
+      "rir": "3",
+      "skip": false
+     },
+     {
+      "key": "5a",
+      "exerciseId": "lateral",
+      "sets": 2,
+      "repsMin": 12,
+      "repsMax": 20,
+      "repsLabel": null,
+      "rir": "3",
+      "skip": false
+     },
+     {
+      "key": "5b",
+      "exerciseId": "facepull",
+      "sets": 1,
+      "repsMin": 12,
+      "repsMax": 20,
+      "repsLabel": null,
+      "rir": "3",
+      "skip": false
+     },
+     {
+      "key": "6a",
+      "exerciseId": "curl",
+      "sets": 1,
+      "repsMin": 10,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "3",
+      "skip": false
+     },
+     {
+      "key": "6b",
+      "exerciseId": "pushdown",
+      "sets": 1,
+      "repsMin": 10,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "3",
+      "skip": false
+     }
+    ],
+    "game": [
+     {
+      "key": "1",
+      "exerciseId": "incline",
+      "sets": 2,
+      "repsMin": 6,
+      "repsMax": 10,
+      "repsLabel": null,
+      "rir": "3",
+      "skip": false
+     },
+     {
+      "key": "2",
+      "exerciseId": "csrow",
+      "sets": 2,
+      "repsMin": 8,
+      "repsMax": 12,
+      "repsLabel": null,
+      "rir": "3",
+      "skip": false
+     },
+     {
+      "key": "3",
+      "exerciseId": "cablefly",
+      "sets": 2,
+      "repsMin": 10,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "3",
+      "skip": false
+     },
+     {
+      "key": "4",
+      "exerciseId": "pulldown",
+      "sets": 2,
+      "repsMin": 8,
+      "repsMax": 12,
+      "repsLabel": null,
+      "rir": "3",
+      "skip": false
+     },
+     {
+      "key": "5a",
+      "exerciseId": "lateral",
+      "sets": 2,
+      "repsMin": 12,
+      "repsMax": 20,
+      "repsLabel": null,
+      "rir": "3",
+      "skip": false
+     },
+     {
+      "key": "5b",
+      "exerciseId": "facepull",
+      "sets": 1,
+      "repsMin": 12,
+      "repsMax": 20,
+      "repsLabel": null,
+      "rir": "3",
+      "skip": false
+     },
+     {
+      "key": "6a",
+      "exerciseId": "curl",
+      "sets": 1,
+      "repsMin": 10,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "3",
+      "skip": false
+     },
+     {
+      "key": "6b",
+      "exerciseId": "pushdown",
+      "sets": 1,
+      "repsMin": 10,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "3",
+      "skip": false
+     }
+    ]
+   },
+   "lower": {
+    "normal": [
+     {
+      "key": "1",
+      "exerciseId": "legpress",
+      "sets": 2,
+      "repsMin": 6,
+      "repsMax": 10,
+      "repsLabel": null,
+      "rir": "3",
+      "skip": false
+     },
+     {
+      "key": "2",
+      "exerciseId": "rdl",
+      "sets": 2,
+      "repsMin": 8,
+      "repsMax": 10,
+      "repsLabel": null,
+      "rir": "3",
+      "skip": false
+     },
+     {
+      "key": "3",
+      "exerciseId": "bss",
+      "sets": 1,
+      "repsMin": 8,
+      "repsMax": 12,
+      "repsLabel": null,
+      "rir": "3",
+      "skip": false
+     },
+     {
+      "key": "4",
+      "exerciseId": "legcurl",
+      "sets": 2,
+      "repsMin": 10,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "3",
+      "skip": false
+     },
+     {
+      "key": "5a",
+      "exerciseId": "calf",
+      "sets": 2,
+      "repsMin": 10,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "3",
+      "skip": false
+     },
+     {
+      "key": "5b",
+      "exerciseId": "pallof",
+      "sets": 1,
+      "repsMin": 10,
+      "repsMax": 10,
+      "repsLabel": null,
+      "rir": "Controlled",
+      "skip": false
+     },
+     {
+      "key": "6",
+      "exerciseId": "crunch",
+      "sets": 1,
+      "repsMin": 10,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "3",
+      "skip": false
+     }
+    ],
+    "game": [
+     {
+      "key": "1",
+      "exerciseId": "legpress",
+      "sets": 2,
+      "repsMin": 6,
+      "repsMax": 10,
+      "repsLabel": null,
+      "rir": "3",
+      "skip": false
+     },
+     {
+      "key": "2",
+      "exerciseId": "rdl",
+      "sets": 2,
+      "repsMin": 8,
+      "repsMax": 10,
+      "repsLabel": null,
+      "rir": "3",
+      "skip": false
+     },
+     {
+      "key": "3",
+      "exerciseId": "bss",
+      "sets": 1,
+      "repsMin": 8,
+      "repsMax": 12,
+      "repsLabel": null,
+      "rir": "3",
+      "skip": true
+     },
+     {
+      "key": "4",
+      "exerciseId": "legcurl",
+      "sets": 2,
+      "repsMin": 10,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "3",
+      "skip": false
+     },
+     {
+      "key": "5a",
+      "exerciseId": "calf",
+      "sets": 2,
+      "repsMin": 10,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "3",
+      "skip": false
+     },
+     {
+      "key": "5b",
+      "exerciseId": "pallof",
+      "sets": 1,
+      "repsMin": 10,
+      "repsMax": 10,
+      "repsLabel": null,
+      "rir": "Controlled",
+      "skip": false
+     },
+     {
+      "key": "6",
+      "exerciseId": "crunch",
+      "sets": 1,
+      "repsMin": 10,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "3",
+      "skip": false
+     }
+    ]
+   },
+   "upperb": {
+    "normal": [
+     {
+      "key": "1",
+      "exerciseId": "flatpress",
+      "sets": 2,
+      "repsMin": 8,
+      "repsMax": 12,
+      "repsLabel": null,
+      "rir": "3",
+      "skip": false
+     },
+     {
+      "key": "2",
+      "exerciseId": "pullup",
+      "sets": 2,
+      "repsMin": 6,
+      "repsMax": 10,
+      "repsLabel": null,
+      "rir": "3",
+      "skip": false
+     },
+     {
+      "key": "3",
+      "exerciseId": "cablerow",
+      "sets": 2,
+      "repsMin": 10,
+      "repsMax": 12,
+      "repsLabel": null,
+      "rir": "3",
+      "skip": false
+     },
+     {
+      "key": "4",
+      "exerciseId": "lowhighfly",
+      "sets": 2,
+      "repsMin": 12,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "3",
+      "skip": false
+     },
+     {
+      "key": "5",
+      "exerciseId": "pushup",
+      "sets": 1,
+      "repsMin": 8,
+      "repsMax": 25,
+      "repsLabel": "stop 2 reps before failure",
+      "rir": "3",
+      "skip": false
+     },
+     {
+      "key": "6a",
+      "exerciseId": "lateral",
+      "sets": 2,
+      "repsMin": 12,
+      "repsMax": 20,
+      "repsLabel": null,
+      "rir": "3",
+      "skip": false
+     },
+     {
+      "key": "6b",
+      "exerciseId": "revpec",
+      "sets": 1,
+      "repsMin": 15,
+      "repsMax": 20,
+      "repsLabel": null,
+      "rir": "3",
+      "skip": false
+     },
+     {
+      "key": "7a",
+      "exerciseId": "hammer",
+      "sets": 1,
+      "repsMin": 10,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "3",
+      "skip": false
+     },
+     {
+      "key": "7b",
+      "exerciseId": "ohext",
+      "sets": 1,
+      "repsMin": 10,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "3",
+      "skip": false
+     }
+    ],
+    "game": [
+     {
+      "key": "1",
+      "exerciseId": "flatpress",
+      "sets": 2,
+      "repsMin": 8,
+      "repsMax": 12,
+      "repsLabel": null,
+      "rir": "3",
+      "skip": false
+     },
+     {
+      "key": "2",
+      "exerciseId": "pullup",
+      "sets": 2,
+      "repsMin": 6,
+      "repsMax": 10,
+      "repsLabel": null,
+      "rir": "3",
+      "skip": false
+     },
+     {
+      "key": "3",
+      "exerciseId": "cablerow",
+      "sets": 2,
+      "repsMin": 10,
+      "repsMax": 12,
+      "repsLabel": null,
+      "rir": "3",
+      "skip": false
+     },
+     {
+      "key": "4",
+      "exerciseId": "lowhighfly",
+      "sets": 2,
+      "repsMin": 12,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "3",
+      "skip": false
+     },
+     {
+      "key": "5",
+      "exerciseId": "pushup",
+      "sets": 1,
+      "repsMin": 8,
+      "repsMax": 25,
+      "repsLabel": "stop 2 reps before failure",
+      "rir": "3",
+      "skip": false
+     },
+     {
+      "key": "6a",
+      "exerciseId": "lateral",
+      "sets": 2,
+      "repsMin": 12,
+      "repsMax": 20,
+      "repsLabel": null,
+      "rir": "3",
+      "skip": false
+     },
+     {
+      "key": "6b",
+      "exerciseId": "revpec",
+      "sets": 1,
+      "repsMin": 15,
+      "repsMax": 20,
+      "repsLabel": null,
+      "rir": "3",
+      "skip": false
+     },
+     {
+      "key": "7a",
+      "exerciseId": "hammer",
+      "sets": 1,
+      "repsMin": 10,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "3",
+      "skip": false
+     },
+     {
+      "key": "7b",
+      "exerciseId": "ohext",
+      "sets": 1,
+      "repsMin": 10,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "3",
+      "skip": false
+     }
+    ]
+   },
+   "bonus": {
+    "normal": [
+     {
+      "key": "1",
+      "exerciseId": "alt_machinepress",
+      "sets": 2,
+      "repsMin": 12,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "2",
+      "skip": false
+     },
+     {
+      "key": "2",
+      "exerciseId": "cablefly",
+      "sets": 2,
+      "repsMin": 12,
+      "repsMax": 20,
+      "repsLabel": null,
+      "rir": "1–2",
+      "skip": false
+     },
+     {
+      "key": "3a",
+      "exerciseId": "lateral",
+      "sets": 3,
+      "repsMin": 15,
+      "repsMax": 20,
+      "repsLabel": null,
+      "rir": "1",
+      "skip": false
+     },
+     {
+      "key": "3b",
+      "exerciseId": "c_er",
+      "sets": 2,
+      "repsMin": 15,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "Easy",
+      "skip": false
+     },
+     {
+      "key": "4a",
+      "exerciseId": "curl",
+      "sets": 2,
+      "repsMin": 12,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "1–2",
+      "skip": false
+     },
+     {
+      "key": "4b",
+      "exerciseId": "pushdown",
+      "sets": 2,
+      "repsMin": 12,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "1–2",
+      "skip": false
+     },
+     {
+      "key": "5a",
+      "exerciseId": "c_proney",
+      "sets": 2,
+      "repsMin": 10,
+      "repsMax": 10,
+      "repsLabel": null,
+      "rir": "Easy",
+      "skip": false
+     },
+     {
+      "key": "5b",
+      "exerciseId": "c_scappush",
+      "sets": 2,
+      "repsMin": 10,
+      "repsMax": 10,
+      "repsLabel": null,
+      "rir": "Easy",
+      "skip": false
+     },
+     {
+      "key": "5c",
+      "exerciseId": "c_wallslide",
+      "sets": 2,
+      "repsMin": 8,
+      "repsMax": 8,
+      "repsLabel": null,
+      "rir": "Easy",
+      "skip": false
+     }
+    ],
+    "game": [
+     {
+      "key": "1",
+      "exerciseId": "alt_machinepress",
+      "sets": 2,
+      "repsMin": 12,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "2",
+      "skip": false
+     },
+     {
+      "key": "2",
+      "exerciseId": "cablefly",
+      "sets": 2,
+      "repsMin": 12,
+      "repsMax": 20,
+      "repsLabel": null,
+      "rir": "1–2",
+      "skip": false
+     },
+     {
+      "key": "3a",
+      "exerciseId": "lateral",
+      "sets": 3,
+      "repsMin": 15,
+      "repsMax": 20,
+      "repsLabel": null,
+      "rir": "1",
+      "skip": false
+     },
+     {
+      "key": "3b",
+      "exerciseId": "c_er",
+      "sets": 2,
+      "repsMin": 15,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "Easy",
+      "skip": false
+     },
+     {
+      "key": "4a",
+      "exerciseId": "curl",
+      "sets": 2,
+      "repsMin": 12,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "1–2",
+      "skip": false
+     },
+     {
+      "key": "4b",
+      "exerciseId": "pushdown",
+      "sets": 2,
+      "repsMin": 12,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "1–2",
+      "skip": false
+     },
+     {
+      "key": "5a",
+      "exerciseId": "c_proney",
+      "sets": 2,
+      "repsMin": 10,
+      "repsMax": 10,
+      "repsLabel": null,
+      "rir": "Easy",
+      "skip": false
+     },
+     {
+      "key": "5b",
+      "exerciseId": "c_scappush",
+      "sets": 2,
+      "repsMin": 10,
+      "repsMax": 10,
+      "repsLabel": null,
+      "rir": "Easy",
+      "skip": false
+     },
+     {
+      "key": "5c",
+      "exerciseId": "c_wallslide",
+      "sets": 2,
+      "repsMin": 8,
+      "repsMax": 8,
+      "repsLabel": null,
+      "rir": "Easy",
+      "skip": false
+     }
+    ]
+   }
+  },
+  "build": {
+   "uppera": {
+    "normal": [
+     {
+      "key": "1",
+      "exerciseId": "incline",
+      "sets": 3,
+      "repsMin": 6,
+      "repsMax": 10,
+      "repsLabel": null,
+      "rir": "1–2",
+      "skip": false
+     },
+     {
+      "key": "2",
+      "exerciseId": "csrow",
+      "sets": 3,
+      "repsMin": 8,
+      "repsMax": 12,
+      "repsLabel": null,
+      "rir": "1–2",
+      "skip": false
+     },
+     {
+      "key": "3",
+      "exerciseId": "cablefly",
+      "sets": 3,
+      "repsMin": 10,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "1 · last set 0",
+      "skip": false
+     },
+     {
+      "key": "4",
+      "exerciseId": "pulldown",
+      "sets": 3,
+      "repsMin": 8,
+      "repsMax": 12,
+      "repsLabel": null,
+      "rir": "1–2",
+      "skip": false
+     },
+     {
+      "key": "5a",
+      "exerciseId": "lateral",
+      "sets": 3,
+      "repsMin": 12,
+      "repsMax": 20,
+      "repsLabel": null,
+      "rir": "0–1",
+      "skip": false
+     },
+     {
+      "key": "5b",
+      "exerciseId": "facepull",
+      "sets": 2,
+      "repsMin": 12,
+      "repsMax": 20,
+      "repsLabel": null,
+      "rir": "1–2",
+      "skip": false
+     },
+     {
+      "key": "6a",
+      "exerciseId": "curl",
+      "sets": 2,
+      "repsMin": 10,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "1",
+      "skip": false
+     },
+     {
+      "key": "6b",
+      "exerciseId": "pushdown",
+      "sets": 2,
+      "repsMin": 10,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "1",
+      "skip": false
+     }
+    ],
+    "game": [
+     {
+      "key": "1",
+      "exerciseId": "incline",
+      "sets": 3,
+      "repsMin": 6,
+      "repsMax": 10,
+      "repsLabel": null,
+      "rir": "1–2",
+      "skip": false
+     },
+     {
+      "key": "2",
+      "exerciseId": "csrow",
+      "sets": 3,
+      "repsMin": 8,
+      "repsMax": 12,
+      "repsLabel": null,
+      "rir": "1–2",
+      "skip": false
+     },
+     {
+      "key": "3",
+      "exerciseId": "cablefly",
+      "sets": 3,
+      "repsMin": 10,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "1 · last set 0",
+      "skip": false
+     },
+     {
+      "key": "4",
+      "exerciseId": "pulldown",
+      "sets": 3,
+      "repsMin": 8,
+      "repsMax": 12,
+      "repsLabel": null,
+      "rir": "1–2",
+      "skip": false
+     },
+     {
+      "key": "5a",
+      "exerciseId": "lateral",
+      "sets": 3,
+      "repsMin": 12,
+      "repsMax": 20,
+      "repsLabel": null,
+      "rir": "0–1",
+      "skip": false
+     },
+     {
+      "key": "5b",
+      "exerciseId": "facepull",
+      "sets": 2,
+      "repsMin": 12,
+      "repsMax": 20,
+      "repsLabel": null,
+      "rir": "1–2",
+      "skip": false
+     },
+     {
+      "key": "6a",
+      "exerciseId": "curl",
+      "sets": 2,
+      "repsMin": 10,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "1",
+      "skip": false
+     },
+     {
+      "key": "6b",
+      "exerciseId": "pushdown",
+      "sets": 2,
+      "repsMin": 10,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "1",
+      "skip": false
+     }
+    ]
+   },
+   "lower": {
+    "normal": [
+     {
+      "key": "1",
+      "exerciseId": "legpress",
+      "sets": 3,
+      "repsMin": 6,
+      "repsMax": 10,
+      "repsLabel": null,
+      "rir": "1–2",
+      "skip": false
+     },
+     {
+      "key": "2",
+      "exerciseId": "rdl",
+      "sets": 3,
+      "repsMin": 8,
+      "repsMax": 10,
+      "repsLabel": null,
+      "rir": "2",
+      "skip": false
+     },
+     {
+      "key": "3",
+      "exerciseId": "bss",
+      "sets": 2,
+      "repsMin": 8,
+      "repsMax": 12,
+      "repsLabel": null,
+      "rir": "1–2",
+      "skip": false
+     },
+     {
+      "key": "4",
+      "exerciseId": "legcurl",
+      "sets": 3,
+      "repsMin": 10,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "0–1",
+      "skip": false
+     },
+     {
+      "key": "5a",
+      "exerciseId": "calf",
+      "sets": 3,
+      "repsMin": 10,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "0–1",
+      "skip": false
+     },
+     {
+      "key": "5b",
+      "exerciseId": "pallof",
+      "sets": 2,
+      "repsMin": 10,
+      "repsMax": 10,
+      "repsLabel": null,
+      "rir": "Controlled",
+      "skip": false
+     },
+     {
+      "key": "6",
+      "exerciseId": "crunch",
+      "sets": 2,
+      "repsMin": 10,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "1",
+      "skip": false
+     }
+    ],
+    "game": [
+     {
+      "key": "1",
+      "exerciseId": "legpress",
+      "sets": 2,
+      "repsMin": 6,
+      "repsMax": 10,
+      "repsLabel": null,
+      "rir": "3",
+      "skip": false
+     },
+     {
+      "key": "2",
+      "exerciseId": "rdl",
+      "sets": 2,
+      "repsMin": 8,
+      "repsMax": 10,
+      "repsLabel": null,
+      "rir": "3",
+      "skip": false
+     },
+     {
+      "key": "3",
+      "exerciseId": "bss",
+      "sets": 2,
+      "repsMin": 8,
+      "repsMax": 12,
+      "repsLabel": null,
+      "rir": "3",
+      "skip": true
+     },
+     {
+      "key": "4",
+      "exerciseId": "legcurl",
+      "sets": 2,
+      "repsMin": 10,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "3",
+      "skip": false
+     },
+     {
+      "key": "5a",
+      "exerciseId": "calf",
+      "sets": 2,
+      "repsMin": 10,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "3",
+      "skip": false
+     },
+     {
+      "key": "5b",
+      "exerciseId": "pallof",
+      "sets": 2,
+      "repsMin": 10,
+      "repsMax": 10,
+      "repsLabel": null,
+      "rir": "Controlled",
+      "skip": false
+     },
+     {
+      "key": "6",
+      "exerciseId": "crunch",
+      "sets": 2,
+      "repsMin": 10,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "3",
+      "skip": false
+     }
+    ]
+   },
+   "upperb": {
+    "normal": [
+     {
+      "key": "1",
+      "exerciseId": "flatpress",
+      "sets": 3,
+      "repsMin": 8,
+      "repsMax": 12,
+      "repsLabel": null,
+      "rir": "1–2",
+      "skip": false
+     },
+     {
+      "key": "2",
+      "exerciseId": "pullup",
+      "sets": 3,
+      "repsMin": 6,
+      "repsMax": 10,
+      "repsLabel": null,
+      "rir": "1–2",
+      "skip": false
+     },
+     {
+      "key": "3",
+      "exerciseId": "cablerow",
+      "sets": 3,
+      "repsMin": 10,
+      "repsMax": 12,
+      "repsLabel": null,
+      "rir": "1–2",
+      "skip": false
+     },
+     {
+      "key": "4",
+      "exerciseId": "lowhighfly",
+      "sets": 3,
+      "repsMin": 12,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "0–1",
+      "skip": false
+     },
+     {
+      "key": "5",
+      "exerciseId": "pushup",
+      "sets": 2,
+      "repsMin": 8,
+      "repsMax": 25,
+      "repsLabel": "stop 2 reps before failure",
+      "rir": "2",
+      "skip": false
+     },
+     {
+      "key": "6a",
+      "exerciseId": "lateral",
+      "sets": 3,
+      "repsMin": 12,
+      "repsMax": 20,
+      "repsLabel": null,
+      "rir": "0–1",
+      "skip": false
+     },
+     {
+      "key": "6b",
+      "exerciseId": "revpec",
+      "sets": 2,
+      "repsMin": 15,
+      "repsMax": 20,
+      "repsLabel": null,
+      "rir": "0–1",
+      "skip": false
+     },
+     {
+      "key": "7a",
+      "exerciseId": "hammer",
+      "sets": 2,
+      "repsMin": 10,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "1",
+      "skip": false
+     },
+     {
+      "key": "7b",
+      "exerciseId": "ohext",
+      "sets": 2,
+      "repsMin": 10,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "1",
+      "skip": false
+     }
+    ],
+    "game": [
+     {
+      "key": "1",
+      "exerciseId": "flatpress",
+      "sets": 3,
+      "repsMin": 8,
+      "repsMax": 12,
+      "repsLabel": null,
+      "rir": "1–2",
+      "skip": false
+     },
+     {
+      "key": "2",
+      "exerciseId": "pullup",
+      "sets": 3,
+      "repsMin": 6,
+      "repsMax": 10,
+      "repsLabel": null,
+      "rir": "1–2",
+      "skip": false
+     },
+     {
+      "key": "3",
+      "exerciseId": "cablerow",
+      "sets": 3,
+      "repsMin": 10,
+      "repsMax": 12,
+      "repsLabel": null,
+      "rir": "1–2",
+      "skip": false
+     },
+     {
+      "key": "4",
+      "exerciseId": "lowhighfly",
+      "sets": 3,
+      "repsMin": 12,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "0–1",
+      "skip": false
+     },
+     {
+      "key": "5",
+      "exerciseId": "pushup",
+      "sets": 2,
+      "repsMin": 8,
+      "repsMax": 25,
+      "repsLabel": "stop 2 reps before failure",
+      "rir": "2",
+      "skip": false
+     },
+     {
+      "key": "6a",
+      "exerciseId": "lateral",
+      "sets": 3,
+      "repsMin": 12,
+      "repsMax": 20,
+      "repsLabel": null,
+      "rir": "0–1",
+      "skip": false
+     },
+     {
+      "key": "6b",
+      "exerciseId": "revpec",
+      "sets": 2,
+      "repsMin": 15,
+      "repsMax": 20,
+      "repsLabel": null,
+      "rir": "0–1",
+      "skip": false
+     },
+     {
+      "key": "7a",
+      "exerciseId": "hammer",
+      "sets": 2,
+      "repsMin": 10,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "1",
+      "skip": false
+     },
+     {
+      "key": "7b",
+      "exerciseId": "ohext",
+      "sets": 2,
+      "repsMin": 10,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "1",
+      "skip": false
+     }
+    ]
+   },
+   "bonus": {
+    "normal": [
+     {
+      "key": "1",
+      "exerciseId": "alt_machinepress",
+      "sets": 2,
+      "repsMin": 12,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "2",
+      "skip": false
+     },
+     {
+      "key": "2",
+      "exerciseId": "cablefly",
+      "sets": 2,
+      "repsMin": 12,
+      "repsMax": 20,
+      "repsLabel": null,
+      "rir": "1–2",
+      "skip": false
+     },
+     {
+      "key": "3a",
+      "exerciseId": "lateral",
+      "sets": 3,
+      "repsMin": 15,
+      "repsMax": 20,
+      "repsLabel": null,
+      "rir": "1",
+      "skip": false
+     },
+     {
+      "key": "3b",
+      "exerciseId": "c_er",
+      "sets": 2,
+      "repsMin": 15,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "Easy",
+      "skip": false
+     },
+     {
+      "key": "4a",
+      "exerciseId": "curl",
+      "sets": 2,
+      "repsMin": 12,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "1–2",
+      "skip": false
+     },
+     {
+      "key": "4b",
+      "exerciseId": "pushdown",
+      "sets": 2,
+      "repsMin": 12,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "1–2",
+      "skip": false
+     },
+     {
+      "key": "5a",
+      "exerciseId": "c_proney",
+      "sets": 2,
+      "repsMin": 10,
+      "repsMax": 10,
+      "repsLabel": null,
+      "rir": "Easy",
+      "skip": false
+     },
+     {
+      "key": "5b",
+      "exerciseId": "c_scappush",
+      "sets": 2,
+      "repsMin": 10,
+      "repsMax": 10,
+      "repsLabel": null,
+      "rir": "Easy",
+      "skip": false
+     },
+     {
+      "key": "5c",
+      "exerciseId": "c_wallslide",
+      "sets": 2,
+      "repsMin": 8,
+      "repsMax": 8,
+      "repsLabel": null,
+      "rir": "Easy",
+      "skip": false
+     }
+    ],
+    "game": [
+     {
+      "key": "1",
+      "exerciseId": "alt_machinepress",
+      "sets": 2,
+      "repsMin": 12,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "2",
+      "skip": false
+     },
+     {
+      "key": "2",
+      "exerciseId": "cablefly",
+      "sets": 2,
+      "repsMin": 12,
+      "repsMax": 20,
+      "repsLabel": null,
+      "rir": "1–2",
+      "skip": false
+     },
+     {
+      "key": "3a",
+      "exerciseId": "lateral",
+      "sets": 3,
+      "repsMin": 15,
+      "repsMax": 20,
+      "repsLabel": null,
+      "rir": "1",
+      "skip": false
+     },
+     {
+      "key": "3b",
+      "exerciseId": "c_er",
+      "sets": 2,
+      "repsMin": 15,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "Easy",
+      "skip": false
+     },
+     {
+      "key": "4a",
+      "exerciseId": "curl",
+      "sets": 2,
+      "repsMin": 12,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "1–2",
+      "skip": false
+     },
+     {
+      "key": "4b",
+      "exerciseId": "pushdown",
+      "sets": 2,
+      "repsMin": 12,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "1–2",
+      "skip": false
+     },
+     {
+      "key": "5a",
+      "exerciseId": "c_proney",
+      "sets": 2,
+      "repsMin": 10,
+      "repsMax": 10,
+      "repsLabel": null,
+      "rir": "Easy",
+      "skip": false
+     },
+     {
+      "key": "5b",
+      "exerciseId": "c_scappush",
+      "sets": 2,
+      "repsMin": 10,
+      "repsMax": 10,
+      "repsLabel": null,
+      "rir": "Easy",
+      "skip": false
+     },
+     {
+      "key": "5c",
+      "exerciseId": "c_wallslide",
+      "sets": 2,
+      "repsMin": 8,
+      "repsMax": 8,
+      "repsLabel": null,
+      "rir": "Easy",
+      "skip": false
+     }
+    ]
+   }
+  },
+  "deload": {
+   "uppera": {
+    "normal": [
+     {
+      "key": "1",
+      "exerciseId": "incline",
+      "sets": 2,
+      "repsMin": 6,
+      "repsMax": 10,
+      "repsLabel": null,
+      "rir": "3–4",
+      "skip": false
+     },
+     {
+      "key": "2",
+      "exerciseId": "csrow",
+      "sets": 2,
+      "repsMin": 8,
+      "repsMax": 12,
+      "repsLabel": null,
+      "rir": "3–4",
+      "skip": false
+     },
+     {
+      "key": "3",
+      "exerciseId": "cablefly",
+      "sets": 2,
+      "repsMin": 10,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "3–4",
+      "skip": false
+     },
+     {
+      "key": "4",
+      "exerciseId": "pulldown",
+      "sets": 2,
+      "repsMin": 8,
+      "repsMax": 12,
+      "repsLabel": null,
+      "rir": "3–4",
+      "skip": false
+     },
+     {
+      "key": "5a",
+      "exerciseId": "lateral",
+      "sets": 2,
+      "repsMin": 12,
+      "repsMax": 20,
+      "repsLabel": null,
+      "rir": "3–4",
+      "skip": false
+     },
+     {
+      "key": "5b",
+      "exerciseId": "facepull",
+      "sets": 1,
+      "repsMin": 12,
+      "repsMax": 20,
+      "repsLabel": null,
+      "rir": "3–4",
+      "skip": false
+     },
+     {
+      "key": "6a",
+      "exerciseId": "curl",
+      "sets": 1,
+      "repsMin": 10,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "3–4",
+      "skip": false
+     },
+     {
+      "key": "6b",
+      "exerciseId": "pushdown",
+      "sets": 1,
+      "repsMin": 10,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "3–4",
+      "skip": false
+     }
+    ],
+    "game": [
+     {
+      "key": "1",
+      "exerciseId": "incline",
+      "sets": 2,
+      "repsMin": 6,
+      "repsMax": 10,
+      "repsLabel": null,
+      "rir": "3–4",
+      "skip": false
+     },
+     {
+      "key": "2",
+      "exerciseId": "csrow",
+      "sets": 2,
+      "repsMin": 8,
+      "repsMax": 12,
+      "repsLabel": null,
+      "rir": "3–4",
+      "skip": false
+     },
+     {
+      "key": "3",
+      "exerciseId": "cablefly",
+      "sets": 2,
+      "repsMin": 10,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "3–4",
+      "skip": false
+     },
+     {
+      "key": "4",
+      "exerciseId": "pulldown",
+      "sets": 2,
+      "repsMin": 8,
+      "repsMax": 12,
+      "repsLabel": null,
+      "rir": "3–4",
+      "skip": false
+     },
+     {
+      "key": "5a",
+      "exerciseId": "lateral",
+      "sets": 2,
+      "repsMin": 12,
+      "repsMax": 20,
+      "repsLabel": null,
+      "rir": "3–4",
+      "skip": false
+     },
+     {
+      "key": "5b",
+      "exerciseId": "facepull",
+      "sets": 1,
+      "repsMin": 12,
+      "repsMax": 20,
+      "repsLabel": null,
+      "rir": "3–4",
+      "skip": false
+     },
+     {
+      "key": "6a",
+      "exerciseId": "curl",
+      "sets": 1,
+      "repsMin": 10,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "3–4",
+      "skip": false
+     },
+     {
+      "key": "6b",
+      "exerciseId": "pushdown",
+      "sets": 1,
+      "repsMin": 10,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "3–4",
+      "skip": false
+     }
+    ]
+   },
+   "lower": {
+    "normal": [
+     {
+      "key": "1",
+      "exerciseId": "legpress",
+      "sets": 2,
+      "repsMin": 6,
+      "repsMax": 10,
+      "repsLabel": null,
+      "rir": "3–4",
+      "skip": false
+     },
+     {
+      "key": "2",
+      "exerciseId": "rdl",
+      "sets": 2,
+      "repsMin": 8,
+      "repsMax": 10,
+      "repsLabel": null,
+      "rir": "3–4",
+      "skip": false
+     },
+     {
+      "key": "3",
+      "exerciseId": "bss",
+      "sets": 1,
+      "repsMin": 8,
+      "repsMax": 12,
+      "repsLabel": null,
+      "rir": "3–4",
+      "skip": false
+     },
+     {
+      "key": "4",
+      "exerciseId": "legcurl",
+      "sets": 2,
+      "repsMin": 10,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "3–4",
+      "skip": false
+     },
+     {
+      "key": "5a",
+      "exerciseId": "calf",
+      "sets": 2,
+      "repsMin": 10,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "3–4",
+      "skip": false
+     },
+     {
+      "key": "5b",
+      "exerciseId": "pallof",
+      "sets": 1,
+      "repsMin": 10,
+      "repsMax": 10,
+      "repsLabel": null,
+      "rir": "Controlled",
+      "skip": false
+     },
+     {
+      "key": "6",
+      "exerciseId": "crunch",
+      "sets": 1,
+      "repsMin": 10,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "3–4",
+      "skip": false
+     }
+    ],
+    "game": [
+     {
+      "key": "1",
+      "exerciseId": "legpress",
+      "sets": 2,
+      "repsMin": 6,
+      "repsMax": 10,
+      "repsLabel": null,
+      "rir": "3–4",
+      "skip": false
+     },
+     {
+      "key": "2",
+      "exerciseId": "rdl",
+      "sets": 2,
+      "repsMin": 8,
+      "repsMax": 10,
+      "repsLabel": null,
+      "rir": "3–4",
+      "skip": false
+     },
+     {
+      "key": "3",
+      "exerciseId": "bss",
+      "sets": 1,
+      "repsMin": 8,
+      "repsMax": 12,
+      "repsLabel": null,
+      "rir": "3–4",
+      "skip": true
+     },
+     {
+      "key": "4",
+      "exerciseId": "legcurl",
+      "sets": 2,
+      "repsMin": 10,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "3–4",
+      "skip": false
+     },
+     {
+      "key": "5a",
+      "exerciseId": "calf",
+      "sets": 2,
+      "repsMin": 10,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "3–4",
+      "skip": false
+     },
+     {
+      "key": "5b",
+      "exerciseId": "pallof",
+      "sets": 1,
+      "repsMin": 10,
+      "repsMax": 10,
+      "repsLabel": null,
+      "rir": "Controlled",
+      "skip": false
+     },
+     {
+      "key": "6",
+      "exerciseId": "crunch",
+      "sets": 1,
+      "repsMin": 10,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "3–4",
+      "skip": false
+     }
+    ]
+   },
+   "upperb": {
+    "normal": [
+     {
+      "key": "1",
+      "exerciseId": "flatpress",
+      "sets": 2,
+      "repsMin": 8,
+      "repsMax": 12,
+      "repsLabel": null,
+      "rir": "3–4",
+      "skip": false
+     },
+     {
+      "key": "2",
+      "exerciseId": "pullup",
+      "sets": 2,
+      "repsMin": 6,
+      "repsMax": 10,
+      "repsLabel": null,
+      "rir": "3–4",
+      "skip": false
+     },
+     {
+      "key": "3",
+      "exerciseId": "cablerow",
+      "sets": 2,
+      "repsMin": 10,
+      "repsMax": 12,
+      "repsLabel": null,
+      "rir": "3–4",
+      "skip": false
+     },
+     {
+      "key": "4",
+      "exerciseId": "lowhighfly",
+      "sets": 2,
+      "repsMin": 12,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "3–4",
+      "skip": false
+     },
+     {
+      "key": "5",
+      "exerciseId": "pushup",
+      "sets": 1,
+      "repsMin": 8,
+      "repsMax": 25,
+      "repsLabel": "stop 2 reps before failure",
+      "rir": "3–4",
+      "skip": false
+     },
+     {
+      "key": "6a",
+      "exerciseId": "lateral",
+      "sets": 2,
+      "repsMin": 12,
+      "repsMax": 20,
+      "repsLabel": null,
+      "rir": "3–4",
+      "skip": false
+     },
+     {
+      "key": "6b",
+      "exerciseId": "revpec",
+      "sets": 1,
+      "repsMin": 15,
+      "repsMax": 20,
+      "repsLabel": null,
+      "rir": "3–4",
+      "skip": false
+     },
+     {
+      "key": "7a",
+      "exerciseId": "hammer",
+      "sets": 1,
+      "repsMin": 10,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "3–4",
+      "skip": false
+     },
+     {
+      "key": "7b",
+      "exerciseId": "ohext",
+      "sets": 1,
+      "repsMin": 10,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "3–4",
+      "skip": false
+     }
+    ],
+    "game": [
+     {
+      "key": "1",
+      "exerciseId": "flatpress",
+      "sets": 2,
+      "repsMin": 8,
+      "repsMax": 12,
+      "repsLabel": null,
+      "rir": "3–4",
+      "skip": false
+     },
+     {
+      "key": "2",
+      "exerciseId": "pullup",
+      "sets": 2,
+      "repsMin": 6,
+      "repsMax": 10,
+      "repsLabel": null,
+      "rir": "3–4",
+      "skip": false
+     },
+     {
+      "key": "3",
+      "exerciseId": "cablerow",
+      "sets": 2,
+      "repsMin": 10,
+      "repsMax": 12,
+      "repsLabel": null,
+      "rir": "3–4",
+      "skip": false
+     },
+     {
+      "key": "4",
+      "exerciseId": "lowhighfly",
+      "sets": 2,
+      "repsMin": 12,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "3–4",
+      "skip": false
+     },
+     {
+      "key": "5",
+      "exerciseId": "pushup",
+      "sets": 1,
+      "repsMin": 8,
+      "repsMax": 25,
+      "repsLabel": "stop 2 reps before failure",
+      "rir": "3–4",
+      "skip": false
+     },
+     {
+      "key": "6a",
+      "exerciseId": "lateral",
+      "sets": 2,
+      "repsMin": 12,
+      "repsMax": 20,
+      "repsLabel": null,
+      "rir": "3–4",
+      "skip": false
+     },
+     {
+      "key": "6b",
+      "exerciseId": "revpec",
+      "sets": 1,
+      "repsMin": 15,
+      "repsMax": 20,
+      "repsLabel": null,
+      "rir": "3–4",
+      "skip": false
+     },
+     {
+      "key": "7a",
+      "exerciseId": "hammer",
+      "sets": 1,
+      "repsMin": 10,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "3–4",
+      "skip": false
+     },
+     {
+      "key": "7b",
+      "exerciseId": "ohext",
+      "sets": 1,
+      "repsMin": 10,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "3–4",
+      "skip": false
+     }
+    ]
+   },
+   "bonus": {
+    "normal": [
+     {
+      "key": "1",
+      "exerciseId": "alt_machinepress",
+      "sets": 1,
+      "repsMin": 12,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "2",
+      "skip": false
+     },
+     {
+      "key": "2",
+      "exerciseId": "cablefly",
+      "sets": 1,
+      "repsMin": 12,
+      "repsMax": 20,
+      "repsLabel": null,
+      "rir": "1–2",
+      "skip": false
+     },
+     {
+      "key": "3a",
+      "exerciseId": "lateral",
+      "sets": 2,
+      "repsMin": 15,
+      "repsMax": 20,
+      "repsLabel": null,
+      "rir": "1",
+      "skip": false
+     },
+     {
+      "key": "3b",
+      "exerciseId": "c_er",
+      "sets": 1,
+      "repsMin": 15,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "Easy",
+      "skip": false
+     },
+     {
+      "key": "4a",
+      "exerciseId": "curl",
+      "sets": 1,
+      "repsMin": 12,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "1–2",
+      "skip": false
+     },
+     {
+      "key": "4b",
+      "exerciseId": "pushdown",
+      "sets": 1,
+      "repsMin": 12,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "1–2",
+      "skip": false
+     },
+     {
+      "key": "5a",
+      "exerciseId": "c_proney",
+      "sets": 1,
+      "repsMin": 10,
+      "repsMax": 10,
+      "repsLabel": null,
+      "rir": "Easy",
+      "skip": false
+     },
+     {
+      "key": "5b",
+      "exerciseId": "c_scappush",
+      "sets": 1,
+      "repsMin": 10,
+      "repsMax": 10,
+      "repsLabel": null,
+      "rir": "Easy",
+      "skip": false
+     },
+     {
+      "key": "5c",
+      "exerciseId": "c_wallslide",
+      "sets": 1,
+      "repsMin": 8,
+      "repsMax": 8,
+      "repsLabel": null,
+      "rir": "Easy",
+      "skip": false
+     }
+    ],
+    "game": [
+     {
+      "key": "1",
+      "exerciseId": "alt_machinepress",
+      "sets": 1,
+      "repsMin": 12,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "2",
+      "skip": false
+     },
+     {
+      "key": "2",
+      "exerciseId": "cablefly",
+      "sets": 1,
+      "repsMin": 12,
+      "repsMax": 20,
+      "repsLabel": null,
+      "rir": "1–2",
+      "skip": false
+     },
+     {
+      "key": "3a",
+      "exerciseId": "lateral",
+      "sets": 2,
+      "repsMin": 15,
+      "repsMax": 20,
+      "repsLabel": null,
+      "rir": "1",
+      "skip": false
+     },
+     {
+      "key": "3b",
+      "exerciseId": "c_er",
+      "sets": 1,
+      "repsMin": 15,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "Easy",
+      "skip": false
+     },
+     {
+      "key": "4a",
+      "exerciseId": "curl",
+      "sets": 1,
+      "repsMin": 12,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "1–2",
+      "skip": false
+     },
+     {
+      "key": "4b",
+      "exerciseId": "pushdown",
+      "sets": 1,
+      "repsMin": 12,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "1–2",
+      "skip": false
+     },
+     {
+      "key": "5a",
+      "exerciseId": "c_proney",
+      "sets": 1,
+      "repsMin": 10,
+      "repsMax": 10,
+      "repsLabel": null,
+      "rir": "Easy",
+      "skip": false
+     },
+     {
+      "key": "5b",
+      "exerciseId": "c_scappush",
+      "sets": 1,
+      "repsMin": 10,
+      "repsMax": 10,
+      "repsLabel": null,
+      "rir": "Easy",
+      "skip": false
+     },
+     {
+      "key": "5c",
+      "exerciseId": "c_wallslide",
+      "sets": 1,
+      "repsMin": 8,
+      "repsMax": 8,
+      "repsLabel": null,
+      "rir": "Easy",
+      "skip": false
+     }
+    ]
+   }
+  },
+  "push": {
+   "uppera": {
+    "normal": [
+     {
+      "key": "1",
+      "exerciseId": "incline",
+      "sets": 4,
+      "repsMin": 6,
+      "repsMax": 10,
+      "repsLabel": null,
+      "rir": "1–2",
+      "skip": false
+     },
+     {
+      "key": "2",
+      "exerciseId": "csrow",
+      "sets": 4,
+      "repsMin": 8,
+      "repsMax": 12,
+      "repsLabel": null,
+      "rir": "1–2",
+      "skip": false
+     },
+     {
+      "key": "3",
+      "exerciseId": "cablefly",
+      "sets": 3,
+      "repsMin": 10,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "1 · last set 0",
+      "skip": false
+     },
+     {
+      "key": "4",
+      "exerciseId": "pulldown",
+      "sets": 3,
+      "repsMin": 8,
+      "repsMax": 12,
+      "repsLabel": null,
+      "rir": "1–2",
+      "skip": false
+     },
+     {
+      "key": "5a",
+      "exerciseId": "lateral",
+      "sets": 3,
+      "repsMin": 12,
+      "repsMax": 20,
+      "repsLabel": null,
+      "rir": "0–1",
+      "skip": false
+     },
+     {
+      "key": "5b",
+      "exerciseId": "facepull",
+      "sets": 2,
+      "repsMin": 12,
+      "repsMax": 20,
+      "repsLabel": null,
+      "rir": "1–2 · last set 0",
+      "skip": false
+     },
+     {
+      "key": "6a",
+      "exerciseId": "curl",
+      "sets": 2,
+      "repsMin": 10,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "1 · last set 0",
+      "skip": false
+     },
+     {
+      "key": "6b",
+      "exerciseId": "pushdown",
+      "sets": 2,
+      "repsMin": 10,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "1 · last set 0",
+      "skip": false
+     }
+    ],
+    "game": [
+     {
+      "key": "1",
+      "exerciseId": "incline",
+      "sets": 4,
+      "repsMin": 6,
+      "repsMax": 10,
+      "repsLabel": null,
+      "rir": "1–2",
+      "skip": false
+     },
+     {
+      "key": "2",
+      "exerciseId": "csrow",
+      "sets": 4,
+      "repsMin": 8,
+      "repsMax": 12,
+      "repsLabel": null,
+      "rir": "1–2",
+      "skip": false
+     },
+     {
+      "key": "3",
+      "exerciseId": "cablefly",
+      "sets": 3,
+      "repsMin": 10,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "1 · last set 0",
+      "skip": false
+     },
+     {
+      "key": "4",
+      "exerciseId": "pulldown",
+      "sets": 3,
+      "repsMin": 8,
+      "repsMax": 12,
+      "repsLabel": null,
+      "rir": "1–2",
+      "skip": false
+     },
+     {
+      "key": "5a",
+      "exerciseId": "lateral",
+      "sets": 3,
+      "repsMin": 12,
+      "repsMax": 20,
+      "repsLabel": null,
+      "rir": "0–1",
+      "skip": false
+     },
+     {
+      "key": "5b",
+      "exerciseId": "facepull",
+      "sets": 2,
+      "repsMin": 12,
+      "repsMax": 20,
+      "repsLabel": null,
+      "rir": "1–2 · last set 0",
+      "skip": false
+     },
+     {
+      "key": "6a",
+      "exerciseId": "curl",
+      "sets": 2,
+      "repsMin": 10,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "1 · last set 0",
+      "skip": false
+     },
+     {
+      "key": "6b",
+      "exerciseId": "pushdown",
+      "sets": 2,
+      "repsMin": 10,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "1 · last set 0",
+      "skip": false
+     }
+    ]
+   },
+   "lower": {
+    "normal": [
+     {
+      "key": "1",
+      "exerciseId": "legpress",
+      "sets": 4,
+      "repsMin": 6,
+      "repsMax": 10,
+      "repsLabel": null,
+      "rir": "1–2",
+      "skip": false
+     },
+     {
+      "key": "2",
+      "exerciseId": "rdl",
+      "sets": 4,
+      "repsMin": 8,
+      "repsMax": 10,
+      "repsLabel": null,
+      "rir": "2",
+      "skip": false
+     },
+     {
+      "key": "3",
+      "exerciseId": "bss",
+      "sets": 2,
+      "repsMin": 8,
+      "repsMax": 12,
+      "repsLabel": null,
+      "rir": "1–2",
+      "skip": false
+     },
+     {
+      "key": "4",
+      "exerciseId": "legcurl",
+      "sets": 3,
+      "repsMin": 10,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "0–1",
+      "skip": false
+     },
+     {
+      "key": "5a",
+      "exerciseId": "calf",
+      "sets": 3,
+      "repsMin": 10,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "0–1",
+      "skip": false
+     },
+     {
+      "key": "5b",
+      "exerciseId": "pallof",
+      "sets": 2,
+      "repsMin": 10,
+      "repsMax": 10,
+      "repsLabel": null,
+      "rir": "Controlled",
+      "skip": false
+     },
+     {
+      "key": "6",
+      "exerciseId": "crunch",
+      "sets": 2,
+      "repsMin": 10,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "1 · last set 0",
+      "skip": false
+     }
+    ],
+    "game": [
+     {
+      "key": "1",
+      "exerciseId": "legpress",
+      "sets": 2,
+      "repsMin": 6,
+      "repsMax": 10,
+      "repsLabel": null,
+      "rir": "3",
+      "skip": false
+     },
+     {
+      "key": "2",
+      "exerciseId": "rdl",
+      "sets": 2,
+      "repsMin": 8,
+      "repsMax": 10,
+      "repsLabel": null,
+      "rir": "3",
+      "skip": false
+     },
+     {
+      "key": "3",
+      "exerciseId": "bss",
+      "sets": 2,
+      "repsMin": 8,
+      "repsMax": 12,
+      "repsLabel": null,
+      "rir": "3",
+      "skip": true
+     },
+     {
+      "key": "4",
+      "exerciseId": "legcurl",
+      "sets": 2,
+      "repsMin": 10,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "3",
+      "skip": false
+     },
+     {
+      "key": "5a",
+      "exerciseId": "calf",
+      "sets": 2,
+      "repsMin": 10,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "3",
+      "skip": false
+     },
+     {
+      "key": "5b",
+      "exerciseId": "pallof",
+      "sets": 2,
+      "repsMin": 10,
+      "repsMax": 10,
+      "repsLabel": null,
+      "rir": "Controlled",
+      "skip": false
+     },
+     {
+      "key": "6",
+      "exerciseId": "crunch",
+      "sets": 2,
+      "repsMin": 10,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "3",
+      "skip": false
+     }
+    ]
+   },
+   "upperb": {
+    "normal": [
+     {
+      "key": "1",
+      "exerciseId": "flatpress",
+      "sets": 4,
+      "repsMin": 8,
+      "repsMax": 12,
+      "repsLabel": null,
+      "rir": "1–2",
+      "skip": false
+     },
+     {
+      "key": "2",
+      "exerciseId": "pullup",
+      "sets": 4,
+      "repsMin": 6,
+      "repsMax": 10,
+      "repsLabel": null,
+      "rir": "1–2",
+      "skip": false
+     },
+     {
+      "key": "3",
+      "exerciseId": "cablerow",
+      "sets": 3,
+      "repsMin": 10,
+      "repsMax": 12,
+      "repsLabel": null,
+      "rir": "1–2",
+      "skip": false
+     },
+     {
+      "key": "4",
+      "exerciseId": "lowhighfly",
+      "sets": 3,
+      "repsMin": 12,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "0–1",
+      "skip": false
+     },
+     {
+      "key": "5",
+      "exerciseId": "pushup",
+      "sets": 2,
+      "repsMin": 8,
+      "repsMax": 25,
+      "repsLabel": "stop 2 reps before failure",
+      "rir": "2",
+      "skip": false
+     },
+     {
+      "key": "6a",
+      "exerciseId": "lateral",
+      "sets": 3,
+      "repsMin": 12,
+      "repsMax": 20,
+      "repsLabel": null,
+      "rir": "0–1",
+      "skip": false
+     },
+     {
+      "key": "6b",
+      "exerciseId": "revpec",
+      "sets": 2,
+      "repsMin": 15,
+      "repsMax": 20,
+      "repsLabel": null,
+      "rir": "0–1",
+      "skip": false
+     },
+     {
+      "key": "7a",
+      "exerciseId": "hammer",
+      "sets": 2,
+      "repsMin": 10,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "1 · last set 0",
+      "skip": false
+     },
+     {
+      "key": "7b",
+      "exerciseId": "ohext",
+      "sets": 2,
+      "repsMin": 10,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "1 · last set 0",
+      "skip": false
+     }
+    ],
+    "game": [
+     {
+      "key": "1",
+      "exerciseId": "flatpress",
+      "sets": 4,
+      "repsMin": 8,
+      "repsMax": 12,
+      "repsLabel": null,
+      "rir": "1–2",
+      "skip": false
+     },
+     {
+      "key": "2",
+      "exerciseId": "pullup",
+      "sets": 4,
+      "repsMin": 6,
+      "repsMax": 10,
+      "repsLabel": null,
+      "rir": "1–2",
+      "skip": false
+     },
+     {
+      "key": "3",
+      "exerciseId": "cablerow",
+      "sets": 3,
+      "repsMin": 10,
+      "repsMax": 12,
+      "repsLabel": null,
+      "rir": "1–2",
+      "skip": false
+     },
+     {
+      "key": "4",
+      "exerciseId": "lowhighfly",
+      "sets": 3,
+      "repsMin": 12,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "0–1",
+      "skip": false
+     },
+     {
+      "key": "5",
+      "exerciseId": "pushup",
+      "sets": 2,
+      "repsMin": 8,
+      "repsMax": 25,
+      "repsLabel": "stop 2 reps before failure",
+      "rir": "2",
+      "skip": false
+     },
+     {
+      "key": "6a",
+      "exerciseId": "lateral",
+      "sets": 3,
+      "repsMin": 12,
+      "repsMax": 20,
+      "repsLabel": null,
+      "rir": "0–1",
+      "skip": false
+     },
+     {
+      "key": "6b",
+      "exerciseId": "revpec",
+      "sets": 2,
+      "repsMin": 15,
+      "repsMax": 20,
+      "repsLabel": null,
+      "rir": "0–1",
+      "skip": false
+     },
+     {
+      "key": "7a",
+      "exerciseId": "hammer",
+      "sets": 2,
+      "repsMin": 10,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "1 · last set 0",
+      "skip": false
+     },
+     {
+      "key": "7b",
+      "exerciseId": "ohext",
+      "sets": 2,
+      "repsMin": 10,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "1 · last set 0",
+      "skip": false
+     }
+    ]
+   },
+   "bonus": {
+    "normal": [
+     {
+      "key": "1",
+      "exerciseId": "alt_machinepress",
+      "sets": 2,
+      "repsMin": 12,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "2",
+      "skip": false
+     },
+     {
+      "key": "2",
+      "exerciseId": "cablefly",
+      "sets": 2,
+      "repsMin": 12,
+      "repsMax": 20,
+      "repsLabel": null,
+      "rir": "1–2",
+      "skip": false
+     },
+     {
+      "key": "3a",
+      "exerciseId": "lateral",
+      "sets": 3,
+      "repsMin": 15,
+      "repsMax": 20,
+      "repsLabel": null,
+      "rir": "1",
+      "skip": false
+     },
+     {
+      "key": "3b",
+      "exerciseId": "c_er",
+      "sets": 2,
+      "repsMin": 15,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "Easy",
+      "skip": false
+     },
+     {
+      "key": "4a",
+      "exerciseId": "curl",
+      "sets": 2,
+      "repsMin": 12,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "1–2",
+      "skip": false
+     },
+     {
+      "key": "4b",
+      "exerciseId": "pushdown",
+      "sets": 2,
+      "repsMin": 12,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "1–2",
+      "skip": false
+     },
+     {
+      "key": "5a",
+      "exerciseId": "c_proney",
+      "sets": 2,
+      "repsMin": 10,
+      "repsMax": 10,
+      "repsLabel": null,
+      "rir": "Easy",
+      "skip": false
+     },
+     {
+      "key": "5b",
+      "exerciseId": "c_scappush",
+      "sets": 2,
+      "repsMin": 10,
+      "repsMax": 10,
+      "repsLabel": null,
+      "rir": "Easy",
+      "skip": false
+     },
+     {
+      "key": "5c",
+      "exerciseId": "c_wallslide",
+      "sets": 2,
+      "repsMin": 8,
+      "repsMax": 8,
+      "repsLabel": null,
+      "rir": "Easy",
+      "skip": false
+     }
+    ],
+    "game": [
+     {
+      "key": "1",
+      "exerciseId": "alt_machinepress",
+      "sets": 2,
+      "repsMin": 12,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "2",
+      "skip": false
+     },
+     {
+      "key": "2",
+      "exerciseId": "cablefly",
+      "sets": 2,
+      "repsMin": 12,
+      "repsMax": 20,
+      "repsLabel": null,
+      "rir": "1–2",
+      "skip": false
+     },
+     {
+      "key": "3a",
+      "exerciseId": "lateral",
+      "sets": 3,
+      "repsMin": 15,
+      "repsMax": 20,
+      "repsLabel": null,
+      "rir": "1",
+      "skip": false
+     },
+     {
+      "key": "3b",
+      "exerciseId": "c_er",
+      "sets": 2,
+      "repsMin": 15,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "Easy",
+      "skip": false
+     },
+     {
+      "key": "4a",
+      "exerciseId": "curl",
+      "sets": 2,
+      "repsMin": 12,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "1–2",
+      "skip": false
+     },
+     {
+      "key": "4b",
+      "exerciseId": "pushdown",
+      "sets": 2,
+      "repsMin": 12,
+      "repsMax": 15,
+      "repsLabel": null,
+      "rir": "1–2",
+      "skip": false
+     },
+     {
+      "key": "5a",
+      "exerciseId": "c_proney",
+      "sets": 2,
+      "repsMin": 10,
+      "repsMax": 10,
+      "repsLabel": null,
+      "rir": "Easy",
+      "skip": false
+     },
+     {
+      "key": "5b",
+      "exerciseId": "c_scappush",
+      "sets": 2,
+      "repsMin": 10,
+      "repsMax": 10,
+      "repsLabel": null,
+      "rir": "Easy",
+      "skip": false
+     },
+     {
+      "key": "5c",
+      "exerciseId": "c_wallslide",
+      "sets": 2,
+      "repsMin": 8,
+      "repsMax": 8,
+      "repsLabel": null,
+      "rir": "Easy",
+      "skip": false
+     }
+    ]
+   }
+  }
+ }
+}
