@@ -1468,6 +1468,263 @@ export const EXERCISES: ExerciseDef[] = [
       },
     ],
   },
+  // Added for the Muscle Mass Building and Definition example plans (phase 3).
+  {
+    id: 'benchpress',
+    name: 'Barbell bench press',
+    muscles: 'Chest, front shoulders, triceps',
+    primary: 'chest',
+    secondary: ['shoulders', 'triceps'],
+    equipment: 'barbell',
+    isolation: false,
+    tracking: 'weight_reps',
+    increment: 2.5,
+    kind: 'main',
+    swaps: ['flatpress', 'alt_machinepress'],
+    sections: [
+      {
+        label: 'SETUP',
+        items: [
+          'Lie with your eyes under the bar. Feet flat on the floor, shoulder blades pulled back and down, small arch in your lower back, butt on the bench.',
+          'Grip a little wider than your shoulders, wrists straight over your forearms. Unrack with straight arms.',
+        ],
+      },
+      {
+        label: 'DO IT',
+        items: [
+          'Lower the bar in 2–3 s to the lower half of your chest, elbows about 45° from your body.',
+          'Pause for a moment, then press up and slightly back toward your eyes.',
+          'Breathe in on the way down, out as you press.',
+        ],
+      },
+      {
+        label: 'AVOID',
+        items: [
+          'Bouncing the bar off your chest, or lifting your butt off the bench.',
+          'Elbows flaring out to a “T”, or shoulders rolling forward at the top.',
+        ],
+      },
+      {
+        label: 'IF IT HURTS',
+        items: [
+          'Take a slightly wider or narrower grip, tuck your elbows more, or stop 3–5 cm above your chest.',
+          'Still pinching? Use dumbbells or a machine press instead.',
+        ],
+      },
+    ],
+    warning: 'Heavy sets need a spotter or safety pins set just above your chest. Never clip the collars on a bar you can’t rack.',
+  },
+  {
+    id: 'shoulderpress',
+    name: 'Dumbbell shoulder press',
+    muscles: 'Shoulders (mostly the front), triceps',
+    primary: 'shoulders',
+    secondary: ['triceps'],
+    equipment: 'dumbbell',
+    isolation: false,
+    tracking: 'weight_reps',
+    increment: 2,
+    kind: 'main',
+    swaps: ['alt_machinepress', 'alt_inclinemachine'],
+    sections: [
+      {
+        label: 'SETUP',
+        items: [
+          'Sit on a bench with the back set to 80–90°. Rest the dumbbells on your thighs, then bring them up to shoulder height.',
+          'Feet flat, ribs down, shoulder blades against the pad.',
+        ],
+      },
+      {
+        label: 'DO IT',
+        items: [
+          'Start with your palms facing forward or slightly in, elbows a little in front of your body.',
+          'Press up until your arms are almost straight, with the dumbbells above your shoulders.',
+          'Lower in 2–3 s until your upper arms are about level with the floor.',
+        ],
+      },
+      {
+        label: 'AVOID',
+        items: [
+          'Arching your lower back to push the weight up.',
+          'Shrugging your shoulders up toward your ears.',
+        ],
+      },
+      {
+        label: 'IF IT HURTS',
+        items: [
+          'Turn your palms toward each other, lower the bench a notch, or stop a little higher.',
+          'Still pinching? Use a machine shoulder press with neutral handles.',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'latpulldown',
+    name: 'Lat pulldown',
+    muscles: 'Lats, upper back, biceps',
+    primary: 'back',
+    secondary: ['biceps'],
+    equipment: 'cable',
+    isolation: false,
+    tracking: 'weight_reps',
+    increment: 2.5,
+    kind: 'main',
+    swaps: ['pulldown', 'alt_assistedpullup', 'pullup'],
+    sections: [
+      {
+        label: 'SETUP',
+        items: [
+          'Hold the bar a little wider than your shoulders. Sit with your thighs snug under the pads.',
+          'Lean back slightly and lift your chest.',
+        ],
+      },
+      {
+        label: 'DO IT',
+        items: [
+          'Pull your shoulders down first, then bring your elbows down toward your sides.',
+          'Pull the bar to your upper chest and squeeze for 1 s.',
+          'Let the bar back up in 2–3 s until your arms are straight and you feel a stretch in your lats.',
+        ],
+      },
+      {
+        label: 'AVOID',
+        items: [
+          'Swinging back to yank the bar down.',
+          'Pulling the bar behind your neck.',
+        ],
+      },
+      {
+        label: 'IF IT HURTS',
+        items: [
+          'Elbow or grip pain: use straps, or try the neutral-grip pulldown.',
+          'Shoulder pinching: don’t reach all the way up at the top.',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'backsquat',
+    name: 'Barbell back squat',
+    muscles: 'Quads, glutes, lower back',
+    primary: 'quads',
+    secondary: ['glutes'],
+    equipment: 'barbell',
+    isolation: false,
+    tracking: 'weight_reps',
+    increment: 2.5,
+    kind: 'main',
+    swaps: ['legpress', 'alt_gobletsquat'],
+    sections: [
+      {
+        label: 'SETUP',
+        items: [
+          'Set the bar in the rack at about chest height, with safety arms just below the bottom of your squat.',
+          'Get under the bar so it rests on your upper back, not on your neck. Hands just outside your shoulders. Stand up to unrack and take two small steps back.',
+          'Feet about shoulder-width apart, toes turned slightly out.',
+        ],
+      },
+      {
+        label: 'DO IT',
+        items: [
+          'Take a big breath into your belly and brace before each rep.',
+          'Sit down and slightly back, knees moving in line with your toes. Go as deep as you can while your back stays flat.',
+          'Push through your whole foot to stand up. Keep your chest up.',
+        ],
+      },
+      {
+        label: 'AVOID',
+        items: [
+          'Knees caving inward, or heels lifting off the floor.',
+          'Rounding your lower back at the bottom, or bouncing out of the hole.',
+        ],
+      },
+      {
+        label: 'IF IT HURTS',
+        items: [
+          'Shoulders or elbows: take a wider grip, or use the leg press.',
+          'Knees: use a shorter range, or try the heel-elevated goblet squat.',
+        ],
+      },
+    ],
+    warning: 'Always use the safety arms. If you get stuck, lower the bar onto them instead of fighting it.',
+  },
+  {
+    id: 'barbellrdl',
+    name: 'Barbell Romanian deadlift',
+    muscles: 'Hamstrings, glutes, lower back',
+    primary: 'hamstrings',
+    secondary: ['glutes'],
+    equipment: 'barbell',
+    isolation: false,
+    tracking: 'weight_reps',
+    increment: 2.5,
+    kind: 'main',
+    swaps: ['rdl', 'alt_backext'],
+    sections: [
+      {
+        label: 'SETUP',
+        items: [
+          'Stand tall holding the bar in front of your thighs, hands just outside your legs. Feet hip-width apart, knees slightly bent.',
+        ],
+      },
+      {
+        label: 'DO IT',
+        items: [
+          'Push your hips back, like closing a car door with your butt. Keep your back flat and the bar close to your legs.',
+          'Lower in 3 s until you feel a strong stretch in your hamstrings — usually just below the knees.',
+          'Drive your hips forward to stand tall and squeeze your glutes. Don’t lean back at the top.',
+        ],
+      },
+      {
+        label: 'AVOID',
+        items: [
+          'Rounding your lower back to reach lower.',
+          'Bending your knees more and more until it becomes a squat.',
+        ],
+      },
+      {
+        label: 'IF IT HURTS',
+        items: ['Lower back: shorten the range, or use dumbbells. Grip: use straps.'],
+      },
+    ],
+    warning: 'Stop the set if your lower back rounds. Lower the bar to the floor between sets instead of dropping it.',
+  },
+  {
+    id: 'legext',
+    name: 'Leg extension',
+    muscles: 'Quads',
+    primary: 'quads',
+    equipment: 'machine',
+    isolation: true,
+    tracking: 'weight_reps',
+    increment: 2.5,
+    kind: 'main',
+    swaps: ['legpress', 'alt_gobletsquat'],
+    sections: [
+      {
+        label: 'SETUP',
+        items: [
+          'Set the seat so your knees line up with the machine’s pivot and your back is flat against the pad.',
+          'The pad rests on your lower shins, just above your ankles.',
+        ],
+      },
+      {
+        label: 'DO IT',
+        items: [
+          'Straighten your legs and squeeze your quads for 1 s at the top.',
+          'Lower in 2–3 s until your knees are bent at about 90°.',
+        ],
+      },
+      {
+        label: 'AVOID',
+        items: ['Swinging the weight up, or lifting your hips off the seat.', 'Locking your knees hard at the top.'],
+      },
+      {
+        label: 'IF IT HURTS',
+        items: ['Knee pain: use lighter weight and skip the last few degrees at the top, or do leg presses instead.'],
+      },
+    ],
+  },
 ];
 
 export const EXERCISE_BY_ID: Record<string, ExerciseDef> = Object.fromEntries(EXERCISES.map((e) => [e.id, e]));
