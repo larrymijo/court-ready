@@ -6,6 +6,8 @@
 //   3. 404.html is a copy of index.html, so deep links like /<repo>/routine/lower work on Pages.
 //   4. The page and sw.js both carry the build's id, so an app left open can tell when a newer
 //      build has been cached and offer "New version ready" (src/lib/serviceWorker.web.ts).
+//   5. The icon addresses carry a fingerprint of the icon files, so a changed icon is fetched again
+//      instead of being shown from the browser's memory.
 //
 // The beta copy (EXPO_PUBLIC_CHANNEL=beta) is built the same way with its own base path, name and
 // cache, so it installs as a second home-screen app next to the main one. The Pages workflow puts
@@ -24,6 +26,17 @@ const beta = process.env.EXPO_PUBLIC_CHANNEL === 'beta';
 const homeScreenName = beta ? 'Hybrid Beta' : 'Hybrid';
 // Each copy only cleans up caches it made itself, so the two never delete each other's files.
 const cachePrefix = beta ? 'court-ready-beta-' : 'court-ready-app-';
+
+// Browsers remember an icon by its address. The icon files keep their names from build to build, so
+// their addresses get a fingerprint of the pictures: a new icon has a new address and is fetched
+// again. (After the rename to Hybrid, Safari kept showing the old icon because the address was the same.)
+const ICON_FILES = ['favicon.ico', 'icons/apple-touch-icon.png', 'icons/icon-192.png', 'icons/icon-512.png'];
+const iconHash = createHash('sha256');
+for (const file of ICON_FILES) {
+  if (existsSync(join(dist, file))) iconHash.update(file).update(readFileSync(join(dist, file)));
+}
+const iconVersion = iconHash.digest('hex').slice(0, 8);
+const versioned = (url) => `${url.split('?')[0]}?v=${iconVersion}`;
 
 function listFiles(dir) {
   return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
@@ -58,14 +71,20 @@ const tags = [
 if (!html.includes('rel="manifest"')) {
   html = html.replace('</head>', `\n    ${tags.join('\n    ')}\n  </head>`);
 }
+// The icon links, the one Expo wrote for the favicon included, point at the fingerprinted addresses.
+html = html.replace(
+  /(<link rel="(?:icon|shortcut icon|apple-touch-icon)"[^>]*href=")([^"]+)(")/g,
+  (_match, start, href, end) => `${start}${versioned(href)}${end}`,
+);
 // Run on a folder that was finished before, the page already names a build: start from the stand-in again.
 html = html.replace(/window\.__COURT_READY_BUILD__="[^"]*"/, BUILD_PENDING);
 writeFileSync(indexPath, html);
 
 const manifestPath = join(dist, 'manifest.json');
-if (beta && existsSync(manifestPath)) {
+if (existsSync(manifestPath)) {
   const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
-  const named = { ...manifest, name: 'Hybrid Beta', short_name: homeScreenName };
+  const icons = (manifest.icons ?? []).map((icon) => ({ ...icon, src: versioned(icon.src) }));
+  const named = beta ? { ...manifest, name: 'Hybrid Beta', short_name: homeScreenName, icons } : { ...manifest, icons };
   writeFileSync(manifestPath, `${JSON.stringify(named, null, 2)}\n`);
 }
 
