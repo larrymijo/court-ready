@@ -1,5 +1,4 @@
 import { formatDateLong, plural } from '@/lib/format';
-import { workoutSetCount } from '@/lib/stats';
 import type { BodyEntry, Workout } from '@/lib/types';
 
 type SavedSet = Workout['exercises'][number]['sets'][number];
