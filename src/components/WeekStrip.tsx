@@ -1,38 +1,50 @@
 import { StyleSheet, Text, View } from 'react-native';
 
 import { Check } from '@/components/ui';
-import { DAY_LONG, DAY_SHORT, WEEK_PLAN } from '@/data/schedule';
-import { addDaysISO, isoFromTimestamp, parseISODate } from '@/lib/dates';
+import { DAY_LONG, DAY_SHORT } from '@/data/schedule';
+import { isoFromTimestamp, parseISODate } from '@/lib/dates';
+import type { WeekDayView } from '@/lib/planView';
 import type { Workout } from '@/lib/types';
 import { C, T } from '@/theme';
 
 /**
- * Monday to Sunday. Today is the white circle. Under each date: a filled dot for a gym day, a ring
- * for a sport day, and the check mark once you trained that day.
+ * Monday to Sunday of the plan in use. Today is the white circle. Under each date: a filled dot for
+ * a day with a required gym session, a ring for a sport day, and the check mark once you trained
+ * that day. A day with only optional sessions is left unmarked.
  */
-export function WeekStrip({ mondayISO, todayISO, workouts }: { mondayISO: string; todayISO: string; workouts: Workout[] }) {
+export function WeekStrip({ days: planDays, workouts }: { days: WeekDayView[]; workouts: Workout[] }) {
   const trained = new Set(workouts.filter((w) => w.finishedAt).map((w) => isoFromTimestamp(w.startedAt)));
-  const days = WEEK_PLAN.map((plan, i) => {
-    const date = addDaysISO(mondayISO, i);
-    return { plan, date, dayOfMonth: parseISODate(date).getDate(), isToday: date === todayISO, did: trained.has(date) };
+  const days = planDays.map((d) => {
+    const required = d.sessions.filter((s) => !s.optional);
+    const mark = required.some((s) => s.kind === 'gym') ? 'gym' : required.length > 0 ? 'sport' : null;
+    const names = d.sessions.map((s) => (s.optional ? `${s.name} (optional)` : s.name));
+    return {
+      weekday: d.weekday,
+      mark,
+      label: names.length > 0 ? names.join(', ') : 'Rest',
+      date: d.date,
+      dayOfMonth: parseISODate(d.date).getDate(),
+      isToday: d.isToday,
+      did: trained.has(d.date),
+    };
   });
   const anyDone = days.some((d) => d.did);
 
   return (
     <View style={styles.wrap}>
       <View style={styles.row}>
-        {days.map(({ plan, date, dayOfMonth, isToday, did }, i) => (
+        {days.map(({ weekday: i, mark, label, date, dayOfMonth, isToday, did }) => (
           <View
             key={date}
             style={styles.day}
             accessible
-            accessibilityLabel={`${DAY_LONG[i]} ${dayOfMonth}${isToday ? ', today' : ''}: ${plan.label}${did ? ', trained' : ''}`}>
+            accessibilityLabel={`${DAY_LONG[i]} ${dayOfMonth}${isToday ? ', today' : ''}: ${label}${did ? ', trained' : ''}`}>
             <Text style={[styles.name, isToday && { color: C.text }]}>{DAY_SHORT[i]}</Text>
             <View style={[styles.date, isToday && styles.dateToday]}>
               <Text style={[styles.dateText, isToday && styles.dateTextToday]}>{dayOfMonth}</Text>
             </View>
             <View style={styles.mark}>
-              {did ? <Check done size={14} /> : plan.kind === 'gym' ? <View style={styles.dot} /> : plan.kind === 'sport' ? <View style={styles.ring} /> : null}
+              {did ? <Check done size={14} /> : mark === 'gym' ? <View style={styles.dot} /> : mark === 'sport' ? <View style={styles.ring} /> : null}
             </View>
           </View>
         ))}

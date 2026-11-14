@@ -4,6 +4,7 @@
 // Phase 3: only gym workouts can be started. Sport sessions are shown but never startable and
 // never count as done; phase 4 adds logging them.
 import { examplePlans } from '@/data/plan-templates';
+import { DAY_LONG } from '@/data/schedule';
 import { addDaysISO, daysBetween, isoFromTimestamp, mondayOfISO, parseISODate, weekdayIndex } from '@/lib/dates';
 import {
   daySessions,
@@ -13,6 +14,7 @@ import {
   type DaySession,
   type PlanPosition,
 } from '@/lib/plans';
+import { PHASES } from '@/lib/program';
 import type { GymWorkout, PhaseId, Plan, PlanState, SessionRef, SportId, Workout } from '@/lib/types';
 
 // ---------------------------------------------------------------------------------------------
@@ -392,4 +394,179 @@ export function visibleGuideSlugs(slugs: readonly string[], activePlan: Plan | u
   const specific = planSpecificArticleSlugs();
   const mine = new Set(activePlan?.articles ?? []);
   return slugs.filter((s) => !specific.has(s) || mine.has(s));
+}
+
+// ---------------------------------------------------------------------------------------------
+// Wording for the plan screens
+
+/** The second line of a session in the week list: "Legs and core · 55 min · today". */
+export function weekSessionLine(day: WeekDayView, session: WeekSessionView): string {
+  if (session.kind === 'sport') {
+    if (!session.optional) return 'Sport';
+    return day.sessions.length === 1 ? 'Sport · optional, or rest' : 'Sport · optional';
+  }
+  const parts: string[] = [session.optional ? 'Optional' : session.focus];
+  if (session.done) {
+    const at = session.doneOnWeekday;
+    parts.push(at == null || at === day.weekday ? 'done' : `done ${DAY_LONG[at]}`);
+    return parts.join(' · ');
+  }
+  if (session.minutes) parts.push(`${session.minutes} min`);
+  if (day.isToday) parts.push('today');
+  return parts.join(' · ');
+}
+
+/** "3 gym and 2 sport sessions a week", "4 gym sessions a week". */
+export function sessionsPerWeekText(facts: Pick<PlanFacts, 'gymPerWeek' | 'sportPerWeek'>): string {
+  const { gymPerWeek: g, sportPerWeek: s } = facts;
+  if (g > 0 && s > 0) return `${g} gym and ${s} sport sessions a week`;
+  if (s > 0) return `${s} sport ${s === 1 ? 'session' : 'sessions'} a week`;
+  return `${g} gym ${g === 1 ? 'session' : 'sessions'} a week`;
+}
+
+function listWithAnd(names: string[]): string {
+  if (names.length <= 1) return names.join('');
+  return `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}`;
+}
+
+const TIMES = ['', 'once', 'twice'];
+
+/** One line about a plan, made from its data: "Upper and Lower, each twice a week. Gym only." */
+export function planDescription(plan: Plan): string {
+  const counts = new Map<string, number>();
+  const optional = new Set<string>();
+  let anyGym = false;
+  let anySport = false;
+  for (let d = 0; d < 7; d++) {
+    for (const s of daySessions(plan, d)) {
+      if (s.kind === 'sport') {
+        anySport = true;
+        continue;
+      }
+      anyGym = true;
+      if (s.optional) optional.add(s.workout.id);
+      else counts.set(s.workout.id, (counts.get(s.workout.id) ?? 0) + 1);
+    }
+  }
+  const required = plan.workouts.filter((w) => counts.has(w.id));
+  const extra = plan.workouts.filter((w) => !counts.has(w.id) && optional.has(w.id));
+  let text = '';
+  if (required.length > 0) {
+    text = listWithAnd(required.map((w) => w.name));
+    const first = counts.get(required[0].id) ?? 1;
+    if (required.every((w) => counts.get(w.id) === first)) {
+      const times = TIMES[first] ?? `${first} times`;
+      text += required.length > 1 ? `, each ${times} a week` : `, ${times} a week`;
+    }
+  }
+  if (extra.length > 0) {
+    const names = listWithAnd(extra.map((w) => w.name));
+    text = text ? `${text}, plus an optional ${names}` : `Optional: ${names}`;
+  }
+  if (!text) text = anySport ? 'Sport sessions' : 'No sessions planned yet';
+  return `${text}. ${anyGym && anySport ? 'Gym and sport.' : anySport ? 'Sport only.' : 'Gym only.'}`;
+}
+
+/** "week 4 of 12", "week 4". */
+export function weekOfText(week: number, cycleLength: number | null): string {
+  return cycleLength ? `week ${week} of ${cycleLength}` : `week ${week}`;
+}
+
+/** The line under a plan's name in the plan list. */
+export function planListLine(plan: Plan, standing: PlanStanding): string {
+  const facts = planFacts(plan);
+  const kind = facts.mixesGymAndSport ? 'Gym and sport' : facts.workoutNames.join(', ');
+  switch (standing.status) {
+    case 'active':
+      return `${kind} · ${weekOfText(standing.week, standing.cycleLength)}`;
+    case 'paused':
+      return `${kind} · paused at ${weekOfText(standing.week, standing.cycleLength)}`;
+    case 'notStarted':
+      return `${kind} · starts in ${standing.daysUntilStart} ${standing.daysUntilStart === 1 ? 'day' : 'days'}`;
+    default:
+      return `${kind} · ${sessionsPerWeekText(facts)}`;
+  }
+}
+
+export interface PositionText {
+  /** "Week 4 of 12". */
+  week: string;
+  /** "Build"; null for a plan without a rhythm. */
+  phase: string | null;
+  /** What the phase asks of the sets; null for a plan without a rhythm. */
+  rule: string | null;
+  /** 1 for the first pass through the cycle. */
+  cycle: number;
+}
+
+/** Where a started plan stands, as words. */
+export function positionText(plan: Plan, pos: PlanPosition): PositionText {
+  const length = plan.cycle?.phases.length ?? 0;
+  const rhythm = planFacts(plan).hasRhythm;
+  return {
+    week: `Week ${pos.week}${length > 0 ? ` of ${length}` : ''}`,
+    phase: rhythm ? PHASES[pos.phase].name : null,
+    rule: rhythm ? PHASES[pos.phase].rule : null,
+    cycle: pos.cycle,
+  };
+}
+
+export interface TargetTile {
+  key: 'kcal' | 'protein' | 'steps';
+  label: string;
+  value: string;
+  caption: string;
+}
+
+/** Today's daily targets from the plan; empty when the plan has none. `sportDay`: a required sport session today. */
+export function planTargetTiles(plan: Plan, sportDay: boolean): TargetTile[] {
+  const t = plan.targets;
+  if (!t) return [];
+  const out: TargetTile[] = [];
+  const num = (n: number) => n.toLocaleString('en-US');
+  if (t.kcal != null) {
+    out.push({
+      key: 'kcal',
+      label: 'Calories',
+      value: num(t.kcal),
+      caption: t.kcalRestDay != null ? `${num(t.kcalRestDay)} rest day` : 'every day',
+    });
+  }
+  if (t.proteinG != null) out.push({ key: 'protein', label: 'Protein', value: `${t.proteinG} g`, caption: 'every day' });
+  if (t.steps != null) {
+    out.push({
+      key: 'steps',
+      label: 'Steps',
+      value: `${t.steps / 1000}k`,
+      caption: sportDay && t.stepsSportDay != null ? `${t.stepsSportDay / 1000}k ok today` : 'every day',
+    });
+  }
+  return out;
+}
+
+/** The days a workout is planned on: "Monday", "Monday and Thursday", "Thursday" (empty if the week doesn't use it). */
+export function plannedDaysText(plan: Plan, workoutId: string): string {
+  const names: string[] = [];
+  let anyRequired = false;
+  for (let d = 0; d < 7; d++) {
+    for (const s of daySessions(plan, d)) {
+      if (s.kind !== 'gym' || s.workout.id !== workoutId) continue;
+      if (!s.optional) anyRequired = true;
+      if (!names.includes(DAY_LONG[d])) names.push(DAY_LONG[d]);
+    }
+  }
+  if (names.length <= 1) return names.join('');
+  return `${names.slice(0, -1).join(', ')} ${anyRequired ? 'and' : 'or'} ${names[names.length - 1]}`;
+}
+
+/** The "Lighter week" tile of the plan page. */
+export function lighterWeekTile(plan: Plan): { value: string; caption: string } {
+  const facts = planFacts(plan);
+  const lw = facts.lighterWeek;
+  if (lw.kind === 'every') return { value: `Every ${lw.every}${lw.every === 1 ? 'st' : lw.every === 2 ? 'nd' : lw.every === 3 ? 'rd' : 'th'}`, caption: 'week' };
+  if (lw.kind === 'cycle') {
+    const weeks = (plan.cycle?.phases ?? []).flatMap((p, i) => (p === 'deload' ? [i + 1] : []));
+    if (weeks.length > 0) return { value: `Week ${weeks.join(', ')}`, caption: `of ${lw.weeks}` };
+  }
+  return { value: 'None', caption: 'in this plan' };
 }

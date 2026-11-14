@@ -5,12 +5,21 @@ import { ARTICLES } from '@/data/guide';
 import {
   chooseWorkoutView,
   isGuideArticleVisible,
+  planDescription,
   planFacts,
+  lighterWeekTile,
+  planListLine,
+  plannedDaysText,
+  planTargetTiles,
+  positionText,
+  sessionsPerWeekText,
+  weekSessionLine,
   planSpecificArticleSlugs,
   planStanding,
   planWeekView,
   visibleGuideSlugs,
 } from '@/lib/planView';
+import { planPosition } from '@/lib/plans';
 import type { GymWorkout, Plan, Workout } from '@/lib/types';
 
 const [COURT_READY, MUSCLE_MASS, DEFINITION] = examplePlans();
@@ -274,5 +283,77 @@ describe('guide pages', () => {
     const mine: Plan = { ...DEFINITION, articles: ['food'] };
     expect(isGuideArticleVisible('food', mine)).toBe(true);
     expect(isGuideArticleVisible('how', mine)).toBe(false);
+  });
+});
+
+describe('plan screen wording', () => {
+  const week = planWeekView(COURT_READY, { start: '2026-10-19' }, [], WED);
+  const line = (weekday: number, i = 0) => weekSessionLine(week.days[weekday], week.days[weekday].sessions[i]);
+
+  it('words each session line of Court-Ready as the Plan tab design does', () => {
+    expect(line(0)).toBe('Chest focus · 60 min');
+    expect(line(1)).toBe('Sport');
+    expect(line(2)).toBe('Legs and core · 55 min · today');
+    expect(line(3, 0)).toBe('Sport · optional');
+    expect(line(3, 1)).toBe('Optional · 35 min');
+    expect(line(5)).toBe('Back and chest · 65 min');
+    expect(line(6)).toBe('Sport · optional, or rest');
+  });
+
+  it('says done, and the day it was done on when that is not the planned day', () => {
+    const v = planWeekView(COURT_READY, { start: '2026-10-19' }, [done('2026-11-10', 'court-ready', 'uppera')], WED);
+    expect(weekSessionLine(v.days[0], v.days[0].sessions[0])).toBe('Chest focus · done Tuesday');
+  });
+
+  it('describes plans from their data', () => {
+    expect(planDescription(DEFINITION)).toBe('Upper and Lower, each twice a week. Gym only.');
+    expect(planDescription(MUSCLE_MASS)).toMatch(/^Push, Pull and Legs, each twice a week\. Gym only\.$/);
+    expect(planDescription(COURT_READY)).toBe(
+      'Upper A, Lower + Core and Upper B, each once a week, plus an optional Bonus. Gym and sport.',
+    );
+  });
+
+  it('counts sessions a week and words the plan list lines', () => {
+    expect(sessionsPerWeekText(planFacts(COURT_READY))).toBe('3 gym and 2 sport sessions a week');
+    expect(sessionsPerWeekText(planFacts(DEFINITION))).toBe('4 gym sessions a week');
+    expect(planListLine(COURT_READY, { status: 'active', week: 4, cycle: 1, phase: 'build', cycleLength: 12 })).toBe(
+      'Gym and sport · week 4 of 12',
+    );
+    expect(planListLine(DEFINITION, { status: 'unused' })).toBe('Upper, Lower · 4 gym sessions a week');
+  });
+
+  it('words the position, with no phase for a plan without a rhythm', () => {
+    const pos = planPosition(COURT_READY, { start: '2026-10-19' }, WED);
+    expect(positionText(COURT_READY, pos)).toMatchObject({ week: 'Week 4 of 12', phase: 'Build' });
+    const plain = positionText(DEFINITION, planPosition(DEFINITION, { start: '2026-10-19' }, WED));
+    expect(plain).toMatchObject({ week: 'Week 4', phase: null, rule: null });
+  });
+
+  it('gives the targets of the plan, or none', () => {
+    expect(planTargetTiles(COURT_READY, false).map((t) => [t.value, t.caption])).toEqual([
+      ['2,100', '1,900 rest day'],
+      ['165 g', 'every day'],
+      ['10k', 'every day'],
+    ]);
+    expect(planTargetTiles(COURT_READY, true)[2].caption).toBe('7k ok today');
+    expect(planTargetTiles({ ...DEFINITION, targets: undefined }, true)).toEqual([]);
+  });
+});
+
+describe('plannedDaysText', () => {
+  it('names the days a workout is planned on', () => {
+    expect(plannedDaysText(COURT_READY, 'uppera')).toBe('Monday');
+    expect(plannedDaysText(COURT_READY, 'lower')).toBe('Wednesday');
+    expect(plannedDaysText(COURT_READY, 'bonus')).toBe('Thursday');
+    expect(plannedDaysText(DEFINITION, 'def-upper')).toMatch(/^\w+ and \w+$/);
+    expect(plannedDaysText(DEFINITION, 'nope')).toBe('');
+  });
+});
+
+describe('lighterWeekTile', () => {
+  it('names the lighter weeks of a cycle, or says none', () => {
+    expect(lighterWeekTile(COURT_READY)).toEqual({ value: 'Week 7, 12', caption: 'of 12' });
+    expect(lighterWeekTile(DEFINITION)).toEqual({ value: 'None', caption: 'in this plan' });
+    expect(lighterWeekTile({ ...DEFINITION, lighterWeekEvery: 4 })).toEqual({ value: 'Every 4th', caption: 'week' });
   });
 });
