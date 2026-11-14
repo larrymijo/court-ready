@@ -2,7 +2,7 @@
 // plan stands. Helpers here are pure apart from new ids, so they can be tested on their own.
 import { EXERCISE_BY_ID } from '@/data/exercises';
 import { examplePlans } from '@/data/plan-templates';
-import { mondayOfISO } from '@/lib/dates';
+import { addDaysISO, daysBetween, isISODate, mondayOfISO } from '@/lib/dates';
 import { uid } from '@/lib/id';
 import { findWorkout, planPhaseForWeek, planPosition, prescribeItem } from '@/lib/plans';
 import { lastPerformance, suggestNext } from '@/lib/progression';
@@ -135,4 +135,79 @@ export function buildPlanWorkout(
   };
   if (plan.id === 'court-ready' && ROUTINE_IDS.includes(workout.id)) out.routineId = workout.id as RoutineId;
   return out;
+}
+
+/** Weeks since a plan's start, counted from 1 (not the week inside its cycle), or null if it hasn't started. */
+export function weeksSinceStart(state: PlanState | undefined, today: string): number | null {
+  if (!state || typeof state.start !== 'string') return null;
+  const days = daysBetween(state.start, today);
+  return days < 0 ? null : Math.floor(days / 7) + 1;
+}
+
+/**
+ * Makes a saved plan the active one. The plan that stops being active keeps its place as
+ * `leftAtWeek` (only if it has started). With 'continue' the plan comes back to the week it left
+ * (a new start is worked out from it); with a date it starts on the Monday of that date's week.
+ * Returns null if the plan isn't saved or the date isn't a date.
+ */
+export function activatePlanData(
+  data: PlanData,
+  planId: string,
+  start: 'continue' | string,
+  today: string,
+): PlanData | null {
+  if (!data.plans.some((p) => p.id === planId)) return null;
+  if (start !== 'continue' && !isISODate(start)) return null;
+
+  const planState: Record<string, PlanState> = { ...data.planState };
+
+  // Pause the plan that was active. A plan that hasn't started keeps its state unchanged.
+  const leaving = data.activePlanId;
+  if (leaving !== planId && data.plans.some((p) => p.id === leaving)) {
+    const weeks = weeksSinceStart(planState[leaving], today);
+    if (weeks != null) planState[leaving] = { ...planState[leaving], leftAtWeek: weeks };
+  }
+
+  const thisMonday = mondayOfISO(today);
+  const current = planState[planId];
+  const hasStart = !!current && typeof current.start === 'string';
+  let next: PlanState;
+  if (start === 'continue') {
+    const left = current?.leftAtWeek;
+    if (hasStart && typeof left === 'number' && Number.isInteger(left) && left >= 1) {
+      next = { ...current, start: addDaysISO(thisMonday, -(left - 1) * 7) };
+      delete next.leftAtWeek;
+    } else if (hasStart) {
+      next = { ...current };
+      delete next.leftAtWeek;
+    } else {
+      next = { start: thisMonday };
+    }
+  } else {
+    next = { start: mondayOfISO(start) };
+  }
+  planState[planId] = next;
+  return { plans: data.plans, activePlanId: planId, planState };
+}
+
+/**
+ * Removes a saved plan and its state. The last plan stays. Deleting the active plan needs
+ * `useInstead`, another saved plan, which becomes active as `activatePlanData(..., 'continue')` does.
+ * Returns null when nothing may change.
+ */
+export function deletePlanData(data: PlanData, planId: string, useInstead: string | undefined, today: string): PlanData | null {
+  if (!data.plans.some((p) => p.id === planId) || data.plans.length <= 1) return null;
+  const remaining = data.plans.filter((p) => p.id !== planId);
+  const planState = { ...data.planState };
+  delete planState[planId];
+  const without: PlanData = { plans: remaining, activePlanId: data.activePlanId, planState };
+  if (data.activePlanId !== planId) return without;
+  if (!useInstead || useInstead === planId || !remaining.some((p) => p.id === useInstead)) return null;
+  return activatePlanData(without, useInstead, 'continue', today);
+}
+
+/** Fresh copies of the examples whose id isn't among the saved plans, to add after them. */
+export function missingExamples(plans: readonly Plan[]): Plan[] {
+  const have = new Set(plans.map((p) => p.id));
+  return examplePlans().filter((p) => !have.has(p.id));
 }

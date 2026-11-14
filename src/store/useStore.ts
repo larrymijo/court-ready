@@ -21,7 +21,15 @@ import type {
   WorkoutSet,
 } from '@/lib/types';
 import { DATA_VERSION, isNewerData, migrate } from '@/store/migrations';
-import { buildPlanWorkout, normalizePlanData, workoutPosition, type PlanData } from '@/store/planData';
+import {
+  activatePlanData,
+  buildPlanWorkout,
+  deletePlanData,
+  missingExamples,
+  normalizePlanData,
+  workoutPosition,
+  type PlanData,
+} from '@/store/planData';
 import { keepSafetyCopy, readSafetyCopy } from '@/store/safetyCopy';
 
 export interface RestState {
@@ -98,6 +106,21 @@ interface State {
   updateSettings: (patch: Partial<Settings>) => void;
   /** Sets the Monday of a plan's week 1. For Court-Ready, also settings.programStart. */
   setPlanStart: (planId: string, startISO: string) => void;
+  /**
+   * Makes a saved plan the active one; false if it isn't saved (or the date is not YYYY-MM-DD). The plan
+   * left keeps its week (leftAtWeek). 'continue' returns to the week a plan was left in (a plan never
+   * used starts this week); a date starts the plan on the Monday of that date's week, also for the
+   * plan that is already active. The workout in progress is never touched.
+   */
+  activatePlan: (planId: string, start: 'continue' | string) => boolean;
+  /**
+   * Removes a saved plan and its state; history keeps its plan fields. False (nothing changes) for
+   * the last plan, an unknown id, or the active plan without a valid `useInstead` (another saved plan,
+   * which becomes active as activatePlan(useInstead, 'continue') does).
+   */
+  deletePlan: (planId: string, useInstead?: string) => boolean;
+  /** Adds a fresh copy of each example whose id isn't saved, after the saved plans. Returns how many. */
+  restoreExamples: () => number;
   exportData: () => string;
   importData: (json: string) => RestoreResult;
   /** Puts back the data as it was before the last app update changed its shape. */
@@ -412,6 +435,30 @@ export const useStore = create<State>()(
         };
         if (planId === 'court-ready') next.settings = { ...settings, programStart: startISO };
         set(next);
+      },
+
+      activatePlan: (planId, start) => {
+        const { settings, plans, activePlanId, planState } = get();
+        const next = activatePlanData({ plans, activePlanId, planState }, planId, start, todayISO());
+        if (!next) return false;
+        const patch: Partial<Saved> = { activePlanId: next.activePlanId, planState: next.planState };
+        if (planId === 'court-ready') patch.settings = { ...settings, programStart: next.planState[planId].start };
+        set(patch);
+        return true;
+      },
+
+      deletePlan: (planId, useInstead) => {
+        const { plans, activePlanId, planState } = get();
+        const next = deletePlanData({ plans, activePlanId, planState }, planId, useInstead, todayISO());
+        if (!next) return false;
+        set(next);
+        return true;
+      },
+
+      restoreExamples: () => {
+        const add = missingExamples(get().plans);
+        if (add.length > 0) set({ plans: [...get().plans, ...add] });
+        return add.length;
       },
 
       exportData: () => {

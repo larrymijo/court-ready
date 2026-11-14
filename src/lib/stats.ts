@@ -1,5 +1,6 @@
 import { mondayOfISO, isoFromTimestamp } from '@/lib/dates';
-import type { ExerciseDef, MuscleGroup, PR, PRKind, Workout, WorkoutSet } from '@/lib/types';
+import { plannedGymWorkouts, prescribeItem } from '@/lib/plans';
+import type { ExerciseDef, MuscleGroup, PhaseId, Plan, PR, PRKind, Workout, WorkoutSet } from '@/lib/types';
 
 /** Estimated one-rep max (Epley). Reps above 15 say little about max strength, so they're capped. */
 export function e1rm(weight: number, reps: number): number {
@@ -156,6 +157,30 @@ export function muscleSets(
       if (n === 0) continue;
       out[def.primary] = (out[def.primary] ?? 0) + n;
       for (const m of def.secondary ?? []) out[m] = (out[m] ?? 0) + n / 2;
+    }
+  }
+  return out;
+}
+
+/**
+ * The hard sets a plan prescribes per muscle in a week of the given phase, to compare with
+ * `muscleSets`. The week's planned gym workouts (optional ones left out, one per time planned) go
+ * through `prescribeItem` without game mode; care drills don't count; the main muscle counts 1,
+ * helpers ½. Sport sessions have no sets.
+ */
+export function plannedMuscleSets(
+  plan: Plan,
+  phase: PhaseId,
+  getExercise: (id: string) => ExerciseDef | undefined,
+): Partial<Record<MuscleGroup, number>> {
+  const out: Partial<Record<MuscleGroup, number>> = {};
+  for (const workout of plannedGymWorkouts(plan)) {
+    for (const item of workout.items) {
+      const def = getExercise(item.exerciseId);
+      if (!def || def.kind === 'care') continue;
+      const sets = prescribeItem(item, def, workout, { phase }).sets;
+      out[def.primary] = (out[def.primary] ?? 0) + sets;
+      for (const m of def.secondary ?? []) out[m] = (out[m] ?? 0) + sets / 2;
     }
   }
   return out;
