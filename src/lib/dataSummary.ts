@@ -1,5 +1,7 @@
-import { formatDateLong, plural } from '@/lib/format';
-import type { BodyEntry, Workout } from '@/lib/types';
+import { parseISODate } from '@/lib/dates';
+import { formatDate, formatDateLong, plural } from '@/lib/format';
+import { planPosition } from '@/lib/plans';
+import type { BodyEntry, Plan, PlanState, Workout } from '@/lib/types';
 
 type SavedSet = Workout['exercises'][number]['sets'][number];
 
@@ -53,4 +55,23 @@ export function summaryLines(s: DataSummary): string[] {
   ];
   if (s.lastWorkoutAt != null) lines.push(`Last workout: ${formatDateLong(s.lastWorkoutAt).replace(/^\w{3} /, '')}`);
   return lines;
+}
+
+/**
+ * One more line for Settings → Your data, about plans: `3 plans · Court-Ready, week 5`, or, before
+ * the active plan's first week, `3 plans · Definition, starts Mon 16 Nov`. Kept apart from
+ * summaryLines, whose two lines must read the same before and after an update.
+ */
+export function planSummaryLine(
+  data: { plans: readonly Plan[]; activePlanId: string; planState: Readonly<Record<string, PlanState>> },
+  todayISO: string,
+): string {
+  const count = plural(data.plans.length, 'plan');
+  const plan = data.plans.find((p) => p.id === data.activePlanId);
+  if (!plan) return count;
+  const state = data.planState[plan.id];
+  if (!state || typeof state.start !== 'string') return `${count} · ${plan.name}, not started`;
+  const pos = planPosition(plan, state, todayISO);
+  if (!pos.started) return `${count} · ${plan.name}, starts ${formatDate(parseISODate(state.start).getTime())}`;
+  return `${count} · ${plan.name}, week ${pos.week}`;
 }

@@ -97,6 +97,28 @@
         }
       ],
       "prs": []
+    },
+    {
+      "id": "w2-free",
+      "name": "Workout",
+      "startedAt": 1792828800000,
+      "finishedAt": 1792830600000,
+      "week": 3,
+      "phase": "build",
+      "exercises": [
+        {
+          "id": "w2-free-e1",
+          "exerciseId": "curl",
+          "restSec": 75,
+          "sets": [
+            { "id": "w2-free-s1", "type": "normal", "weight": 12, "reps": 12, "rir": 2, "done": true },
+            { "id": "w2-free-s2", "type": "normal", "weight": 12, "reps": 10, "rir": 1, "done": true }
+          ],
+          "pain": null,
+          "note": "Travel day"
+        }
+      ],
+      "prs": []
     }
   ],
   "body": [

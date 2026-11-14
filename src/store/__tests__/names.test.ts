@@ -1,13 +1,16 @@
 import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import { DATA_VERSION } from '@/store/migrations';
+import { COURT_READY_PLAN } from '@/data/plan-templates/court-ready';
+import { examplePlans } from '@/data/plan-templates';
+import { DATA_VERSION, migrate } from '@/store/migrations';
 import { keepSafetyCopy } from '@/store/safetyCopy';
 import { useStore } from '@/store/useStore';
 
 // Made-up backups, one in each shape the app has written. Not anyone's real data.
 import exportV1 from './fixtures/export-v1.json';
 import exportV2 from './fixtures/export-v2.json';
+import exportV3 from './fixtures/export-v3.json';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
   // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -55,6 +58,30 @@ describe('names the saved data hangs on', () => {
   });
 });
 
+// Saved plans and workout history point to these ids from data version 3. The ids of Muscle
+// Mass Building's and Definition's plans and workouts are pinned in src/data/__tests__/plan-templates.test.ts.
+describe('plan names the saved data hangs on', () => {
+  it('keeps the example plan ids, in list order', () => {
+    expect(examplePlans().map((p) => p.id)).toEqual(['court-ready', 'muscle-mass', 'definition']);
+    expect(examplePlans().map((p) => p.example)).toEqual(['court-ready', 'muscle-mass', 'definition']);
+  });
+
+  it('keeps Court-Ready’s name, workout ids and sport session ids', () => {
+    expect(COURT_READY_PLAN.id).toBe('court-ready');
+    expect(COURT_READY_PLAN.name).toBe('Court-Ready');
+    expect(COURT_READY_PLAN.workouts.map((w) => w.id)).toEqual(['uppera', 'lower', 'upperb', 'bonus']);
+    expect(COURT_READY_PLAN.sports.map((s) => s.id)).toEqual(['volleyball', 'basketball']);
+  });
+
+  it('links old workouts to court-ready / Court-Ready, and starts with Court-Ready active', () => {
+    const out = migrate({ workouts: [{ id: 'w', routineId: 'bonus' }] }, 2);
+    expect(out.workouts).toEqual([
+      { id: 'w', routineId: 'bonus', planId: 'court-ready', planName: 'Court-Ready', sessionId: 'bonus' },
+    ]);
+    expect(out.activePlanId).toBe('court-ready');
+  });
+});
+
 describe('backups made before the rename', () => {
   beforeEach(async () => {
     await AsyncStorage.clear();
@@ -62,12 +89,15 @@ describe('backups made before the rename', () => {
   });
 
   it('the fixture for the current data version is current', () => {
-    expect(exportV2.version).toBe(DATA_VERSION);
+    expect(exportV1.version).toBe(1);
+    expect(exportV2.version).toBe(2);
+    expect(exportV3.version).toBe(DATA_VERSION);
   });
 
   it.each([
     ['version 1', exportV1],
-    ['the current version', exportV2],
+    ['version 2', exportV2],
+    ['the current version', exportV3],
   ])('imports a backup in the shape of %s', (_name, file) => {
     expect(useStore.getState().importData(JSON.stringify(file))).toEqual({ ok: true, workouts: file.workouts.length });
     const state = useStore.getState();

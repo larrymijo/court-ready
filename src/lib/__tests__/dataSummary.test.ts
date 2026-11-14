@@ -1,7 +1,9 @@
 import { describe, expect, it } from '@jest/globals';
 
-import { summarizeData, summaryLines } from '@/lib/dataSummary';
+import { examplePlans } from '@/data/plan-templates';
+import { planSummaryLine, summarizeData, summaryLines } from '@/lib/dataSummary';
 import type { BodyEntry, Workout, WorkoutSet } from '@/lib/types';
+import { migrate } from '@/store/migrations';
 
 const set = (over: Partial<WorkoutSet> = {}): WorkoutSet => ({
   id: 's',
@@ -76,5 +78,50 @@ describe('summaryLines', () => {
     expect(
       summaryLines({ workouts: 142, sets: 2318, weighIns: 1, lastWorkoutAt: d(2026, 11, 9) }),
     ).toEqual(['142 workouts · 2,318 sets · 1 weigh-in', 'Last workout: 9 Nov 2026']);
+  });
+});
+
+describe('the summary across the upgrade to plans', () => {
+  it('reads the same for the same workouts and weigh-ins before and after', () => {
+    const before = workouts.map((w, i) => (i % 2 === 0 ? { ...w, routineId: 'uppera' as const } : w));
+    const after = migrate({ settings: { programStart: '2026-10-12' }, workouts: before, body }, 2);
+    const linked = after.workouts as Workout[];
+    expect(linked.filter((w) => w.planId === 'court-ready')).toHaveLength(2);
+    expect(summarizeData(linked, after.body as BodyEntry[])).toEqual(summarizeData(before, body));
+    expect(summaryLines(summarizeData(linked, after.body as BodyEntry[]))).toEqual([
+      '3 workouts · 4 sets · 2 weigh-ins',
+      'Last workout: 9 Nov 2026',
+    ]);
+  });
+});
+
+describe('planSummaryLine', () => {
+  const plans = examplePlans();
+  const TODAY = '2026-11-14';
+
+  it('names the active plan and its week', () => {
+    expect(planSummaryLine({ plans, activePlanId: 'court-ready', planState: { 'court-ready': { start: '2026-10-12' } } }, TODAY)).toBe(
+      '3 plans · Court-Ready, week 5',
+    );
+    // Court-Ready repeats from week 3 after week 12.
+    expect(planSummaryLine({ plans, activePlanId: 'court-ready', planState: { 'court-ready': { start: '2026-08-17' } } }, TODAY)).toBe(
+      '3 plans · Court-Ready, week 3',
+    );
+  });
+
+  it('says when a plan that has not started starts', () => {
+    expect(
+      planSummaryLine({ plans, activePlanId: 'definition', planState: { definition: { start: '2026-11-16' } } }, TODAY),
+    ).toBe('3 plans · Definition, starts Mon 16 Nov');
+  });
+
+  it('uses the singular, and copes with missing state or plan', () => {
+    expect(planSummaryLine({ plans: [plans[2]], activePlanId: 'definition', planState: { definition: { start: '2026-11-09' } } }, TODAY)).toBe(
+      '1 plan · Definition, week 1',
+    );
+    expect(planSummaryLine({ plans, activePlanId: 'muscle-mass', planState: {} }, TODAY)).toBe(
+      '3 plans · Muscle Mass Building, not started',
+    );
+    expect(planSummaryLine({ plans, activePlanId: 'gone', planState: {} }, TODAY)).toBe('3 plans');
   });
 });

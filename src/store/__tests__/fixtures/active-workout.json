@@ -1,0 +1,24 @@
+{
+  "id": "w-active",
+  "name": "Lower + Core (game mode)",
+  "routineId": "lower",
+  "startedAt": 1793347200000,
+  "week": 4,
+  "phase": "build",
+  "gameMode": true,
+  "exercises": [
+    {
+      "id": "w-active-e1",
+      "exerciseId": "legpress",
+      "itemKey": "1",
+      "restSec": 150,
+      "target": { "sets": 2, "repsMin": 6, "repsMax": 10, "rir": "3" },
+      "sets": [
+        { "id": "w-active-s1", "type": "normal", "weight": 130, "reps": 9, "rir": 3, "done": true },
+        { "id": "w-active-s2", "type": "normal", "weight": 130, "reps": null, "rir": null, "done": false }
+      ],
+      "pain": null,
+      "note": ""
+    }
+  ]
+}

@@ -1,0 +1,1261 @@
+{
+  "app": "court-ready",
+  "version": 3,
+  "exportedAt": "2026-11-13T19:00:00.000Z",
+  "settings": {
+    "programStart": "2026-10-12",
+    "restTimer": true,
+    "vibrate": false,
+    "keepAwake": true,
+    "lastExportAt": 1794596400000
+  },
+  "workouts": [
+    {
+      "id": "w3-push",
+      "name": "Push",
+      "planId": "muscle-mass",
+      "planName": "Muscle Mass Building",
+      "sessionId": "mm-push",
+      "startedAt": 1794398400000,
+      "finishedAt": 1794402000000,
+      "week": 1,
+      "phase": "build",
+      "gameMode": false,
+      "exercises": [
+        {
+          "id": "w3-push-e1",
+          "exerciseId": "benchpress",
+          "itemKey": "1",
+          "restSec": 150,
+          "target": {
+            "sets": 4,
+            "repsMin": 6,
+            "repsMax": 10,
+            "rir": "1–2"
+          },
+          "sets": [
+            {
+              "id": "w3-push-s1",
+              "type": "warmup",
+              "weight": 20,
+              "reps": 10,
+              "rir": null,
+              "done": true
+            },
+            {
+              "id": "w3-push-s2",
+              "type": "normal",
+              "weight": 60,
+              "reps": 8,
+              "rir": 2,
+              "done": true
+            },
+            {
+              "id": "w3-push-s3",
+              "type": "normal",
+              "weight": 60,
+              "reps": 8,
+              "rir": 1,
+              "done": true
+            },
+            {
+              "id": "w3-push-s4",
+              "type": "normal",
+              "weight": 60,
+              "reps": 7,
+              "rir": 1,
+              "done": true
+            }
+          ],
+          "pain": null,
+          "note": ""
+        }
+      ],
+      "prs": [
+        {
+          "exerciseId": "benchpress",
+          "kind": "weight",
+          "value": 60,
+          "weight": 60,
+          "reps": 8
+        }
+      ]
+    },
+    {
+      "id": "w3-free",
+      "name": "Workout",
+      "startedAt": 1794312000000,
+      "finishedAt": 1794313800000,
+      "week": 1,
+      "phase": "build",
+      "exercises": [
+        {
+          "id": "w3-free-e1",
+          "exerciseId": "pushup",
+          "restSec": 90,
+          "sets": [
+            {
+              "id": "w3-free-s1",
+              "type": "normal",
+              "weight": null,
+              "reps": 20,
+              "rir": null,
+              "done": true
+            },
+            {
+              "id": "w3-free-s2",
+              "type": "normal",
+              "weight": null,
+              "reps": 18,
+              "rir": null,
+              "done": true
+            }
+          ],
+          "pain": null,
+          "note": "Hotel room"
+        }
+      ],
+      "prs": []
+    },
+    {
+      "id": "w3-upper-a",
+      "name": "Upper A",
+      "planId": "court-ready",
+      "planName": "Court-Ready",
+      "sessionId": "uppera",
+      "routineId": "uppera",
+      "startedAt": 1794225600000,
+      "finishedAt": 1794229200000,
+      "week": 5,
+      "phase": "build",
+      "gameMode": false,
+      "exercises": [
+        {
+          "id": "w3-upper-a-e1",
+          "exerciseId": "incline",
+          "itemKey": "1",
+          "restSec": 150,
+          "target": {
+            "sets": 3,
+            "repsMin": 6,
+            "repsMax": 10,
+            "rir": "2"
+          },
+          "sets": [
+            {
+              "id": "w3-upper-a-s1",
+              "type": "normal",
+              "weight": 24,
+              "reps": 9,
+              "rir": 2,
+              "done": true
+            },
+            {
+              "id": "w3-upper-a-s2",
+              "type": "normal",
+              "weight": 24,
+              "reps": 8,
+              "rir": 2,
+              "done": true
+            },
+            {
+              "id": "w3-upper-a-s3",
+              "type": "normal",
+              "weight": 24,
+              "reps": 8,
+              "rir": 1,
+              "done": true
+            }
+          ],
+          "pain": 0,
+          "note": ""
+        }
+      ],
+      "prs": [
+        {
+          "exerciseId": "incline",
+          "kind": "weight",
+          "value": 24,
+          "weight": 24,
+          "reps": 9
+        }
+      ]
+    }
+  ],
+  "body": [
+    {
+      "date": "2026-11-09",
+      "weight": 78.6
+    },
+    {
+      "date": "2026-11-12",
+      "weight": 78.4,
+      "waist": 85
+    }
+  ],
+  "plans": [
+    {
+      "id": "court-ready",
+      "name": "Court-Ready",
+      "example": "court-ready",
+      "workouts": [
+        {
+          "id": "uppera",
+          "name": "Upper A",
+          "title": "Upper A — Chest focus",
+          "focus": "Chest focus",
+          "minutes": 60,
+          "intro": "Chest first, while you’re fresh. Then back, shoulders and arms.",
+          "warmup": "upper",
+          "groups": {
+            "a5": "Superset: do 5a, rest 45 s, do 5b, rest 75 s. Repeat. Round 3 is 5a only.",
+            "a6": "Superset: do 6a, rest 45 s, do 6b, rest 75 s. Repeat."
+          },
+          "items": [
+            {
+              "key": "1",
+              "exerciseId": "incline",
+              "sets": 3,
+              "repsMin": 6,
+              "repsMax": 10,
+              "rir": "1–2",
+              "restSec": 150,
+              "main": true,
+              "cue": "Bench 15–30°. Shoulder blades pinned, elbows about 45°, 3 s down."
+            },
+            {
+              "key": "2",
+              "exerciseId": "csrow",
+              "sets": 3,
+              "repsMin": 8,
+              "repsMax": 12,
+              "rir": "1–2",
+              "restSec": 120,
+              "main": true,
+              "cue": "Chest stays on the pad. Elbows to your hips, squeeze 1 s."
+            },
+            {
+              "key": "3",
+              "exerciseId": "cablefly",
+              "sets": 3,
+              "repsMin": 10,
+              "repsMax": 15,
+              "rir": "1 · last set 0",
+              "restSec": 90,
+              "cue": "Hug a big tree. Fixed elbow bend, slow stretch."
+            },
+            {
+              "key": "4",
+              "exerciseId": "pulldown",
+              "sets": 3,
+              "repsMin": 8,
+              "repsMax": 12,
+              "rir": "1–2",
+              "restSec": 120,
+              "cue": "Shoulders down first, then elbows to your sides."
+            },
+            {
+              "key": "5a",
+              "exerciseId": "lateral",
+              "sets": 3,
+              "repsMin": 12,
+              "repsMax": 20,
+              "rir": "0–1",
+              "restSec": 45,
+              "group": "a5",
+              "cue": "30° in front of your body. Stop at shoulder height."
+            },
+            {
+              "key": "5b",
+              "exerciseId": "facepull",
+              "sets": 2,
+              "repsMin": 12,
+              "repsMax": 20,
+              "rir": "1–2",
+              "restSec": 75,
+              "group": "a5",
+              "cue": "Rope to your eyes. Finish in a “double biceps” pose."
+            },
+            {
+              "key": "6a",
+              "exerciseId": "curl",
+              "sets": 2,
+              "repsMin": 10,
+              "repsMax": 15,
+              "rir": "1",
+              "restSec": 45,
+              "group": "a6",
+              "cue": "Elbows still, 3 s down, pain-free grip."
+            },
+            {
+              "key": "6b",
+              "exerciseId": "pushdown",
+              "sets": 2,
+              "repsMin": 10,
+              "repsMax": 15,
+              "rir": "1",
+              "restSec": 75,
+              "group": "a6",
+              "cue": "Elbows pinned to your sides. Smooth lockout."
+            }
+          ]
+        },
+        {
+          "id": "lower",
+          "name": "Lower + Core",
+          "title": "Lower + Core",
+          "focus": "Legs and core",
+          "minutes": 55,
+          "intro": "Legs and core for jumping, landing and staying injury-free.",
+          "warmup": "lower",
+          "groups": {
+            "l5": "Superset: do 5a, rest 45 s, do 5b, rest 60 s. Repeat. Round 3 is 5a only."
+          },
+          "items": [
+            {
+              "key": "1",
+              "exerciseId": "legpress",
+              "sets": 3,
+              "repsMin": 6,
+              "repsMax": 10,
+              "rir": "1–2",
+              "restSec": 150,
+              "main": true,
+              "cue": "Brace, 3 s down, hips stay on the pad."
+            },
+            {
+              "key": "2",
+              "exerciseId": "rdl",
+              "sets": 3,
+              "repsMin": 8,
+              "repsMax": 10,
+              "rir": "2",
+              "restSec": 120,
+              "main": true,
+              "cue": "Hips back, flat back, feel the hamstring stretch."
+            },
+            {
+              "key": "3",
+              "exerciseId": "bss",
+              "sets": 2,
+              "repsMin": 8,
+              "repsMax": 12,
+              "perSide": true,
+              "rir": "1–2",
+              "restSec": 60,
+              "skipInGameMode": true,
+              "cue": "Back knee straight down. Push through the front foot."
+            },
+            {
+              "key": "4",
+              "exerciseId": "legcurl",
+              "sets": 3,
+              "repsMin": 10,
+              "repsMax": 15,
+              "rir": "0–1",
+              "restSec": 90,
+              "cue": "Squeeze 1 s, 3 s on the way back."
+            },
+            {
+              "key": "5a",
+              "exerciseId": "calf",
+              "sets": 3,
+              "repsMin": 10,
+              "repsMax": 15,
+              "rir": "0–1",
+              "restSec": 45,
+              "group": "l5",
+              "cue": "2 s pause in the bottom stretch. No bouncing."
+            },
+            {
+              "key": "5b",
+              "exerciseId": "pallof",
+              "sets": 2,
+              "repsMin": 10,
+              "repsMax": 10,
+              "perSide": true,
+              "rir": "Controlled",
+              "restSec": 60,
+              "group": "l5",
+              "cue": "Don’t let the cable twist you. Hold 2–3 s."
+            },
+            {
+              "key": "6",
+              "exerciseId": "crunch",
+              "sets": 2,
+              "repsMin": 10,
+              "repsMax": 15,
+              "rir": "1",
+              "restSec": 75,
+              "cue": "Ribs to hips. Hips stay still."
+            }
+          ],
+          "gameMode": true
+        },
+        {
+          "id": "upperb",
+          "name": "Upper B",
+          "title": "Upper B — Back & chest",
+          "focus": "Back and chest",
+          "minutes": 65,
+          "intro": "Chest first again, with more back work.",
+          "warmup": "upper",
+          "shortOnTime": "Short on time? Skip exercise 5 and do 2 rounds of each superset.",
+          "groups": {
+            "b6": "Superset: do 6a, rest 45 s, do 6b, rest 75 s. Repeat. Round 3 is 6a only.",
+            "b7": "Superset: do 7a, rest 45 s, do 7b, rest 75 s. Repeat."
+          },
+          "items": [
+            {
+              "key": "1",
+              "exerciseId": "flatpress",
+              "sets": 3,
+              "repsMin": 8,
+              "repsMax": 12,
+              "rir": "1–2",
+              "restSec": 150,
+              "main": true,
+              "cue": "Palms facing each other, elbows 30–45°, pause in the stretch."
+            },
+            {
+              "key": "2",
+              "exerciseId": "pullup",
+              "sets": 3,
+              "repsMin": 6,
+              "repsMax": 10,
+              "rir": "1–2",
+              "restSec": 150,
+              "main": true,
+              "cue": "Assisted is fine. Full hang, chin over the handles."
+            },
+            {
+              "key": "3",
+              "exerciseId": "cablerow",
+              "sets": 3,
+              "repsMin": 10,
+              "repsMax": 12,
+              "rir": "1–2",
+              "restSec": 120,
+              "cue": "Handle to your belly button. Squeeze 1 s."
+            },
+            {
+              "key": "4",
+              "exerciseId": "lowhighfly",
+              "sets": 3,
+              "repsMin": 12,
+              "repsMax": 15,
+              "rir": "0–1",
+              "restSec": 90,
+              "cue": "Scoop up and in to your upper chest."
+            },
+            {
+              "key": "5",
+              "exerciseId": "pushup",
+              "sets": 2,
+              "repsMin": 8,
+              "repsMax": 25,
+              "repsLabel": "stop 2 reps before failure",
+              "rir": "2",
+              "restSec": 90,
+              "cue": "Straight body. Push the floor away, add the “plus”."
+            },
+            {
+              "key": "6a",
+              "exerciseId": "lateral",
+              "sets": 3,
+              "repsMin": 12,
+              "repsMax": 20,
+              "rir": "0–1",
+              "restSec": 45,
+              "group": "b6",
+              "cue": "30° in front of your body. Thumbs level."
+            },
+            {
+              "key": "6b",
+              "exerciseId": "revpec",
+              "sets": 2,
+              "repsMin": 15,
+              "repsMax": 20,
+              "rir": "0–1",
+              "restSec": 75,
+              "group": "b6",
+              "cue": "Reach your hands out wide."
+            },
+            {
+              "key": "7a",
+              "exerciseId": "hammer",
+              "sets": 2,
+              "repsMin": 10,
+              "repsMax": 15,
+              "rir": "1",
+              "restSec": 45,
+              "group": "b7",
+              "cue": "Palms facing each other, elbows by your sides."
+            },
+            {
+              "key": "7b",
+              "exerciseId": "ohext",
+              "sets": 2,
+              "repsMin": 10,
+              "repsMax": 15,
+              "rir": "1",
+              "restSec": 75,
+              "group": "b7",
+              "cue": "Only if your shoulder and elbow are pain-free. Otherwise swap to rope pushdowns."
+            }
+          ]
+        },
+        {
+          "id": "bonus",
+          "name": "Bonus",
+          "title": "Bonus — Chest, arms & shoulder care",
+          "focus": "Chest, arms and shoulder care",
+          "minutes": 35,
+          "optional": true,
+          "intro": "Only in weeks where you play just Tuesday and Friday, and only if you feel fresh. It should leave you feeling better, not wrecked.",
+          "warmup": "upper",
+          "groups": {
+            "x3": "Superset: alternate 3a and 3b, resting about 45 s between them.",
+            "x4": "Superset: alternate 4a and 4b, resting about 45 s between them.",
+            "x5": "Circuit × 2 rounds: prone Y raise, scapular push-up, wall slide. Slow and controlled, no pinching."
+          },
+          "items": [
+            {
+              "key": "1",
+              "exerciseId": "alt_machinepress",
+              "sets": 2,
+              "repsMin": 12,
+              "repsMax": 15,
+              "rir": "2",
+              "restSec": 90,
+              "cue": "Neutral handles, shoulder blades back."
+            },
+            {
+              "key": "2",
+              "exerciseId": "cablefly",
+              "sets": 2,
+              "repsMin": 12,
+              "repsMax": 20,
+              "rir": "1–2",
+              "restSec": 60,
+              "cue": "Slow stretch, squeeze 1 s."
+            },
+            {
+              "key": "3a",
+              "exerciseId": "lateral",
+              "sets": 3,
+              "repsMin": 15,
+              "repsMax": 20,
+              "rir": "1",
+              "restSec": 45,
+              "group": "x3",
+              "cue": "Light and strict."
+            },
+            {
+              "key": "3b",
+              "exerciseId": "c_er",
+              "sets": 2,
+              "repsMin": 15,
+              "repsMax": 15,
+              "perSide": true,
+              "rir": "Easy",
+              "restSec": 45,
+              "group": "x3",
+              "cue": "Elbow stays on the towel."
+            },
+            {
+              "key": "4a",
+              "exerciseId": "curl",
+              "sets": 2,
+              "repsMin": 12,
+              "repsMax": 15,
+              "rir": "1–2",
+              "restSec": 45,
+              "group": "x4",
+              "cue": "3 s down."
+            },
+            {
+              "key": "4b",
+              "exerciseId": "pushdown",
+              "sets": 2,
+              "repsMin": 12,
+              "repsMax": 15,
+              "rir": "1–2",
+              "restSec": 45,
+              "group": "x4",
+              "cue": "Smooth lockout."
+            },
+            {
+              "key": "5a",
+              "exerciseId": "c_proney",
+              "sets": 2,
+              "repsMin": 10,
+              "repsMax": 10,
+              "rir": "Easy",
+              "restSec": 20,
+              "group": "x5",
+              "cue": "Very light: 0–2 kg. Stop below any pinch."
+            },
+            {
+              "key": "5b",
+              "exerciseId": "c_scappush",
+              "sets": 2,
+              "repsMin": 10,
+              "repsMax": 10,
+              "rir": "Easy",
+              "restSec": 20,
+              "group": "x5",
+              "cue": "Arms stay straight; only the shoulder blades move."
+            },
+            {
+              "key": "5c",
+              "exerciseId": "c_wallslide",
+              "sets": 2,
+              "repsMin": 8,
+              "repsMax": 8,
+              "rir": "Easy",
+              "restSec": 45,
+              "group": "x5",
+              "cue": "Slide up into a “Y” without shrugging."
+            }
+          ],
+          "cycleRule": "deloadOnly"
+        }
+      ],
+      "sports": [
+        {
+          "id": "volleyball",
+          "sport": "volleyball",
+          "name": "Volleyball"
+        },
+        {
+          "id": "basketball",
+          "sport": "basketball",
+          "name": "Basketball"
+        }
+      ],
+      "week": [
+        {
+          "sessions": [
+            {
+              "ref": {
+                "kind": "gym",
+                "workoutId": "uppera"
+              }
+            }
+          ]
+        },
+        {
+          "sessions": [
+            {
+              "ref": {
+                "kind": "sport",
+                "sessionId": "volleyball"
+              }
+            }
+          ]
+        },
+        {
+          "sessions": [
+            {
+              "ref": {
+                "kind": "gym",
+                "workoutId": "lower"
+              }
+            }
+          ]
+        },
+        {
+          "sessions": [
+            {
+              "ref": {
+                "kind": "sport",
+                "sessionId": "volleyball"
+              },
+              "optional": true
+            },
+            {
+              "ref": {
+                "kind": "gym",
+                "workoutId": "bonus"
+              },
+              "optional": true
+            }
+          ],
+          "note": "If you play, do the game warm-up and rest from the gym. If this week is only Tuesday and Friday, you can do the optional Bonus session, or just rest."
+        },
+        {
+          "sessions": [
+            {
+              "ref": {
+                "kind": "sport",
+                "sessionId": "basketball"
+              }
+            }
+          ]
+        },
+        {
+          "sessions": [
+            {
+              "ref": {
+                "kind": "gym",
+                "workoutId": "upperb"
+              }
+            }
+          ]
+        },
+        {
+          "sessions": [
+            {
+              "ref": {
+                "kind": "sport",
+                "sessionId": "volleyball"
+              },
+              "optional": true
+            }
+          ],
+          "note": "If you play, do the game warm-up and rest from the gym. If this week is only Tuesday and Friday, you can do the optional Bonus session, or just rest."
+        }
+      ],
+      "cycle": {
+        "phases": [
+          "learn",
+          "learn",
+          "build",
+          "build",
+          "build",
+          "build",
+          "deload",
+          "push",
+          "push",
+          "push",
+          "push",
+          "deload"
+        ],
+        "repeatFrom": 3
+      },
+      "progression": "progress",
+      "targets": {
+        "kcal": 2100,
+        "kcalRestDay": 1900,
+        "proteinG": 165,
+        "steps": 10000,
+        "stepsSportDay": 7000
+      },
+      "articles": [
+        "how",
+        "week",
+        "weeks12",
+        "chest",
+        "food",
+        "life",
+        "cheat"
+      ]
+    },
+    {
+      "id": "muscle-mass",
+      "name": "Muscle Mass Building",
+      "example": "muscle-mass",
+      "progression": "progress",
+      "lighterWeekEvery": 6,
+      "sports": [],
+      "workouts": [
+        {
+          "id": "mm-push",
+          "name": "Push",
+          "focus": "Chest, shoulders, triceps",
+          "minutes": 55,
+          "warmup": "upper",
+          "groups": {},
+          "items": [
+            {
+              "key": "1",
+              "exerciseId": "benchpress",
+              "sets": 4,
+              "repsMin": 6,
+              "repsMax": 10,
+              "rir": "1–2",
+              "restSec": 150,
+              "cue": "Shoulder blades pinned, elbows about 45°, 3 s down."
+            },
+            {
+              "key": "2",
+              "exerciseId": "incline",
+              "sets": 3,
+              "repsMin": 8,
+              "repsMax": 12,
+              "rir": "1–2",
+              "restSec": 120,
+              "cue": "Bench 15–30°. Shoulder blades pinned, elbows about 45°, 3 s down."
+            },
+            {
+              "key": "3",
+              "exerciseId": "shoulderpress",
+              "sets": 3,
+              "repsMin": 8,
+              "repsMax": 12,
+              "rir": "1–2",
+              "restSec": 120,
+              "cue": "Ribs down, no arching. Press up and slightly in."
+            },
+            {
+              "key": "4",
+              "exerciseId": "lateral",
+              "sets": 4,
+              "repsMin": 12,
+              "repsMax": 20,
+              "rir": "1–2",
+              "restSec": 60,
+              "cue": "30° in front of your body. Stop at shoulder height."
+            },
+            {
+              "key": "5",
+              "exerciseId": "cablefly",
+              "sets": 3,
+              "repsMin": 10,
+              "repsMax": 15,
+              "rir": "1–2",
+              "restSec": 90,
+              "cue": "Hug a big tree. Fixed elbow bend, slow stretch."
+            },
+            {
+              "key": "6",
+              "exerciseId": "pushdown",
+              "sets": 3,
+              "repsMin": 10,
+              "repsMax": 15,
+              "rir": "1–2",
+              "restSec": 75,
+              "cue": "Elbows pinned to your sides. Smooth lockout."
+            }
+          ]
+        },
+        {
+          "id": "mm-pull",
+          "name": "Pull",
+          "focus": "Back, rear shoulders, biceps",
+          "minutes": 55,
+          "warmup": "upper",
+          "groups": {},
+          "items": [
+            {
+              "key": "1",
+              "exerciseId": "latpulldown",
+              "sets": 4,
+              "repsMin": 8,
+              "repsMax": 12,
+              "rir": "1–2",
+              "restSec": 120,
+              "cue": "Chest up. Shoulders down first, then elbows to your sides."
+            },
+            {
+              "key": "2",
+              "exerciseId": "cablerow",
+              "sets": 3,
+              "repsMin": 8,
+              "repsMax": 12,
+              "rir": "1–2",
+              "restSec": 120,
+              "cue": "Handle to your belly button. Squeeze 1 s."
+            },
+            {
+              "key": "3",
+              "exerciseId": "alt_dbrow",
+              "sets": 3,
+              "repsMin": 8,
+              "repsMax": 12,
+              "rir": "1–2",
+              "restSec": 120,
+              "cue": "Back flat. Elbow to your hip, squeeze 1 s."
+            },
+            {
+              "key": "4",
+              "exerciseId": "facepull",
+              "sets": 3,
+              "repsMin": 12,
+              "repsMax": 20,
+              "rir": "1–2",
+              "restSec": 75,
+              "cue": "Rope to your eyes. Finish in a “double biceps” pose."
+            },
+            {
+              "key": "5",
+              "exerciseId": "curl",
+              "sets": 3,
+              "repsMin": 8,
+              "repsMax": 12,
+              "rir": "1–2",
+              "restSec": 75,
+              "cue": "Elbows still, 3 s down, pain-free grip."
+            },
+            {
+              "key": "6",
+              "exerciseId": "hammer",
+              "sets": 3,
+              "repsMin": 10,
+              "repsMax": 15,
+              "rir": "1–2",
+              "restSec": 60,
+              "cue": "Palms facing each other, elbows by your sides."
+            }
+          ]
+        },
+        {
+          "id": "mm-legs",
+          "name": "Legs",
+          "focus": "Quads, hamstrings, glutes, calves",
+          "minutes": 55,
+          "warmup": "lower",
+          "groups": {},
+          "items": [
+            {
+              "key": "1",
+              "exerciseId": "backsquat",
+              "sets": 4,
+              "repsMin": 6,
+              "repsMax": 10,
+              "rir": "1–2",
+              "restSec": 150,
+              "cue": "Brace, sit down between your knees, chest up."
+            },
+            {
+              "key": "2",
+              "exerciseId": "barbellrdl",
+              "sets": 3,
+              "repsMin": 8,
+              "repsMax": 10,
+              "rir": "1–2",
+              "restSec": 120,
+              "cue": "Hips back, flat back, feel the hamstring stretch."
+            },
+            {
+              "key": "3",
+              "exerciseId": "legpress",
+              "sets": 3,
+              "repsMin": 10,
+              "repsMax": 12,
+              "rir": "1–2",
+              "restSec": 120,
+              "cue": "Brace, 3 s down, hips stay on the pad."
+            },
+            {
+              "key": "4",
+              "exerciseId": "legcurl",
+              "sets": 3,
+              "repsMin": 10,
+              "repsMax": 15,
+              "rir": "1–2",
+              "restSec": 90,
+              "cue": "Squeeze 1 s, 3 s on the way back."
+            },
+            {
+              "key": "5",
+              "exerciseId": "legext",
+              "sets": 3,
+              "repsMin": 12,
+              "repsMax": 15,
+              "rir": "1–2",
+              "restSec": 75,
+              "cue": "Squeeze 1 s at the top, 3 s down."
+            },
+            {
+              "key": "6",
+              "exerciseId": "calf",
+              "sets": 4,
+              "repsMin": 10,
+              "repsMax": 15,
+              "rir": "1–2",
+              "restSec": 60,
+              "cue": "2 s pause in the bottom stretch. No bouncing."
+            }
+          ]
+        }
+      ],
+      "week": [
+        {
+          "sessions": [
+            {
+              "ref": {
+                "kind": "gym",
+                "workoutId": "mm-push"
+              }
+            }
+          ]
+        },
+        {
+          "sessions": [
+            {
+              "ref": {
+                "kind": "gym",
+                "workoutId": "mm-pull"
+              }
+            }
+          ]
+        },
+        {
+          "sessions": [
+            {
+              "ref": {
+                "kind": "gym",
+                "workoutId": "mm-legs"
+              }
+            }
+          ]
+        },
+        {
+          "sessions": [
+            {
+              "ref": {
+                "kind": "gym",
+                "workoutId": "mm-push"
+              }
+            }
+          ]
+        },
+        {
+          "sessions": [
+            {
+              "ref": {
+                "kind": "gym",
+                "workoutId": "mm-pull"
+              }
+            }
+          ]
+        },
+        {
+          "sessions": [
+            {
+              "ref": {
+                "kind": "gym",
+                "workoutId": "mm-legs"
+              }
+            }
+          ]
+        },
+        {
+          "sessions": []
+        }
+      ]
+    },
+    {
+      "id": "definition",
+      "name": "Definition",
+      "example": "definition",
+      "progression": "maintain",
+      "sports": [],
+      "workouts": [
+        {
+          "id": "def-upper",
+          "name": "Upper",
+          "focus": "Chest, back, shoulders, arms",
+          "minutes": 55,
+          "warmup": "upper",
+          "groups": {},
+          "items": [
+            {
+              "key": "1",
+              "exerciseId": "benchpress",
+              "sets": 3,
+              "repsMin": 6,
+              "repsMax": 10,
+              "rir": "1–2",
+              "restSec": 150,
+              "cue": "Shoulder blades pinned, elbows about 45°, 3 s down."
+            },
+            {
+              "key": "2",
+              "exerciseId": "latpulldown",
+              "sets": 3,
+              "repsMin": 8,
+              "repsMax": 12,
+              "rir": "1–2",
+              "restSec": 120,
+              "cue": "Chest up. Shoulders down first, then elbows to your sides."
+            },
+            {
+              "key": "3",
+              "exerciseId": "incline",
+              "sets": 3,
+              "repsMin": 8,
+              "repsMax": 12,
+              "rir": "1–2",
+              "restSec": 120,
+              "cue": "Bench 15–30°. Shoulder blades pinned, elbows about 45°, 3 s down."
+            },
+            {
+              "key": "4",
+              "exerciseId": "cablerow",
+              "sets": 3,
+              "repsMin": 8,
+              "repsMax": 12,
+              "rir": "1–2",
+              "restSec": 120,
+              "cue": "Handle to your belly button. Squeeze 1 s."
+            },
+            {
+              "key": "5",
+              "exerciseId": "lateral",
+              "sets": 3,
+              "repsMin": 12,
+              "repsMax": 20,
+              "rir": "1–2",
+              "restSec": 60,
+              "cue": "30° in front of your body. Stop at shoulder height."
+            },
+            {
+              "key": "6",
+              "exerciseId": "curl",
+              "sets": 2,
+              "repsMin": 10,
+              "repsMax": 15,
+              "rir": "1–2",
+              "restSec": 60,
+              "cue": "Elbows still, 3 s down, pain-free grip."
+            },
+            {
+              "key": "7",
+              "exerciseId": "pushdown",
+              "sets": 2,
+              "repsMin": 10,
+              "repsMax": 15,
+              "rir": "1–2",
+              "restSec": 60,
+              "cue": "Elbows pinned to your sides. Smooth lockout."
+            }
+          ]
+        },
+        {
+          "id": "def-lower",
+          "name": "Lower",
+          "focus": "Quads, hamstrings, glutes, calves, core",
+          "minutes": 50,
+          "warmup": "lower",
+          "groups": {},
+          "items": [
+            {
+              "key": "1",
+              "exerciseId": "backsquat",
+              "sets": 3,
+              "repsMin": 6,
+              "repsMax": 10,
+              "rir": "1–2",
+              "restSec": 150,
+              "cue": "Brace, sit down between your knees, chest up."
+            },
+            {
+              "key": "2",
+              "exerciseId": "barbellrdl",
+              "sets": 3,
+              "repsMin": 8,
+              "repsMax": 10,
+              "rir": "1–2",
+              "restSec": 120,
+              "cue": "Hips back, flat back, feel the hamstring stretch."
+            },
+            {
+              "key": "3",
+              "exerciseId": "legpress",
+              "sets": 3,
+              "repsMin": 10,
+              "repsMax": 12,
+              "rir": "1–2",
+              "restSec": 120,
+              "cue": "Brace, 3 s down, hips stay on the pad."
+            },
+            {
+              "key": "4",
+              "exerciseId": "legcurl",
+              "sets": 3,
+              "repsMin": 10,
+              "repsMax": 15,
+              "rir": "1–2",
+              "restSec": 90,
+              "cue": "Squeeze 1 s, 3 s on the way back."
+            },
+            {
+              "key": "5",
+              "exerciseId": "calf",
+              "sets": 3,
+              "repsMin": 10,
+              "repsMax": 15,
+              "rir": "1–2",
+              "restSec": 60,
+              "cue": "2 s pause in the bottom stretch. No bouncing."
+            },
+            {
+              "key": "6",
+              "exerciseId": "crunch",
+              "sets": 3,
+              "repsMin": 10,
+              "repsMax": 15,
+              "rir": "1–2",
+              "restSec": 60,
+              "cue": "Ribs to hips. Hips stay still."
+            }
+          ]
+        }
+      ],
+      "week": [
+        {
+          "sessions": [
+            {
+              "ref": {
+                "kind": "gym",
+                "workoutId": "def-upper"
+              }
+            }
+          ]
+        },
+        {
+          "sessions": [
+            {
+              "ref": {
+                "kind": "gym",
+                "workoutId": "def-lower"
+              }
+            }
+          ]
+        },
+        {
+          "sessions": []
+        },
+        {
+          "sessions": [
+            {
+              "ref": {
+                "kind": "gym",
+                "workoutId": "def-upper"
+              }
+            }
+          ]
+        },
+        {
+          "sessions": [
+            {
+              "ref": {
+                "kind": "gym",
+                "workoutId": "def-lower"
+              }
+            }
+          ]
+        },
+        {
+          "sessions": []
+        },
+        {
+          "sessions": []
+        }
+      ]
+    }
+  ],
+  "activePlanId": "muscle-mass",
+  "planState": {
+    "court-ready": {
+      "start": "2026-10-12",
+      "leftAtWeek": 5
+    },
+    "muscle-mass": {
+      "start": "2026-11-09"
+    }
+  }
+}

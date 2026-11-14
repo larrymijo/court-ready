@@ -4,15 +4,16 @@ import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
 import { EXERCISE_BY_ID, getExercise } from '@/data/exercises';
-import { getRoutine } from '@/data/routines';
+import { examplePlan, examplePlans } from '@/data/plan-templates';
 import { STORE_KEY } from '@/lib/channel';
 import { mondayOfISO, todayISO } from '@/lib/dates';
 import { uid } from '@/lib/id';
-import { prescribe, programPosition } from '@/lib/program';
-import { lastPerformance, suggestNext } from '@/lib/progression';
+import { lastPerformance } from '@/lib/progression';
 import { detectPRs } from '@/lib/stats';
 import type {
   BodyEntry,
+  Plan,
+  PlanState,
   RoutineId,
   Settings,
   Workout,
@@ -20,6 +21,7 @@ import type {
   WorkoutSet,
 } from '@/lib/types';
 import { DATA_VERSION, isNewerData, migrate } from '@/store/migrations';
+import { buildPlanWorkout, normalizePlanData, workoutPosition, type PlanData } from '@/store/planData';
 import { keepSafetyCopy, readSafetyCopy } from '@/store/safetyCopy';
 
 export interface RestState {
@@ -36,6 +38,9 @@ export interface ExportData {
   settings: Settings;
   workouts: Workout[];
   body: BodyEntry[];
+  plans: Plan[];
+  activePlanId: string;
+  planState: Record<string, PlanState>;
 }
 
 interface State {
@@ -46,8 +51,17 @@ interface State {
   warmupChecked: number[];
   body: BodyEntry[];
   rest: RestState | null;
+  /** Saved plans: the examples and, later, your own. There is always at least one. */
+  plans: Plan[];
+  /** Always the id of one of `plans`. */
+  activePlanId: string;
+  /** Where each plan stands, by plan id. The active plan always has one. */
+  planState: Record<string, PlanState>;
 
+  /** Starts a Court-Ready workout. Kept for the screens until they start plan workouts. */
   startRoutine: (routineId: RoutineId, opts?: { gameMode?: boolean }) => void;
+  /** Starts a workout of a saved plan. False when the plan or the workout isn't saved any more. */
+  startPlanWorkout: (planId: string, workoutId: string, opts?: { gameMode?: boolean }) => boolean;
   startEmpty: () => void;
   discardWorkout: () => void;
   finishWorkout: () => string | null;
@@ -80,7 +94,10 @@ interface State {
   deleteWorkout: (id: string) => void;
   logBody: (entry: BodyEntry) => void;
   deleteBody: (date: string) => void;
+  /** A programStart in the patch is also Court-Ready's start. */
   updateSettings: (patch: Partial<Settings>) => void;
+  /** Sets the Monday of a plan's week 1. For Court-Ready, also settings.programStart. */
+  setPlanStart: (planId: string, startISO: string) => void;
   exportData: () => string;
   importData: (json: string) => RestoreResult;
   /** Puts back the data as it was before the last app update changed its shape. */
@@ -91,16 +108,43 @@ interface State {
 export type RestoreResult = { ok: true; workouts: number } | { ok: false; error: string };
 
 /** The part of the state that is saved on the phone. */
-type Saved = Pick<State, 'settings' | 'workouts' | 'active' | 'warmupChecked' | 'body' | 'rest'>;
+type Saved = Pick<
+  State,
+  'settings' | 'workouts' | 'active' | 'warmupChecked' | 'body' | 'rest' | 'plans' | 'activePlanId' | 'planState'
+>;
 
-function defaultSettings(): Settings {
+function defaultSettings(programStart: string = mondayOfISO(todayISO())): Settings {
   return {
-    programStart: mondayOfISO(todayISO()),
+    programStart,
     restTimer: true,
     vibrate: true,
     keepAwake: true,
     lastExportAt: null,
   };
+}
+
+/**
+ * What a new install starts with, and what "reset" returns to. The persist migrate doesn't run
+ * when nothing is saved, so these are the plan defaults the upgrade would give, with one start
+ * date for both Court-Ready and the old settings field.
+ */
+function defaultData(): Pick<Saved, 'settings' | 'plans' | 'activePlanId' | 'planState'> {
+  const start = mondayOfISO(todayISO());
+  return {
+    settings: defaultSettings(start),
+    plans: examplePlans(),
+    activePlanId: 'court-ready',
+    planState: { 'court-ready': { start } },
+  };
+}
+
+function pickPlanData(s: PlanData): PlanData {
+  return { plans: s.plans, activePlanId: s.activePlanId, planState: s.planState };
+}
+
+/** Court-Ready as saved, or the example if it isn't saved. */
+function courtReadyPlan(plans: Plan[]): Plan {
+  return plans.find((p) => p.id === 'court-ready') ?? examplePlan('court-ready')!;
 }
 
 function newSet(weight: number | null): WorkoutSet {
@@ -126,51 +170,6 @@ function freeExercise(exerciseId: string, workouts: Workout[]): WorkoutExercise 
     sets: Array.from({ length: count }, () => newSet(weight)),
     pain: null,
     note: '',
-  };
-}
-
-function buildRoutineWorkout(
-  routineId: RoutineId,
-  gameMode: boolean,
-  settings: Settings,
-  workouts: Workout[],
-): Workout {
-  const routine = getRoutine(routineId);
-  const pos = programPosition(settings.programStart, todayISO());
-  const exercises: WorkoutExercise[] = [];
-  for (const item of routine.items) {
-    const ex = getExercise(item.exerciseId);
-    const p = prescribe(item, ex, { phase: pos.phase, routineId, gameMode });
-    if (p.skip) continue;
-    const last = lastPerformance(item.exerciseId, workouts);
-    let weight: number | null = null;
-    if (ex.tracking === 'weight_reps') {
-      const lastTop = last ? Math.max(...last.sets.map((s) => s.weight ?? 0)) : null;
-      // Deloads keep the same weights; otherwise follow double progression.
-      weight = pos.phase === 'deload' ? lastTop : (suggestNext(ex, p, last).weight ?? lastTop);
-      if (weight === 0) weight = null;
-    }
-    exercises.push({
-      id: uid(),
-      exerciseId: item.exerciseId,
-      itemKey: item.key,
-      group: item.group,
-      restSec: item.restSec,
-      target: { sets: p.sets, repsMin: p.repsMin, repsMax: p.repsMax, repsLabel: p.repsLabel, rir: p.rir },
-      sets: Array.from({ length: p.sets }, () => newSet(weight)),
-      pain: null,
-      note: '',
-    });
-  }
-  return {
-    id: uid(),
-    name: gameMode ? `${routine.name} (game mode)` : routine.name,
-    routineId,
-    startedAt: Date.now(),
-    week: pos.week,
-    phase: pos.phase,
-    gameMode,
-    exercises,
   };
 }
 
@@ -201,7 +200,7 @@ function mapSet(
 export const useStore = create<State>()(
   persist(
     (set, get) => ({
-      settings: defaultSettings(),
+      ...defaultData(),
       workouts: [],
       active: null,
       warmupChecked: [],
@@ -209,16 +208,38 @@ export const useStore = create<State>()(
       rest: null,
 
       startRoutine: (routineId, opts) => {
-        const { settings, workouts } = get();
-        set({
-          active: buildRoutineWorkout(routineId, !!opts?.gameMode, settings, workouts),
-          warmupChecked: [],
-          rest: null,
+        const { plans, planState, settings, workouts } = get();
+        // Until the screens move to plans they show the week from settings.programStart, which the
+        // store keeps equal to Court-Ready's start; it is the fallback if Court-Ready has no state.
+        const state = planState['court-ready'] ?? { start: settings.programStart };
+        const active = buildPlanWorkout(courtReadyPlan(plans), state, routineId, {
+          gameMode: opts?.gameMode,
+          history: workouts,
+          today: todayISO(),
+          now: Date.now(),
         });
+        if (active) set({ active, warmupChecked: [], rest: null });
+      },
+
+      startPlanWorkout: (planId, workoutId, opts) => {
+        const { plans, planState, workouts } = get();
+        const plan = plans.find((p) => p.id === planId);
+        if (!plan) return false;
+        const active = buildPlanWorkout(plan, planState[planId], workoutId, {
+          gameMode: opts?.gameMode,
+          history: workouts,
+          today: todayISO(),
+          now: Date.now(),
+        });
+        if (!active) return false;
+        set({ active, warmupChecked: [], rest: null });
+        return true;
       },
 
       startEmpty: () => {
-        const pos = programPosition(get().settings.programStart, todayISO());
+        const { plans, activePlanId, planState } = get();
+        const plan = plans.find((p) => p.id === activePlanId) ?? courtReadyPlan(plans);
+        const pos = workoutPosition(plan, planState[plan.id], todayISO());
         set({
           active: {
             id: uid(),
@@ -371,10 +392,30 @@ export const useStore = create<State>()(
 
       deleteBody: (date) => set({ body: get().body.filter((b) => b.date !== date) }),
 
-      updateSettings: (patch) => set({ settings: { ...get().settings, ...patch } }),
+      updateSettings: (patch) => {
+        const { settings, planState } = get();
+        const next: Partial<Saved> = { settings: { ...settings, ...patch } };
+        // The old field stays one more release; Court-Ready's start follows it.
+        if (typeof patch.programStart === 'string') {
+          next.planState = {
+            ...planState,
+            'court-ready': { ...planState['court-ready'], start: patch.programStart },
+          };
+        }
+        set(next);
+      },
+
+      setPlanStart: (planId, startISO) => {
+        const { settings, planState } = get();
+        const next: Partial<Saved> = {
+          planState: { ...planState, [planId]: { ...planState[planId], start: startISO } },
+        };
+        if (planId === 'court-ready') next.settings = { ...settings, programStart: startISO };
+        set(next);
+      },
 
       exportData: () => {
-        const { settings, workouts, body } = get();
+        const { settings, workouts, body, plans, activePlanId, planState } = get();
         const data: ExportData = {
           app: 'court-ready',
           version: DATA_VERSION,
@@ -382,6 +423,9 @@ export const useStore = create<State>()(
           settings,
           workouts,
           body,
+          plans,
+          activePlanId,
+          planState,
         };
         return JSON.stringify(data);
       },
@@ -400,19 +444,33 @@ export const useStore = create<State>()(
             };
           }
           const current = migrate(
-            { settings: data.settings, workouts: data.workouts, body: data.body },
+            {
+              settings: data.settings,
+              workouts: data.workouts,
+              body: data.body,
+              plans: data.plans,
+              activePlanId: data.activePlanId,
+              planState: data.planState,
+            },
             version,
-          ) as unknown as Pick<Saved, 'settings' | 'workouts' | 'body'>;
+          ) as unknown as Pick<Saved, 'settings' | 'workouts' | 'body'> & {
+            plans?: unknown;
+            activePlanId?: unknown;
+            planState?: unknown;
+          };
           // The phone now holds exactly what the file holds, so it counts as backed up when the file was made.
           const exportedAt = typeof data.exportedAt === 'string' ? Date.parse(data.exportedAt) : NaN;
+          const settings: Settings = {
+            ...defaultSettings(),
+            ...current.settings,
+            lastExportAt: Number.isFinite(exportedAt) ? exportedAt : null,
+          };
           set({
-            settings: {
-              ...defaultSettings(),
-              ...current.settings,
-              lastExportAt: Number.isFinite(exportedAt) ? exportedAt : null,
-            },
+            settings,
             workouts: [...current.workouts].sort((a, b) => b.startedAt - a.startedAt),
             body: current.body,
+            // Broken plan data never refuses a file: it is made usable, and the workouts import.
+            ...normalizePlanData(current, settings.programStart, todayISO()),
           });
           return { ok: true, workouts: current.workouts.length };
         } catch {
@@ -427,19 +485,22 @@ export const useStore = create<State>()(
         if (!Array.isArray(saved.workouts) || !Array.isArray(saved.body)) {
           return { ok: false, error: 'The earlier copy can’t be read.' };
         }
+        const settings: Settings = { ...defaultSettings(), ...saved.settings };
         set({
-          settings: { ...defaultSettings(), ...saved.settings },
+          settings,
           workouts: saved.workouts,
           body: saved.body,
           active: saved.active ?? null,
           warmupChecked: saved.warmupChecked ?? [],
           rest: null,
+          // The plans as the upgrade made them from that copy: no plan change made since survives.
+          ...normalizePlanData(saved, settings.programStart, todayISO()),
         });
         return { ok: true, workouts: saved.workouts.length };
       },
 
       resetAll: () =>
-        set({ settings: defaultSettings(), workouts: [], active: null, warmupChecked: [], body: [], rest: null }),
+        set({ ...defaultData(), workouts: [], active: null, warmupChecked: [], body: [], rest: null }),
     }),
     {
       name: STORE_KEY,
@@ -450,10 +511,16 @@ export const useStore = create<State>()(
         if (version < DATA_VERSION) await keepSafetyCopy(persisted, version);
         return migrate(persisted, version) as unknown as Saved;
       },
-      // A setting added later gets its default instead of being missing from older saved data.
+      // A setting added later gets its default instead of being missing from older saved data, and
+      // saved plan data is made usable (see normalizePlanData).
       merge: (persisted, current) => {
         const saved = (persisted ?? {}) as Partial<Saved>;
-        return { ...current, ...saved, settings: { ...current.settings, ...saved.settings } };
+        const settings = { ...current.settings, ...saved.settings };
+        const planData =
+          persisted != null && typeof persisted === 'object'
+            ? normalizePlanData(saved, settings.programStart, todayISO())
+            : pickPlanData(current);
+        return { ...current, ...saved, settings, ...planData };
       },
       partialize: (s): Saved => ({
         settings: s.settings,
@@ -462,6 +529,9 @@ export const useStore = create<State>()(
         warmupChecked: s.warmupChecked,
         body: s.body,
         rest: s.rest,
+        plans: s.plans,
+        activePlanId: s.activePlanId,
+        planState: s.planState,
       }),
     },
   ),

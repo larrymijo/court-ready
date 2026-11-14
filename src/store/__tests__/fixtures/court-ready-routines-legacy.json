@@ -1,0 +1,207 @@
+{
+  "source": "Routine names and the items buildRoutineWorkout copied (key, exerciseId, group, restSec), from src/data/routines.ts at commit f3380da.",
+  "routines": {
+    "uppera": {
+      "name": "Upper A",
+      "items": [
+        {
+          "key": "1",
+          "exerciseId": "incline",
+          "restSec": 150
+        },
+        {
+          "key": "2",
+          "exerciseId": "csrow",
+          "restSec": 120
+        },
+        {
+          "key": "3",
+          "exerciseId": "cablefly",
+          "restSec": 90
+        },
+        {
+          "key": "4",
+          "exerciseId": "pulldown",
+          "restSec": 120
+        },
+        {
+          "key": "5a",
+          "exerciseId": "lateral",
+          "group": "a5",
+          "restSec": 45
+        },
+        {
+          "key": "5b",
+          "exerciseId": "facepull",
+          "group": "a5",
+          "restSec": 75
+        },
+        {
+          "key": "6a",
+          "exerciseId": "curl",
+          "group": "a6",
+          "restSec": 45
+        },
+        {
+          "key": "6b",
+          "exerciseId": "pushdown",
+          "group": "a6",
+          "restSec": 75
+        }
+      ]
+    },
+    "lower": {
+      "name": "Lower + Core",
+      "items": [
+        {
+          "key": "1",
+          "exerciseId": "legpress",
+          "restSec": 150
+        },
+        {
+          "key": "2",
+          "exerciseId": "rdl",
+          "restSec": 120
+        },
+        {
+          "key": "3",
+          "exerciseId": "bss",
+          "restSec": 60
+        },
+        {
+          "key": "4",
+          "exerciseId": "legcurl",
+          "restSec": 90
+        },
+        {
+          "key": "5a",
+          "exerciseId": "calf",
+          "group": "l5",
+          "restSec": 45
+        },
+        {
+          "key": "5b",
+          "exerciseId": "pallof",
+          "group": "l5",
+          "restSec": 60
+        },
+        {
+          "key": "6",
+          "exerciseId": "crunch",
+          "restSec": 75
+        }
+      ]
+    },
+    "upperb": {
+      "name": "Upper B",
+      "items": [
+        {
+          "key": "1",
+          "exerciseId": "flatpress",
+          "restSec": 150
+        },
+        {
+          "key": "2",
+          "exerciseId": "pullup",
+          "restSec": 150
+        },
+        {
+          "key": "3",
+          "exerciseId": "cablerow",
+          "restSec": 120
+        },
+        {
+          "key": "4",
+          "exerciseId": "lowhighfly",
+          "restSec": 90
+        },
+        {
+          "key": "5",
+          "exerciseId": "pushup",
+          "restSec": 90
+        },
+        {
+          "key": "6a",
+          "exerciseId": "lateral",
+          "group": "b6",
+          "restSec": 45
+        },
+        {
+          "key": "6b",
+          "exerciseId": "revpec",
+          "group": "b6",
+          "restSec": 75
+        },
+        {
+          "key": "7a",
+          "exerciseId": "hammer",
+          "group": "b7",
+          "restSec": 45
+        },
+        {
+          "key": "7b",
+          "exerciseId": "ohext",
+          "group": "b7",
+          "restSec": 75
+        }
+      ]
+    },
+    "bonus": {
+      "name": "Bonus",
+      "items": [
+        {
+          "key": "1",
+          "exerciseId": "alt_machinepress",
+          "restSec": 90
+        },
+        {
+          "key": "2",
+          "exerciseId": "cablefly",
+          "restSec": 60
+        },
+        {
+          "key": "3a",
+          "exerciseId": "lateral",
+          "group": "x3",
+          "restSec": 45
+        },
+        {
+          "key": "3b",
+          "exerciseId": "c_er",
+          "group": "x3",
+          "restSec": 45
+        },
+        {
+          "key": "4a",
+          "exerciseId": "curl",
+          "group": "x4",
+          "restSec": 45
+        },
+        {
+          "key": "4b",
+          "exerciseId": "pushdown",
+          "group": "x4",
+          "restSec": 45
+        },
+        {
+          "key": "5a",
+          "exerciseId": "c_proney",
+          "group": "x5",
+          "restSec": 20
+        },
+        {
+          "key": "5b",
+          "exerciseId": "c_scappush",
+          "group": "x5",
+          "restSec": 20
+        },
+        {
+          "key": "5c",
+          "exerciseId": "c_wallslide",
+          "group": "x5",
+          "restSec": 45
+        }
+      ]
+    }
+  }
+}
