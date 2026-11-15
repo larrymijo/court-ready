@@ -6,7 +6,7 @@ import { View } from 'react-native';
 import { ItemBadge } from '@/components/ItemBadge';
 import { BOTTOM_BAR_SPACE, BottomBar, Button, Card, ListRow, Row, RowBadge, Screen, Tag, ToggleRow, Txt } from '@/components/ui';
 import { EXERCISE_BY_ID } from '@/data/exercises';
-import { WARMUPS } from '@/data/guide';
+import { checklist } from '@/data/checklists';
 import { todayISO } from '@/lib/dates';
 import { formatClock, formatKg } from '@/lib/format';
 import { findWorkout, prescribeItem, workoutHardSets } from '@/lib/plans';
@@ -37,7 +37,7 @@ export default function WorkoutPage() {
   const gm = !!workout.gameMode && gameMode;
   const sets = workoutHardSets(workout, (x) => EXERCISE_BY_ID[x], { phase: pos.phase, gameMode: gm });
   const days = plannedDaysText(plan, workout.id);
-  const warmup = WARMUPS[workout.warmup as 'upper' | 'lower'];
+  const warmup = workout.warmup === 'upper' || workout.warmup === 'lower' ? checklist(workout.warmup) : undefined;
 
   return (
     <View style={{ flex: 1, backgroundColor: C.bg }}>

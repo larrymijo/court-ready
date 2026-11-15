@@ -60,7 +60,15 @@ export default function ExerciseScreen() {
       <Screen edgesTop={false}>
         <View style={{ gap: S.sm }}>
           <View style={{ gap: 2 }}>
-            <Txt v="label">{ex.kind === 'care' ? 'Shoulder care' : ex.kind === 'alternative' ? 'Swap option' : 'In your plan'}</Txt>
+            <Txt v="label">{ex.kind === 'care'
+                ? 'Shoulder care'
+                : ex.kind === 'alternative'
+                  ? 'Swap option'
+                  : ex.kind === 'drill'
+                    ? 'Warm-up drill'
+                    : ex.kind === 'stretch'
+                      ? 'Stretch'
+                      : 'In your plan'}</Txt>
             <Txt v="title">{ex.name}</Txt>
           </View>
           <Txt color={C.textMuted}>{ex.muscles}</Txt>

@@ -10,6 +10,11 @@ import type { ExerciseDef } from '@/lib/types';
 import { useStore } from '@/store/useStore';
 import { C, R, S, SIZE, T } from '@/theme';
 
+/** Gym exercises: everything but the warm-up drills and cool-down stretches. */
+export function isLift(e: ExerciseDef): boolean {
+  return e.kind !== 'drill' && e.kind !== 'stretch';
+}
+
 export type ExerciseFilter = 'plan' | 'care' | 'swaps' | 'all';
 
 const FILTERS: { value: ExerciseFilter; label: string }[] = [
@@ -59,6 +64,8 @@ export function ExerciseList({
 
   const q = query.trim().toLowerCase();
   let list: ExerciseDef[] = EXERCISES.filter((e) => {
+    // Drills and stretches belong to the warm-up and cool-down checklists, not to a workout.
+    if (!isLift(e)) return false;
     if (filter === 'plan' && !(e.kind === 'main' && inPlan.has(e.id))) return false;
     if (filter === 'care' && e.kind !== 'care') return false;
     if (filter === 'swaps' && e.kind !== 'alternative') return false;

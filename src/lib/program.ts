@@ -124,7 +124,7 @@ export function hardSetCount(
 ): number {
   return routine.items.reduce((sum, item) => {
     const ex = getExercise(item.exerciseId);
-    if (ex.kind === 'care') return sum;
+    if (ex.kind === 'care' || ex.kind === 'drill' || ex.kind === 'stretch') return sum;
     const p = prescribe(item, ex, { ...opts, routineId: routine.id });
     return p.skip ? sum : sum + p.sets;
   }, 0);

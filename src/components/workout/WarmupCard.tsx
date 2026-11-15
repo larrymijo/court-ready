@@ -4,15 +4,24 @@ import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { Check, IconButton, Txt } from '@/components/ui';
-import { WARMUPS } from '@/data/guide';
+import { checklist } from '@/data/checklists';
+import { EXERCISE_BY_ID } from '@/data/exercises';
 import { useStore } from '@/store/useStore';
 import { C, R, S, SIZE, T } from '@/theme';
+
+/**
+ * The how-to this step opens: its first care drill. Other drills get their place here with the photo
+ * loops in phase 5, so this card shows the same links as before.
+ */
+function linkedId(ids?: string[]): string | undefined {
+  return ids?.find((id) => EXERCISE_BY_ID[id]?.kind === 'care');
+}
 
 /** The warm-up checklist at the top of a workout. Folds away once every step is ticked. */
 export function WarmupCard({ kind }: { kind: 'upper' | 'lower' }) {
   const checked = useStore((s) => s.warmupChecked);
   const toggle = useStore((s) => s.toggleWarmup);
-  const w = WARMUPS[kind];
+  const w = checklist(kind)!;
   const allDone = checked.length >= w.steps.length;
   const [open, setOpen] = useState(!allDone);
 
@@ -46,13 +55,13 @@ export function WarmupCard({ kind }: { kind: 'upper' | 'lower' }) {
                   <Check done={on} size={24} />
                   <Text style={[styles.text, on && styles.textOn]}>{step.text}</Text>
                 </Pressable>
-                {step.exerciseId ? (
+                {linkedId(step.exerciseIds) ? (
                   <IconButton
                     plain
                     icon="information-circle-outline"
                     color={C.textFaint}
                     label="How to do it"
-                    onPress={() => router.push(`/exercise/${step.exerciseId}`)}
+                    onPress={() => router.push(`/exercise/${linkedId(step.exerciseIds)}`)}
                   />
                 ) : null}
               </View>

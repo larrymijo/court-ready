@@ -813,27 +813,3 @@ export const ARTICLE_SECTIONS: string[] = ARTICLES.reduce<string[]>((acc, a) => 
   if (!acc.includes(a.section)) acc.push(a.section);
   return acc;
 }, []);
-
-/** Warm-up checklists shown at the top of a workout. */
-export const WARMUPS: Record<'upper' | 'lower', { title: string; steps: { text: string; exerciseId?: string }[] }> = {
-  upper: {
-    title: 'Upper warm-up · 8 min',
-    steps: [
-      { text: 'Easy cardio 3–5 min (rower, bike, fast walk)' },
-      { text: 'Band external rotation — 15 per side', exerciseId: 'c_er' },
-      { text: 'Band pull-apart — 15', exerciseId: 'c_pullapart' },
-      { text: 'Scapular push-up — 10', exerciseId: 'c_scappush' },
-      { text: 'Wall slide — 8', exerciseId: 'c_wallslide' },
-    ],
-  },
-  lower: {
-    title: 'Lower warm-up · 8 min',
-    steps: [
-      { text: 'Easy bike 3–5 min' },
-      { text: 'Bodyweight squat — 10' },
-      { text: 'Glute bridge — 10' },
-      { text: 'Leg swings — 10 + 10 each leg' },
-      { text: 'Hop and stick — 5 per leg, hold 2 s' },
-    ],
-  },
-};

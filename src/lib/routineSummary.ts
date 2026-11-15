@@ -26,7 +26,7 @@ export function routineAreas(routine: Summarised, getExercise: (id: string) => E
   const sets = new Map<string, number>();
   for (const item of routine.items) {
     const ex = getExercise(item.exerciseId);
-    if (ex.kind === 'care') continue;
+    if (ex.kind === 'care' || ex.kind === 'drill' || ex.kind === 'stretch') continue;
     const area = AREA[ex.primary];
     sets.set(area, (sets.get(area) ?? 0) + item.sets);
   }
