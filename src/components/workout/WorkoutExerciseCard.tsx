@@ -7,9 +7,9 @@ import { Button, Check, Chip, IconButton, Row, Sheet, Txt, fieldStyle, type Shee
 import { PainPicker, painTone } from '@/components/workout/PainPicker';
 import { SetHeader, SetRow, type SetGuess } from '@/components/workout/SetRow';
 import { EXERCISE_BY_ID, getExercise } from '@/data/exercises';
-import { getRoutine } from '@/data/routines';
 import { formatClock, formatKg, setLabels } from '@/lib/format';
 import { repsText } from '@/lib/program';
+import { planItemOf, planWorkoutOf } from '@/lib/workoutPlan';
 import { lastPerformance, rampUpSets, suggestNext, type PerformedSet } from '@/lib/progression';
 import type { PhaseId, Workout, WorkoutExercise, WorkoutSet } from '@/lib/types';
 import { useStore } from '@/store/useStore';
@@ -28,6 +28,7 @@ export function WorkoutExerciseCard({
 }) {
   const ex = getExercise(we.exerciseId);
   const workouts = useStore((s) => s.workouts);
+  const plans = useStore((s) => s.plans);
   const settings = useStore((s) => s.settings);
   const updateSet = useStore((s) => s.updateSet);
   const completeSet = useStore((s) => s.completeSet);
@@ -51,10 +52,7 @@ export function WorkoutExerciseCard({
   const weight = ex.tracking === 'weight_reps';
   const target = we.target;
   const suggestion = target ? suggestNext(ex, target, last) : null;
-  const routineItem = workout.routineId
-    ? getRoutine(workout.routineId).items.find((i) => i.key === we.itemKey && i.exerciseId === we.exerciseId)
-    : undefined;
-  const cue = routineItem?.cue;
+  const cue = planItemOf(planWorkoutOf(plans, workout), we)?.cue;
   const doneCount = we.sets.filter((s) => s.done).length;
   const workingWeight = we.sets.find((s) => s.type === 'normal')?.weight ?? null;
   const ramp = isFirst && weight && workingWeight ? rampUpSets(workingWeight, ex.increment || 1) : [];

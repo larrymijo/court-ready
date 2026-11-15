@@ -8,6 +8,9 @@ import {
   planDescription,
   planFacts,
   lighterWeekTile,
+  offDayTitle,
+  planExerciseIds,
+  exerciseUsage,
   planListLine,
   plannedDaysText,
   planTargetTiles,
@@ -352,8 +355,47 @@ describe('plannedDaysText', () => {
 
 describe('lighterWeekTile', () => {
   it('names the lighter weeks of a cycle, or says none', () => {
-    expect(lighterWeekTile(COURT_READY)).toEqual({ value: 'Week 7, 12', caption: 'of 12' });
+    expect(lighterWeekTile(COURT_READY)).toEqual({ value: 'Weeks 7 and 12', caption: 'in the cycle' });
+    expect(lighterWeekTile({ ...COURT_READY, cycle: { phases: ['learn', 'deload', 'build'], repeatFrom: 3 } })).toEqual({ value: 'Week 2', caption: 'in the cycle' });
     expect(lighterWeekTile(DEFINITION)).toEqual({ value: 'None', caption: 'in this plan' });
     expect(lighterWeekTile({ ...DEFINITION, lighterWeekEvery: 4 })).toEqual({ value: 'Every 4th', caption: 'week' });
+  });
+});
+
+describe('offDayTitle', () => {
+  const view = planWeekView(COURT_READY, { start: '2026-10-19' }, [], WED);
+
+  it('reads "Volleyball or rest" on Court-Ready Sunday, as before phase 3', () => {
+    expect(offDayTitle(view.days[6])).toBe('Volleyball or rest');
+  });
+
+  it('joins the sessions of a day with "or", and keeps a required sport session plain', () => {
+    expect(offDayTitle(view.days[3])).toBe('Volleyball or Bonus');
+    expect(offDayTitle(view.days[1])).toBe('Volleyball');
+    expect(offDayTitle(view.days[4])).toBe('Basketball');
+  });
+
+  it('says Rest for a day with nothing planned', () => {
+    const rest = planWeekView(DEFINITION, { start: '2026-10-19' }, [], WED).days[2];
+    expect(offDayTitle(rest)).toBe('Rest');
+  });
+});
+
+describe('exercises in a plan', () => {
+  it('lists every exercise the plan workouts use, and none without a plan', () => {
+    const ids = planExerciseIds(COURT_READY);
+    for (const w of COURT_READY.workouts) for (const i of w.items) expect(ids.has(i.exerciseId)).toBe(true);
+    expect(planExerciseIds(COURT_READY).has('latpulldown')).toBe(false);
+    expect(planExerciseIds(DEFINITION).has('latpulldown')).toBe(true);
+    expect(planExerciseIds(undefined).size).toBe(0);
+  });
+
+  it('finds where a plan uses an exercise, in plan order', () => {
+    const first = COURT_READY.workouts[0].items[0];
+    const found = exerciseUsage(COURT_READY, first.exerciseId);
+    expect(found.length).toBeGreaterThan(0);
+    expect(found[0]).toEqual({ workout: COURT_READY.workouts[0], item: first });
+    expect(exerciseUsage(undefined, first.exerciseId)).toEqual([]);
+    expect(exerciseUsage(COURT_READY, 'no-such-exercise')).toEqual([]);
   });
 });

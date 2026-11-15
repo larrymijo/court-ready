@@ -15,7 +15,7 @@ import {
   type PlanPosition,
 } from '@/lib/plans';
 import { PHASES } from '@/lib/program';
-import type { GymWorkout, PhaseId, Plan, PlanState, SessionRef, SportId, Workout } from '@/lib/types';
+import type { GymWorkout, PhaseId, Plan, PlanState, RoutineItem, SessionRef, SportId, Workout } from '@/lib/types';
 
 // ---------------------------------------------------------------------------------------------
 // The week of a plan
@@ -467,6 +467,18 @@ export function planDescription(plan: Plan): string {
   return `${text}. ${anyGym && anySport ? 'Gym and sport.' : anySport ? 'Sport only.' : 'Gym only.'}`;
 }
 
+/**
+ * The big title of the Today card on a day without a required gym session: the planned sessions
+ * joined with "or" ("Volleyball or Bonus"), "Volleyball or rest" when the only session is
+ * optional, "Rest" when nothing is planned.
+ */
+export function offDayTitle(day: Pick<WeekDayView, 'sessions'>): string {
+  const names = day.sessions.map((s) => s.name);
+  if (names.length === 0) return 'Rest';
+  if (names.length === 1 && day.sessions[0].optional) return `${names[0]} or rest`;
+  return names.join(' or ');
+}
+
 /** "week 4 of 12", "week 4". */
 export function weekOfText(week: number, cycleLength: number | null): string {
   return cycleLength ? `week ${week} of ${cycleLength}` : `week ${week}`;
@@ -566,7 +578,26 @@ export function lighterWeekTile(plan: Plan): { value: string; caption: string } 
   if (lw.kind === 'every') return { value: `Every ${lw.every}${lw.every === 1 ? 'st' : lw.every === 2 ? 'nd' : lw.every === 3 ? 'rd' : 'th'}`, caption: 'week' };
   if (lw.kind === 'cycle') {
     const weeks = (plan.cycle?.phases ?? []).flatMap((p, i) => (p === 'deload' ? [i + 1] : []));
-    if (weeks.length > 0) return { value: `Week ${weeks.join(', ')}`, caption: `of ${lw.weeks}` };
+    if (weeks.length === 1) return { value: `Week ${weeks[0]}`, caption: 'in the cycle' };
+    if (weeks.length > 1) {
+      const last = weeks[weeks.length - 1];
+      return { value: `Weeks ${weeks.slice(0, -1).join(', ')} and ${last}`, caption: 'in the cycle' };
+    }
   }
   return { value: 'None', caption: 'in this plan' };
+}
+
+// ---------------------------------------------------------------------------------------------
+// Exercises in a plan
+
+/** Every exercise id the plan's gym workouts use; empty without a plan. */
+export function planExerciseIds(plan: Plan | undefined): Set<string> {
+  return new Set((plan?.workouts ?? []).flatMap((w) => w.items.map((i) => i.exerciseId)));
+}
+
+/** Where a plan uses an exercise: each workout and item that holds it, in plan order. */
+export function exerciseUsage(plan: Plan | undefined, exerciseId: string): { workout: GymWorkout; item: RoutineItem }[] {
+  return (plan?.workouts ?? []).flatMap((workout) =>
+    workout.items.filter((i) => i.exerciseId === exerciseId).map((item) => ({ workout, item })),
+  );
 }

@@ -30,11 +30,11 @@ import { isoFromTimestamp, mondayOfISO, todayISO, weekdayIndex } from '@/lib/dat
 import { exportBackup } from '@/lib/exportBackup';
 import { formatDuration, formatElapsed, formatKg, formatShortDate, formatVolume, plural } from '@/lib/format';
 import { prescribeItem } from '@/lib/plans';
-import { planTargetTiles, planWeekView, positionText, type WeekDayView } from '@/lib/planView';
+import { offDayTitle, planTargetTiles, planWeekView, positionText, type WeekDayView } from '@/lib/planView';
 import { routineAreas, routineSummary } from '@/lib/routineSummary';
 import { startEmptyWorkoutFlow, startPlanWorkoutFlow } from '@/lib/startWorkout';
 import { workoutDurationMs, workoutSetCount, workoutsInWeek, workoutVolume } from '@/lib/stats';
-import type { GymWorkout, PhaseId, Plan, Routine } from '@/lib/types';
+import type { GymWorkout, PhaseId, Plan } from '@/lib/types';
 import { useNow } from '@/lib/useNow';
 import { workoutPosition } from '@/store/planData';
 import { useStore } from '@/store/useStore';
@@ -316,17 +316,16 @@ function GymCard({
   const gm = !!workout.gameMode && gameMode;
   const known = workout.items.filter((item) => EXERCISE_BY_ID[item.exerciseId]);
   const exercises = known.filter((item) => !prescribeItem(item, getExercise(item.exerciseId), workout, { phase, gameMode: gm }).skip).length;
-  // routineSummary and routineAreas read only the items, focus and minutes, which a workout has too.
-  const asRoutine = { ...workout, items: known } as unknown as Routine;
+  const shown: GymWorkout = { ...workout, items: known };
   return (
     <Card variant="hero">
       <Txt v="label">{done ? 'Scheduled today · done' : 'Up next · scheduled today'}</Txt>
       <View style={{ gap: 4 }}>
         <Txt v="hero">{workout.name}</Txt>
-        <Txt color={C.textMuted}>{routineSummary(asRoutine, exercises)}</Txt>
+        <Txt color={C.textMuted}>{routineSummary(shown, exercises)}</Txt>
       </View>
       <Row gap={6} style={{ flexWrap: 'wrap' }}>
-        {routineAreas(asRoutine, getExercise).map((area) => (
+        {routineAreas(shown, getExercise).map((area) => (
           <Tag key={area} label={area} />
         ))}
       </Row>
@@ -355,7 +354,6 @@ function GymCard({
 
 /** A day with no required gym session: sport, optional sessions or rest. Says what is planned and still lets you train. */
 function OffDayCard({ plan, day, onTrainAnyway }: { plan: Plan; day: WeekDayView; onTrainAnyway: () => void }) {
-  const names = day.sessions.map((s) => s.name);
   const sport = day.sessions.some((s) => s.kind === 'sport');
   const requiredSport = day.sessions.some((s) => s.kind === 'sport' && !s.optional);
   const optionalGym = day.sessions.find((s) => s.kind === 'gym');
@@ -368,7 +366,7 @@ function OffDayCard({ plan, day, onTrainAnyway }: { plan: Plan; day: WeekDayView
     <Card variant="hero">
       <Txt v="label">{day.sessions.length > 0 ? 'Scheduled today' : 'Rest day'}</Txt>
       <View style={{ gap: 4 }}>
-        <Txt v="hero">{names.length > 0 ? names.join(' or ') : 'Rest'}</Txt>
+        <Txt v="hero">{offDayTitle(day)}</Txt>
         <Txt color={C.textMuted}>{body}</Txt>
       </View>
       <Button size="large" variant="secondary" title="Train anyway" onPress={onTrainAnyway} />

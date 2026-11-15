@@ -1,12 +1,13 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 
 import { Card, Chip, ListRow, Row, RowBadge, Txt } from '@/components/ui';
 import { EXERCISE_BY_ID, EXERCISES } from '@/data/exercises';
-import { ROUTINES } from '@/data/routines';
 import { plural } from '@/lib/format';
+import { planExerciseIds } from '@/lib/planView';
 import type { ExerciseDef } from '@/lib/types';
+import { useStore } from '@/store/useStore';
 import { C, R, S, SIZE, T } from '@/theme';
 
 export type ExerciseFilter = 'plan' | 'care' | 'swaps' | 'all';
@@ -17,8 +18,6 @@ const FILTERS: { value: ExerciseFilter; label: string }[] = [
   { value: 'swaps', label: 'Swaps' },
   { value: 'all', label: 'All' },
 ];
-
-const IN_PLAN = new Set(ROUTINES.flatMap((r) => r.items.map((i) => i.exerciseId)));
 
 /** Two letters on the row's badge, so the muscle can be told at a glance. */
 const MUSCLE_CODE: Record<string, string> = {
@@ -53,11 +52,14 @@ export function ExerciseList({
   onChoose: (e: ExerciseDef) => void;
 }) {
   const [query, setQuery] = useState('');
+  const plans = useStore((s) => s.plans);
+  const activePlanId = useStore((s) => s.activePlanId);
+  const inPlan = useMemo(() => planExerciseIds(plans.find((p) => p.id === activePlanId)), [plans, activePlanId]);
   const [filter, setFilter] = useState<ExerciseFilter>(initialFilter);
 
   const q = query.trim().toLowerCase();
   let list: ExerciseDef[] = EXERCISES.filter((e) => {
-    if (filter === 'plan' && !(e.kind === 'main' && IN_PLAN.has(e.id))) return false;
+    if (filter === 'plan' && !(e.kind === 'main' && inPlan.has(e.id))) return false;
     if (filter === 'care' && e.kind !== 'care') return false;
     if (filter === 'swaps' && e.kind !== 'alternative') return false;
     if (q && !`${e.name} ${e.muscles} ${e.primary}`.toLowerCase().includes(q)) return false;

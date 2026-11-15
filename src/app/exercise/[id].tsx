@@ -7,8 +7,8 @@ import { LineChart } from '@/components/LineChart';
 import { Bullet, Button, Card, Chip, EmptyState, Row, Screen, Segmented, StatTile, Tag, Txt } from '@/components/ui';
 import { painTone } from '@/components/workout/PainPicker';
 import { EXERCISE_BY_ID } from '@/data/exercises';
-import { ROUTINES } from '@/data/routines';
 import { formatDate, formatKg, formatSet } from '@/lib/format';
+import { exerciseUsage } from '@/lib/planView';
 import { repsText } from '@/lib/program';
 import { exerciseBests, exerciseSeries, isWorkingSet } from '@/lib/stats';
 import { useStore } from '@/store/useStore';
@@ -25,6 +25,7 @@ export default function ExerciseScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const ex = EXERCISE_BY_ID[id];
   const workouts = useStore((s) => s.workouts);
+  const plan = useStore((s) => s.plans.find((p) => p.id === s.activePlanId));
   const [tab, setTab] = useState<Tab>('how');
 
   const sessions = useMemo(
@@ -50,9 +51,7 @@ export default function ExerciseScreen() {
     );
   }
 
-  const usedIn = ROUTINES.flatMap((r) =>
-    r.items.filter((i) => i.exerciseId === ex.id).map((i) => ({ routine: r, item: i })),
-  );
+  const usedIn = exerciseUsage(plan, ex.id);
   const weight = ex.tracking === 'weight_reps';
 
   return (
@@ -74,13 +73,13 @@ export default function ExerciseScreen() {
 
         {usedIn.length > 0 ? (
           <Row gap={S.sm} style={{ flexWrap: 'wrap' }}>
-            {usedIn.map(({ routine, item }) => (
+            {usedIn.map(({ workout, item }) => (
               <Chip
-                key={routine.id + item.key}
-                label={`${routine.name} · ${item.sets} × ${repsText(item, item.perSide)}`}
-                accessibilityLabel={`Open ${routine.name}`}
+                key={workout.id + item.key}
+                label={`${workout.name} · ${item.sets} × ${repsText(item, item.perSide)}`}
+                accessibilityLabel={`Open ${workout.name}`}
                 style={{ flexShrink: 1 }}
-                onPress={() => router.push(`/routine/${routine.id}`)}
+                onPress={() => router.push(`/plans/${plan?.id}/${workout.id}`)}
               />
             ))}
           </Row>

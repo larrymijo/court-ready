@@ -1,4 +1,7 @@
-import type { ExerciseDef, MuscleGroup, Routine } from '@/lib/types';
+import type { ExerciseDef, GymWorkout, MuscleGroup } from '@/lib/types';
+
+/** What the summary helpers read of a workout. */
+type Summarised = Pick<GymWorkout, 'items' | 'focus' | 'minutes'>;
 
 /** Body areas as a person would name them: biceps and triceps are "Arms", everything below the hips is "Legs". */
 const AREA: Record<MuscleGroup, string> = {
@@ -19,7 +22,7 @@ const AREA: Record<MuscleGroup, string> = {
  * The body areas a routine trains, the one with the most sets first: "Chest", "Back", "Shoulders",
  * "Arms". Shoulder-care drills don't count, the same as for hard sets.
  */
-export function routineAreas(routine: Routine, getExercise: (id: string) => ExerciseDef, max = 4): string[] {
+export function routineAreas(routine: Summarised, getExercise: (id: string) => ExerciseDef, max = 4): string[] {
   const sets = new Map<string, number>();
   for (const item of routine.items) {
     const ex = getExercise(item.exerciseId);
@@ -37,6 +40,6 @@ export function routineAreas(routine: Routine, getExercise: (id: string) => Exer
  * "Chest focus · 8 exercises · about 60 min". Pass `exercises` when some are left out today
  * (game mode skips the split squats).
  */
-export function routineSummary(routine: Routine, exercises: number = routine.items.length): string {
+export function routineSummary(routine: Summarised, exercises: number = routine.items.length): string {
   return `${routine.focus} · ${exercises} exercise${exercises === 1 ? '' : 's'} · about ${routine.minutes} min`;
 }

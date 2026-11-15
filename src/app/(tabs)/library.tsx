@@ -7,6 +7,8 @@ import { TabScreen } from '@/components/TabScreen';
 import { Card, ListRow, PageHeader, RowBadge, SectionTitle, Segmented, Txt, type IconName } from '@/components/ui';
 import { EXERCISES } from '@/data/exercises';
 import { ARTICLES, ARTICLE_SECTIONS } from '@/data/guide';
+import { visibleGuideSlugs } from '@/lib/planView';
+import { useStore } from '@/store/useStore';
 import { S } from '@/theme';
 
 type View_ = 'exercises' | 'guide';
@@ -34,10 +36,12 @@ const ICONS: Record<string, IconName> = {
 
 export default function LibraryScreen() {
   const [view, setView] = useState<View_>('exercises');
+  const plan = useStore((s) => s.plans.find((p) => p.id === s.activePlanId));
+  const guideCount = visibleGuideSlugs(ARTICLES.map((a) => a.slug), plan).length;
 
   return (
     <TabScreen>
-      <PageHeader subtitle={`${EXERCISES.length} exercises · ${ARTICLES.length} guide pages`} title="Library" />
+      <PageHeader subtitle={`${EXERCISES.length} exercises · ${guideCount} guide pages`} title="Library" />
       <Segmented<View_>
         value={view}
         onChange={setView}
@@ -59,10 +63,13 @@ export default function LibraryScreen() {
 }
 
 function GuideList() {
+  const plan = useStore((s) => s.plans.find((p) => p.id === s.activePlanId));
+  const shown = new Set(visibleGuideSlugs(ARTICLES.map((a) => a.slug), plan));
   return (
     <>
       {ARTICLE_SECTIONS.map((section) => {
-        const articles = ARTICLES.filter((a) => a.section === section);
+        const articles = ARTICLES.filter((a) => a.section === section && shown.has(a.slug));
+        if (articles.length === 0) return null;
         return (
           <View key={section} style={{ gap: S.md }}>
             <SectionTitle title={section} />

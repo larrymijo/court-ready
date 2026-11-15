@@ -20,15 +20,15 @@ import {
   Stat,
   Txt,
 } from '@/components/ui';
-import { EXERCISE_BY_ID, getExercise } from '@/data/exercises';
-import { ROUTINES } from '@/data/routines';
+import { EXERCISE_BY_ID } from '@/data/exercises';
 import { weeklyAdvice, weeklyAverages } from '@/lib/body';
 import { addDaysISO, mondayOfISO, parseISODate, todayISO } from '@/lib/dates';
 import { formatChange, formatKg, formatShortDate, plural } from '@/lib/format';
 import { confirm } from '@/lib/platform';
-import { prescribe, programPosition } from '@/lib/program';
-import { muscleSets, workoutsInWeek } from '@/lib/stats';
+import { planFacts } from '@/lib/planView';
+import { muscleSets, plannedMuscleSets, workoutsInWeek } from '@/lib/stats';
 import type { MuscleGroup } from '@/lib/types';
+import { workoutPosition } from '@/store/planData';
 import { useStore } from '@/store/useStore';
 import { C, S } from '@/theme';
 
@@ -50,7 +50,9 @@ type Day = 'today' | 'yesterday';
 export default function ProgressScreen() {
   const body = useStore((s) => s.body);
   const workouts = useStore((s) => s.workouts);
-  const settings = useStore((s) => s.settings);
+  const plans = useStore((s) => s.plans);
+  const activePlanId = useStore((s) => s.activePlanId);
+  const planState = useStore((s) => s.planState);
   const logBody = useStore((s) => s.logBody);
   const deleteBody = useStore((s) => s.deleteBody);
   const today = todayISO();
@@ -68,18 +70,12 @@ export default function ProgressScreen() {
   const entries = [...body].reverse().slice(0, 10);
 
   const monday = mondayOfISO(today);
-  const pos = programPosition(settings.programStart, today);
+  const plan = plans.find((p) => p.id === activePlanId);
+  const week = plan ? workoutPosition(plan, planState[plan.id], today) : null;
   const thisWeek = muscleSets(workoutsInWeek(workouts, monday), (id) => EXERCISE_BY_ID[id]);
-  const plan: Partial<Record<MuscleGroup, number>> = {};
-  for (const r of ROUTINES.filter((x) => x.id !== 'bonus')) {
-    for (const item of r.items) {
-      const ex = getExercise(item.exerciseId);
-      if (ex.kind === 'care') continue;
-      const p = prescribe(item, ex, { phase: pos.phase, routineId: r.id });
-      plan[ex.primary] = (plan[ex.primary] ?? 0) + p.sets;
-      for (const m of ex.secondary ?? []) plan[m] = (plan[m] ?? 0) + p.sets / 2;
-    }
-  }
+  const planned: Partial<Record<MuscleGroup, number>> =
+    plan && week ? plannedMuscleSets(plan, week.phase, (id) => EXERCISE_BY_ID[id]) : {};
+  const sessionsText = plan ? plural(planFacts(plan).gymPerWeek, 'session') : 'sessions';
 
   const perWeek = Array.from({ length: 8 }, (_, i) => {
     const m = addDaysISO(monday, -7 * (7 - i));
@@ -225,14 +221,14 @@ export default function ProgressScreen() {
         </Card>
       ) : null}
 
-      <SectionTitle title="Hard sets this week" right={<Txt v="caption">plan: week {pos.week}</Txt>} />
+      <SectionTitle title="Hard sets this week" right={week ? <Txt v="caption">plan: week {week.week}</Txt> : undefined} />
       {workouts.length === 0 ? (
         <EmptyState icon="stats-chart-outline" title="No training logged yet" body="Your weekly sets per muscle show up here once you finish a workout." />
       ) : (
         <Card>
           {MUSCLES.map(({ key, label }) => {
             const done = thisWeek[key] ?? 0;
-            const target = plan[key] ?? 0;
+            const target = planned[key] ?? 0;
             const reached = target > 0 && done >= target;
             return (
               <View key={key} style={{ gap: 6 }}>
@@ -248,7 +244,7 @@ export default function ProgressScreen() {
               </View>
             );
           })}
-          <Txt v="caption">Main muscle counts 1 set, helper muscles ½. The target is what your 3 sessions prescribe this week.</Txt>
+          <Txt v="caption">Main muscle counts 1 set, helper muscles ½. The target is what your {sessionsText} prescribe this week.</Txt>
         </Card>
       )}
 

@@ -9,11 +9,11 @@ import { Button, IconButton, ProgressBar, Row, Tag, Txt } from '@/components/ui'
 import { REST_BAR_SPACE, RestTimerBar } from '@/components/workout/RestTimerBar';
 import { WarmupCard } from '@/components/workout/WarmupCard';
 import { WorkoutExerciseCard } from '@/components/workout/WorkoutExerciseCard';
-import { getRoutine } from '@/data/routines';
 import { formatElapsed, formatVolume } from '@/lib/format';
 import { confirm, successFeedback } from '@/lib/platform';
 import { PHASES } from '@/lib/program';
 import { workoutVolume } from '@/lib/stats';
+import { groupHeaderFor, planWorkoutOf, warmupKindOf } from '@/lib/workoutPlan';
 import { useNow } from '@/lib/useNow';
 import { useStore } from '@/store/useStore';
 import { C, S, T } from '@/theme';
@@ -25,6 +25,7 @@ export default function WorkoutScreen() {
   const discardWorkout = useStore((s) => s.discardWorkout);
   const renameWorkout = useStore((s) => s.renameWorkout);
   const rest = useStore((s) => s.rest);
+  const plans = useStore((s) => s.plans);
   const insets = useSafeAreaInsets();
   const now = useNow(1000, !!active);
   const [editingName, setEditingName] = useState(false);
@@ -46,7 +47,8 @@ export default function WorkoutScreen() {
     );
   }
 
-  const routine = active.routineId ? getRoutine(active.routineId) : null;
+  const gym = planWorkoutOf(plans, active);
+  const warmupKind = warmupKindOf(gym);
   const sets = active.exercises.flatMap((e) => e.sets);
   const doneSets = sets.filter((s) => s.done).length;
   const volume = workoutVolume({ ...active, exercises: active.exercises });
@@ -144,11 +146,10 @@ export default function WorkoutScreen() {
           {active.phase ? <Txt v="small">{PHASES[active.phase].rule}</Txt> : null}
         </View>
 
-        {routine ? <WarmupCard kind={routine.warmup} /> : null}
+        {warmupKind ? <WarmupCard kind={warmupKind} /> : null}
 
         {active.exercises.map((we, i) => {
-          const header =
-            we.group && we.group !== active.exercises[i - 1]?.group && routine ? routine.groups[we.group] : null;
+          const header = groupHeaderFor(gym, active.exercises, i);
           return (
             <View key={we.id} style={{ gap: S.sm }}>
               {header ? (
@@ -168,7 +169,7 @@ export default function WorkoutScreen() {
           </View>
         ) : null}
 
-        {routine?.shortOnTime ? <Txt v="caption">{routine.shortOnTime}</Txt> : null}
+        {gym?.shortOnTime ? <Txt v="caption">{gym.shortOnTime}</Txt> : null}
 
         <Button title="Add exercise" icon="add" variant="outline" onPress={() => router.push('/exercises?pick=1')} />
         <Button title="Discard workout" variant="danger" onPress={onDiscard} />

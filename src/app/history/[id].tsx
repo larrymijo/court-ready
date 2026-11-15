@@ -71,6 +71,7 @@ export default function WorkoutDetailScreen() {
             <Txt color={C.textMuted}>
               {formatDateLong(workout.startedAt)} · {formatTime(workout.startedAt)}
             </Txt>
+            {workout.planName ? <Txt v="small">{workout.planName}</Txt> : null}
           </View>
           {workout.week || workout.gameMode ? (
             <Row gap={6} style={{ flexWrap: 'wrap' }}>

@@ -3,16 +3,15 @@ import { router } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
 import { Platform, TextInput, View } from 'react-native';
 
-import { Button, Card, Divider, Row, Screen, SectionTitle, Stepper, ToggleRow, Txt, fieldStyle } from '@/components/ui';
+import { Button, Card, Divider, Row, Screen, SectionTitle, ToggleRow, Txt, fieldStyle } from '@/components/ui';
 import { canPickBackupFile, pickBackupFile } from '@/lib/backup';
 import { backupStatus, daysAgoText } from '@/lib/backupStatus';
 import { IS_BETA } from '@/lib/channel';
-import { summarizeData, summaryLines } from '@/lib/dataSummary';
-import { addDaysISO, isISODate, mondayOfISO, parseISODate, todayISO } from '@/lib/dates';
+import { planSummaryLine, summarizeData, summaryLines } from '@/lib/dataSummary';
+import { todayISO } from '@/lib/dates';
 import { exportBackup } from '@/lib/exportBackup';
 import { formatDataSize, formatDateLong, plural } from '@/lib/format';
 import { confirm, notify } from '@/lib/platform';
-import { PHASES, programPosition } from '@/lib/program';
 import { useNow } from '@/lib/useNow';
 import { readSafetyCopy, savedDataLength, type SafetyCopy } from '@/store/safetyCopy';
 import { useStore } from '@/store/useStore';
@@ -38,15 +37,16 @@ export default function SettingsScreen() {
   const resetAll = useStore((s) => s.resetAll);
   const workouts = useStore((s) => s.workouts);
   const body = useStore((s) => s.body);
+  const plans = useStore((s) => s.plans);
+  const activePlanId = useStore((s) => s.activePlanId);
+  const planState = useStore((s) => s.planState);
   const summary = useMemo(() => summarizeData(workouts, body), [workouts, body]);
   const [iconOpen, setIconOpen] = useState(false);
-  const [dateText, setDateText] = useState(settings.programStart);
   const [importText, setImportText] = useState('');
   const [savedBytes, setSavedBytes] = useState<number | null>(null);
   const [safetyCopy, setSafetyCopy] = useState<SafetyCopy | null>(null);
   const now = useNow(60_000);
   const today = todayISO();
-  const pos = programPosition(settings.programStart, today);
   const backup = backupStatus(workouts, settings.lastExportAt, now);
   const showSafetyCopy = safetyCopy != null && now - Date.parse(safetyCopy.savedAt) < SAFETY_COPY_DAYS * DAY_MS;
 
@@ -62,12 +62,6 @@ export default function SettingsScreen() {
       clearTimeout(timer);
     };
   }, [workouts.length, settings]);
-
-  const setStart = (iso: string) => {
-    const monday = mondayOfISO(iso);
-    update({ programStart: monday });
-    setDateText(monday);
-  };
 
   const onRestoreCopy = async () => {
     const ok = await confirm(
@@ -118,40 +112,6 @@ export default function SettingsScreen() {
 
   return (
     <Screen edgesTop={false}>
-      <SectionTitle title="12-week plan" />
-      <Card>
-        <View style={{ gap: 2 }}>
-          <Txt v="h2">
-            {pos.started ? `Week ${pos.week} of 12 · ${PHASES[pos.phase].name}` : `Starts in ${plural(pos.daysUntilStart, 'day')}`}
-          </Txt>
-          <Txt v="small">Week 1 started on {formatDateLong(parseISODate(settings.programStart).getTime())}.</Txt>
-        </View>
-        {/* One week back in the plan means week 1 began a week later, and the other way round. */}
-        <Stepper
-          value={pos.started ? `Week ${pos.week}` : 'Not started'}
-          decrementLabel="One week back in the plan"
-          incrementLabel="One week forward in the plan"
-          onDecrement={() => setStart(addDaysISO(settings.programStart, 7))}
-          onIncrement={() => setStart(addDaysISO(settings.programStart, -7))}
-        />
-        <Button variant="secondary" title="Start week 1 this Monday" onPress={() => setStart(today)} />
-        <Divider />
-        <Txt v="caption">Or type the date week 1 began (YYYY-MM-DD). It snaps to that week’s Monday.</Txt>
-        <Row gap={S.sm}>
-          <TextInput
-            value={dateText}
-            onChangeText={setDateText}
-            style={[fieldStyle, { flex: 1 }]}
-            placeholder="2026-10-05"
-            placeholderTextColor={C.textFaint}
-            accessibilityLabel="Date week 1 began"
-            autoCapitalize="none"
-            autoCorrect={false}
-          />
-          <Button variant="secondary" title="Set" disabled={!isISODate(dateText)} onPress={() => setStart(dateText)} />
-        </Row>
-      </Card>
-
       <SectionTitle title="Workout" />
       <Card>
         <ToggleRow
@@ -174,7 +134,7 @@ export default function SettingsScreen() {
       <SectionTitle title="Your data" />
       <Card>
         <View style={{ gap: 2 }}>
-          {summaryLines(summary).map((line, i) => (
+          {[...summaryLines(summary), planSummaryLine({ plans, activePlanId, planState }, today)].map((line, i) => (
             <Txt key={line} v={i === 0 ? 'h2' : 'small'} color={i === 0 ? C.text : C.textMuted}>
               {line}
             </Txt>

@@ -1,6 +1,7 @@
 import { describe, expect, it } from '@jest/globals';
 import { getExercise } from '@/data/exercises';
 import { getRoutine, ROUTINES } from '@/data/routines';
+import { COURT_READY_PLAN } from '@/data/plan-templates/court-ready';
 import { routineAreas, routineSummary } from '@/lib/routineSummary';
 
 describe('routineAreas', () => {
@@ -32,5 +33,14 @@ describe('routineSummary', () => {
       expect(r.focus.length).toBeGreaterThan(0);
       expect(r.focus.length).toBeLessThanOrEqual(32);
     }
+  });
+});
+
+describe('with a GymWorkout from a plan', () => {
+  const upperA = COURT_READY_PLAN.workouts[0];
+
+  it('reads the same as the old routine', () => {
+    expect(routineSummary(upperA)).toBe(routineSummary(getRoutine('uppera')));
+    expect(routineAreas(upperA, getExercise)).toEqual(routineAreas(getRoutine('uppera'), getExercise));
   });
 });
