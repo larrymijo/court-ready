@@ -16,8 +16,11 @@ export type Equipment = 'dumbbell' | 'barbell' | 'cable' | 'machine' | 'bodyweig
 /** weight_reps: log kg × reps. reps: bodyweight/band moves, reps only. */
 export type TrackingType = 'weight_reps' | 'reps';
 
-/** main: in the plan's routines. care: shoulder-care drills. alternative: a swap option. */
-export type ExerciseKind = 'main' | 'care' | 'alternative';
+/**
+ * main: in the plan's routines. care: shoulder-care drills. alternative: a swap option.
+ * drill, stretch: warm-up and cool-down moves (phase 4). They never count as hard sets.
+ */
+export type ExerciseKind = 'main' | 'care' | 'alternative' | 'drill' | 'stretch';
 
 export interface TechniqueSection {
   label: string;
@@ -134,6 +137,38 @@ export interface SportSession {
   cooldown?: string;
 }
 
+// Sports and checklists ship with the app (src/data/sports.ts, src/data/checklists.ts). They are
+// not saved data, but their ids are: plans and finished sessions point to them, so a sport id or a
+// checklist id never changes once it has shipped.
+
+/** A sport: what a session of it logs, and its own warm-up and cool-down. */
+export interface SportDef {
+  id: SportId;
+  name: string;
+  /** Checklist ids. */
+  warmup: string;
+  cooldown: string;
+  /** Running: the session asks for the distance and shows the pace. */
+  logsDistance: boolean;
+  /** Match or practice. Not asked for a run. */
+  logsMatch: boolean;
+}
+
+export interface ChecklistStep {
+  text: string;
+  /** The drills or stretches this step links to. */
+  exerciseIds?: string[];
+}
+
+/** A warm-up or a cool-down: steps to tick or skip. */
+export interface Checklist {
+  id: string;
+  title: string;
+  minutes: number;
+  kind: 'warmup' | 'cooldown';
+  steps: ChecklistStep[];
+}
+
 /** What a day points to: one of the plan's gym workouts or one of its sport sessions. */
 export type SessionRef = { kind: 'gym'; workoutId: string } | { kind: 'sport'; sessionId: string };
 
@@ -227,6 +262,8 @@ export interface PR {
 export interface Workout {
   id: string;
   name: string;
+  /** 'sport' on sport sessions (from data version 4). Missing means a gym workout. */
+  kind?: 'gym' | 'sport';
   /** The plan the session was started from. Missing on empty workouts. */
   planId?: string;
   /** That plan's name at the time, so history still reads well after the plan is renamed or deleted. */
@@ -242,6 +279,50 @@ export interface Workout {
   gameMode?: boolean;
   exercises: WorkoutExercise[];
   prs?: PR[];
+  /** Whether the warm-up and the cool-down were done. Written on every session from data version 4. */
+  warmupDone?: boolean;
+  cooldownDone?: boolean;
+  // Sport sessions only. A sport session keeps `exercises: []` and has no sets, so an older version
+  // of the app can still read it after a rollback.
+  sport?: SportId;
+  /** Minutes played. */
+  minutes?: number;
+  /** How hard it felt, 1 to 10. */
+  effort?: number;
+  /** true: a match. false: practice. Not set for a run. */
+  match?: boolean;
+  /** Pain 0–10 during the session (null or missing = not rated). */
+  pain?: number | null;
+  distanceKm?: number;
+  note?: string;
+  /** Entered afterwards with "Log a past session". */
+  loggedLater?: boolean;
+}
+
+/** A sport session in progress. Kept in the store only, never in a backup (like the workout in progress). */
+export interface ActiveSport {
+  id: string;
+  sport: SportId;
+  name: string;
+  planId?: string;
+  planName?: string;
+  sessionId?: string;
+  /** Checklist ids, resolved when the session starts. */
+  warmup: string;
+  cooldown: string;
+  /** When the session was opened (ms since 1970). */
+  openedAt: number;
+  stage: 'warmup' | 'playing' | 'log' | 'cooldown';
+  /** Set by "Start playing" and "Finish". The clock is always worked out from these, never counted. */
+  playStartedAt?: number;
+  playEndedAt?: number;
+  /** Indexes of the ticked steps. */
+  warmupChecked: number[];
+  cooldownChecked: number[];
+  /** Set by "Start playing": false when the warm-up was skipped. */
+  warmupDone?: boolean;
+  /** What has been entered on the log sheet so far. */
+  draft: Partial<Pick<Workout, 'minutes' | 'effort' | 'match' | 'pain' | 'distanceKm' | 'note'>>;
 }
 
 export interface BodyEntry {
