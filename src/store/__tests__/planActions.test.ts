@@ -158,6 +158,40 @@ describe('activatePlan', () => {
   });
 });
 
+describe('startPlanWorkout of a paused plan', () => {
+  it('builds and saves Court-Ready, paused at week 4, as week 4 three weeks later, not week 7', () => {
+    state().startPlanWorkout('court-ready', 'uppera');
+    const week4 = state().active!;
+    expect(week4).toMatchObject({ week: 4, phase: 'build' });
+    state().discardWorkout();
+
+    state().activatePlan('definition', 'continue');
+    at('2026-12-02'); // three weeks later: Court-Ready's own start would make this week 7, a lighter week
+    expect(state().startPlanWorkout('court-ready', 'uppera')).toBe(true);
+    const later = state().active!;
+    expect(later).toMatchObject({ week: 4, phase: 'build', planId: 'court-ready', sessionId: 'uppera', routineId: 'uppera' });
+    expect(later.exercises.map((e) => [e.exerciseId, e.target, e.sets.length])).toEqual(
+      week4.exercises.map((e) => [e.exerciseId, e.target, e.sets.length]),
+    );
+    // Starting it changes no plan data.
+    expect(state().activePlanId).toBe('definition');
+    expect(state().planState['court-ready']).toEqual({ start: CR_START, leftAtWeek: 4 });
+  });
+
+  it('changes nothing for the active plan', () => {
+    // A leftAtWeek on the active plan (not written by the app) is not used.
+    useStore.setState({ planState: { 'court-ready': { start: CR_START, leftAtWeek: 2 } } });
+    state().startPlanWorkout('court-ready', 'lower');
+    expect(state().active).toMatchObject({ week: 4, phase: 'build' });
+  });
+
+  it('goes by its own start for a plan that is not active and was never paused', () => {
+    useStore.setState({ planState: { ...state().planState, 'muscle-mass': { start: '2026-10-05' } } });
+    state().startPlanWorkout('muscle-mass', 'mm-push');
+    expect(state().active).toMatchObject({ week: 6, phase: 'deload' });
+  });
+});
+
 describe('deletePlan', () => {
   it('removes a plan that is not active, with its state, and leaves history alone', () => {
     const w = historyWorkout('h1', 'definition', 'def-upper');
@@ -190,6 +224,17 @@ describe('deletePlan', () => {
     expect(state().planState.definition).toEqual({ start: '2026-11-09' });
     // settings.programStart stays as it was.
     expect(state().settings.programStart).toBe(CR_START);
+  });
+
+  it("brings settings.programStart along when Court-Ready continues in place of the deleted plan", () => {
+    state().activatePlan('definition', 'continue'); // Court-Ready paused in week 4
+    at('2026-12-02'); // three weeks later
+    expect(state().settings.programStart).toBe(CR_START);
+    expect(state().deletePlan('definition', 'court-ready')).toBe(true);
+    expect(state().activePlanId).toBe('court-ready');
+    expect(state().planState['court-ready']).toEqual({ start: '2026-11-09' });
+    expect(state().settings.programStart).toBe('2026-11-09');
+    expect(crPos('2026-12-02')).toMatchObject({ week: 4 });
   });
 
   it('keeps the last plan and ignores unknown ids', () => {

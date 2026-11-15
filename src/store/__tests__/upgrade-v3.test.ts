@@ -243,6 +243,49 @@ describe('a version 3 backup', () => {
     expect(s.planState).toEqual({ 'court-ready': { start: exportV3.settings.programStart } });
   });
 
+  it("sets the old programStart to Court-Ready's start when a hand-edited file has them differ", () => {
+    const edited = { ...exportV3, settings: { ...exportV3.settings, programStart: '2026-08-03' } };
+    expect(useStore.getState().importData(JSON.stringify(edited))).toEqual({ ok: true, workouts: 3 });
+    const s = useStore.getState();
+    expect(s.planState).toEqual(exportV3.planState);
+    expect(s.settings.programStart).toBe(exportV3.planState['court-ready'].start);
+    expect(s.settings).toEqual({ ...edited.settings, programStart: '2026-10-12', lastExportAt: Date.parse(exportV3.exportedAt) });
+  });
+
+  it('leaves the old programStart as the file has it when Court-Ready has no state', () => {
+    const { 'court-ready': _cr, ...rest } = exportV3.planState;
+    const noCr = {
+      ...exportV3,
+      settings: { ...exportV3.settings, programStart: '2026-08-03' },
+      plans: exportV3.plans.filter((p) => p.id !== 'court-ready'),
+      planState: rest,
+    };
+    expect(useStore.getState().importData(JSON.stringify(noCr)).ok).toBe(true);
+    expect(useStore.getState().planState).not.toHaveProperty('court-ready');
+    expect(useStore.getState().settings.programStart).toBe('2026-08-03');
+  });
+
+  it("sets the old programStart to Court-Ready's start when saved data on the phone has them differ", async () => {
+    const saved = {
+      settings: { ...exportV3.settings, programStart: '2026-08-03' },
+      workouts: exportV3.workouts,
+      active: null,
+      warmupChecked: [],
+      body: exportV3.body,
+      rest: null,
+      plans: exportV3.plans,
+      activePlanId: exportV3.activePlanId,
+      planState: exportV3.planState,
+    };
+    await AsyncStorage.setItem('court-ready', JSON.stringify({ state: saved, version: 3 }));
+    await useStore.persist.rehydrate();
+    const s = useStore.getState();
+    expect(s.activePlanId).toBe('muscle-mass');
+    expect(s.planState).toEqual(exportV3.planState);
+    expect(s.settings).toEqual({ ...saved.settings, programStart: '2026-10-12' });
+    expect(s.workouts).toEqual(exportV3.workouts);
+  });
+
   it('keeps the readable plans of a partly broken file', () => {
     const mm = exportV3.plans.find((p) => p.id === 'muscle-mass')!;
     const partly = { ...exportV3, plans: [{ id: 'bad' }, mm, 'x'], activePlanId: 'gone' };

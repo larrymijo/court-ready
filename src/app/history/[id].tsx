@@ -8,9 +8,9 @@ import { painTone } from '@/components/workout/PainPicker';
 import { EXERCISE_BY_ID } from '@/data/exercises';
 import { formatDateLong, formatDuration, formatKg, formatSet, formatTime, formatVolume, plural, setLabels } from '@/lib/format';
 import { confirm } from '@/lib/platform';
-import { PHASES } from '@/lib/program';
 import { workoutDurationMs, workoutSetCount, workoutVolume } from '@/lib/stats';
 import type { PR } from '@/lib/types';
+import { workoutPhaseText } from '@/lib/workoutPlan';
 import { useStore } from '@/store/useStore';
 import { C, S, T } from '@/theme';
 
@@ -32,6 +32,7 @@ export default function WorkoutDetailScreen() {
   const { id, new: isNew } = useLocalSearchParams<{ id: string; new?: string }>();
   const workout = useStore((s) => s.workouts.find((w) => w.id === id));
   const deleteWorkout = useStore((s) => s.deleteWorkout);
+  const plans = useStore((s) => s.plans);
   if (!workout) {
     return (
       <Screen edgesTop={false}>
@@ -39,6 +40,8 @@ export default function WorkoutDetailScreen() {
       </Screen>
     );
   }
+
+  const phaseTag = workoutPhaseText(plans, workout).tag;
 
   const onDelete = async () => {
     if (await confirm('Delete workout?', 'This removes it from your history and charts.', 'Delete', true)) {
@@ -73,9 +76,9 @@ export default function WorkoutDetailScreen() {
             </Txt>
             {workout.planName ? <Txt v="small">{workout.planName}</Txt> : null}
           </View>
-          {workout.week || workout.gameMode ? (
+          {phaseTag || workout.gameMode ? (
             <Row gap={6} style={{ flexWrap: 'wrap' }}>
-              {workout.week ? <Tag label={`Week ${workout.week}${workout.phase ? ` · ${PHASES[workout.phase].name}` : ''}`} /> : null}
+              {phaseTag ? <Tag label={phaseTag} /> : null}
               {workout.gameMode ? <Tag label="Game mode" /> : null}
             </Row>
           ) : null}

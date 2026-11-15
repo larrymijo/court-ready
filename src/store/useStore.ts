@@ -25,9 +25,10 @@ import {
   activatePlanData,
   buildPlanWorkout,
   deletePlanData,
+  emptyWorkoutPosition,
   missingExamples,
   normalizePlanData,
-  workoutPosition,
+  syncProgramStart,
   type PlanData,
 } from '@/store/planData';
 import { keepSafetyCopy, readSafetyCopy } from '@/store/safetyCopy';
@@ -245,14 +246,16 @@ export const useStore = create<State>()(
       },
 
       startPlanWorkout: (planId, workoutId, opts) => {
-        const { plans, planState, workouts } = get();
+        const { plans, activePlanId, planState, workouts } = get();
         const plan = plans.find((p) => p.id === planId);
         if (!plan) return false;
+        // A paused plan is built for the week it was paused at.
         const active = buildPlanWorkout(plan, planState[planId], workoutId, {
           gameMode: opts?.gameMode,
           history: workouts,
           today: todayISO(),
           now: Date.now(),
+          isActive: planId === activePlanId,
         });
         if (!active) return false;
         set({ active, warmupChecked: [], rest: null });
@@ -262,14 +265,13 @@ export const useStore = create<State>()(
       startEmpty: () => {
         const { plans, activePlanId, planState } = get();
         const plan = plans.find((p) => p.id === activePlanId) ?? courtReadyPlan(plans);
-        const pos = workoutPosition(plan, planState[plan.id], todayISO());
+        // The phase only for a plan with a cycle or a lighter week; Court-Ready's is kept as before.
         set({
           active: {
             id: uid(),
             name: 'Workout',
             startedAt: Date.now(),
-            week: pos.week,
-            phase: pos.phase,
+            ...emptyWorkoutPosition(plan, planState[plan.id], todayISO()),
             exercises: [],
           },
           warmupChecked: [],
@@ -441,17 +443,21 @@ export const useStore = create<State>()(
         const { settings, plans, activePlanId, planState } = get();
         const next = activatePlanData({ plans, activePlanId, planState }, planId, start, todayISO());
         if (!next) return false;
-        const patch: Partial<Saved> = { activePlanId: next.activePlanId, planState: next.planState };
-        if (planId === 'court-ready') patch.settings = { ...settings, programStart: next.planState[planId].start };
-        set(patch);
+        // The old field follows Court-Ready's start (section 11: expand, then contract).
+        set({
+          activePlanId: next.activePlanId,
+          planState: next.planState,
+          settings: syncProgramStart(settings, next.planState),
+        });
         return true;
       },
 
       deletePlan: (planId, useInstead) => {
-        const { plans, activePlanId, planState } = get();
+        const { settings, plans, activePlanId, planState } = get();
         const next = deletePlanData({ plans, activePlanId, planState }, planId, useInstead, todayISO());
         if (!next) return false;
-        set(next);
+        // Continuing Court-Ready in place of the deleted plan gives it a new start; the old field follows.
+        set({ ...next, settings: syncProgramStart(settings, next.planState) });
         return true;
       },
 
@@ -512,12 +518,14 @@ export const useStore = create<State>()(
             ...current.settings,
             lastExportAt: Number.isFinite(exportedAt) ? exportedAt : null,
           };
+          // Broken plan data never refuses a file: it is made usable, and the workouts import.
+          const planData = normalizePlanData(current, settings.programStart, todayISO());
           set({
-            settings,
+            // A file whose old programStart differs from Court-Ready's start gets Court-Ready's.
+            settings: syncProgramStart(settings, planData.planState),
             workouts: [...current.workouts].sort((a, b) => b.startedAt - a.startedAt),
             body: current.body,
-            // Broken plan data never refuses a file: it is made usable, and the workouts import.
-            ...normalizePlanData(current, settings.programStart, todayISO()),
+            ...planData,
           });
           return { ok: true, workouts: current.workouts.length };
         } catch {
@@ -533,15 +541,16 @@ export const useStore = create<State>()(
           return { ok: false, error: 'The earlier copy can’t be read.' };
         }
         const settings: Settings = { ...defaultSettings(), ...saved.settings };
+        // The plans as the upgrade made them from that copy: no plan change made since survives.
+        const planData = normalizePlanData(saved, settings.programStart, todayISO());
         set({
-          settings,
+          settings: syncProgramStart(settings, planData.planState),
           workouts: saved.workouts,
           body: saved.body,
           active: saved.active ?? null,
           warmupChecked: saved.warmupChecked ?? [],
           rest: null,
-          // The plans as the upgrade made them from that copy: no plan change made since survives.
-          ...normalizePlanData(saved, settings.programStart, todayISO()),
+          ...planData,
         });
         return { ok: true, workouts: saved.workouts.length };
       },
@@ -559,14 +568,16 @@ export const useStore = create<State>()(
         return migrate(persisted, version) as unknown as Saved;
       },
       // A setting added later gets its default instead of being missing from older saved data, and
-      // saved plan data is made usable (see normalizePlanData).
+      // saved plan data is made usable (see normalizePlanData), and the old programStart follows
+      // Court-Ready's start.
       merge: (persisted, current) => {
         const saved = (persisted ?? {}) as Partial<Saved>;
-        const settings = { ...current.settings, ...saved.settings };
+        const merged = { ...current.settings, ...saved.settings };
         const planData =
           persisted != null && typeof persisted === 'object'
-            ? normalizePlanData(saved, settings.programStart, todayISO())
+            ? normalizePlanData(saved, merged.programStart, todayISO())
             : pickPlanData(current);
+        const settings = syncProgramStart(merged, planData.planState);
         return { ...current, ...saved, settings, ...planData };
       },
       partialize: (s): Saved => ({

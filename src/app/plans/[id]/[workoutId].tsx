@@ -12,7 +12,7 @@ import { formatClock, formatKg } from '@/lib/format';
 import { findWorkout, prescribeItem, workoutHardSets } from '@/lib/plans';
 import { planFacts, plannedDaysText } from '@/lib/planView';
 import { PHASES, repsText } from '@/lib/program';
-import { lastPerformance, suggestNext } from '@/lib/progression';
+import { lastPerformance, suggestForPlan } from '@/lib/progression';
 import { startPlanWorkoutFlow } from '@/lib/startWorkout';
 import { workoutPosition } from '@/store/planData';
 import { useStore } from '@/store/useStore';
@@ -23,6 +23,7 @@ export default function WorkoutPage() {
   const { id, workoutId } = useLocalSearchParams<{ id: string; workoutId: string }>();
   const plan = useStore((s) => s.plans.find((p) => p.id === id));
   const state = useStore((s) => (id ? s.planState[id] : undefined));
+  const isActive = useStore((s) => s.activePlanId === id);
   const workouts = useStore((s) => s.workouts);
   const [gameMode, setGameMode] = useState(false);
   const found = plan && workoutId ? findWorkout(plan, workoutId) : undefined;
@@ -30,7 +31,8 @@ export default function WorkoutPage() {
 
   // Exercises this app does not know are left out, as when the workout is started.
   const workout = { ...found, items: found.items.filter((i) => EXERCISE_BY_ID[i.exerciseId]) };
-  const pos = workoutPosition(plan, state, todayISO());
+  // A paused plan shows the week it was paused at, as starting it builds that week.
+  const pos = workoutPosition(plan, state, todayISO(), isActive);
   const rhythm = planFacts(plan).hasRhythm;
   const gm = !!workout.gameMode && gameMode;
   const sets = workoutHardSets(workout, (x) => EXERCISE_BY_ID[x], { phase: pos.phase, gameMode: gm });
@@ -84,7 +86,7 @@ export default function WorkoutPage() {
           const ex = EXERCISE_BY_ID[item.exerciseId];
           const p = prescribeItem(item, ex, workout, { phase: pos.phase, gameMode: gm });
           const last = lastPerformance(item.exerciseId, workouts);
-          const sug = suggestNext(ex, p, last);
+          const sug = suggestForPlan(ex, p, last, plan.progression);
           const groupHeader =
             item.group && item.group !== workout.items[i - 1]?.group ? workout.groups[item.group] : null;
           const addWeight = sug.kind === 'increase' && pos.phase !== 'deload';

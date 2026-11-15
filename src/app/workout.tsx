@@ -11,9 +11,8 @@ import { WarmupCard } from '@/components/workout/WarmupCard';
 import { WorkoutExerciseCard } from '@/components/workout/WorkoutExerciseCard';
 import { formatElapsed, formatVolume } from '@/lib/format';
 import { confirm, successFeedback } from '@/lib/platform';
-import { PHASES } from '@/lib/program';
 import { workoutVolume } from '@/lib/stats';
-import { groupHeaderFor, planWorkoutOf, warmupKindOf } from '@/lib/workoutPlan';
+import { groupHeaderFor, planWorkoutOf, warmupKindOf, workoutPhaseText } from '@/lib/workoutPlan';
 import { useNow } from '@/lib/useNow';
 import { useStore } from '@/store/useStore';
 import { C, S, T } from '@/theme';
@@ -49,6 +48,7 @@ export default function WorkoutScreen() {
 
   const gym = planWorkoutOf(plans, active);
   const warmupKind = warmupKindOf(gym);
+  const phaseText = workoutPhaseText(plans, active);
   const sets = active.exercises.flatMap((e) => e.sets);
   const doneSets = sets.filter((s) => s.done).length;
   const volume = workoutVolume({ ...active, exercises: active.exercises });
@@ -137,13 +137,13 @@ export default function WorkoutScreen() {
               <Txt v="hero">{active.name}</Txt>
             </Pressable>
           )}
-          {active.week || active.gameMode ? (
+          {phaseText.tag || active.gameMode ? (
             <Row gap={6} style={{ flexWrap: 'wrap' }}>
-              {active.week ? <Tag label={`Week ${active.week}${active.phase ? ` · ${PHASES[active.phase].name}` : ''}`} /> : null}
+              {phaseText.tag ? <Tag label={phaseText.tag} /> : null}
               {active.gameMode ? <Tag label="Game mode" /> : null}
             </Row>
           ) : null}
-          {active.phase ? <Txt v="small">{PHASES[active.phase].rule}</Txt> : null}
+          {phaseText.rule ? <Txt v="small">{phaseText.rule}</Txt> : null}
         </View>
 
         {warmupKind ? <WarmupCard kind={warmupKind} /> : null}

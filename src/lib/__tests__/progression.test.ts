@@ -1,6 +1,6 @@
 import { describe, expect, it } from '@jest/globals';
 import { getExercise } from '@/data/exercises';
-import { lastPerformance, rampUpSets, suggestNext } from '@/lib/progression';
+import { lastPerformance, rampUpSets, suggestForPlan, suggestNext } from '@/lib/progression';
 import type { Workout } from '@/lib/types';
 
 function workout(id: string, startedAt: number, exerciseId: string, sets: [number | null, number][]): Workout {
@@ -77,6 +77,51 @@ describe('suggestNext (double progression)', () => {
     expect(
       suggestNext(pushup, { sets: 2, repsMin: 8, repsMax: 25, repsLabel: 'stop 2 reps before failure', rir: '2' }, last),
     ).toMatchObject({ kind: 'repeat', weight: null });
+  });
+});
+
+describe('suggestForPlan', () => {
+  const incline = getExercise('incline');
+  const pushup = getExercise('pushup');
+  const pullup = getExercise('pullup');
+  const pushupTarget = { sets: 2, repsMin: 8, repsMax: 25, rir: '2' };
+  const top = lastPerformance('incline', [workout('a', 1, 'incline', [[22, 10], [22, 10], [22, 10]])]);
+  const short = lastPerformance('incline', [workout('a', 1, 'incline', [[22, 10], [22, 9]])]);
+  const reps = lastPerformance('pushup', [workout('a', 1, 'pushup', [[null, 25], [null, 25]])]);
+  const belt = lastPerformance('pullup', [workout('a', 1, 'pullup', [[5, 10], [5, 10]])]);
+
+  it("is suggestNext for a plan that progresses, and when the plan's progression is unknown", () => {
+    for (const [ex, t, last] of [
+      [incline, target, top],
+      [incline, target, short],
+      [incline, target, null],
+      [pushup, pushupTarget, reps],
+      [pullup, target, belt],
+    ] as const) {
+      expect(suggestForPlan(ex, t, last, 'progress')).toEqual(suggestNext(ex, t, last));
+      expect(suggestForPlan(ex, t, last)).toEqual(suggestNext(ex, t, last));
+    }
+  });
+
+  it('says to match last time in a plan that holds its weights, even at the top of the range', () => {
+    expect(suggestNext(incline, target, top).kind).toBe('increase');
+    expect(suggestForPlan(incline, target, top, 'maintain')).toEqual({
+      kind: 'repeat',
+      weight: 22,
+      message: 'Last time 22 kg × 10 · 10 · 10 — match it.',
+    });
+    expect(suggestForPlan(incline, target, short, 'maintain').message).toBe('Last time 22 kg × 10 · 9 — match it.');
+    expect(suggestForPlan(pushup, pushupTarget, reps, 'maintain')).toEqual({
+      kind: 'repeat',
+      weight: null,
+      message: 'Last time 25 · 25 — match it.',
+    });
+    expect(suggestForPlan(pullup, target, belt, 'maintain')).toMatchObject({ kind: 'repeat', weight: 5 });
+    expect(suggestForPlan(pullup, target, belt, 'maintain').message).toBe('Last time +5 kg × 10 · 10 — match it.');
+  });
+
+  it('asks for a starting weight the first time, either way', () => {
+    expect(suggestForPlan(incline, target, null, 'maintain')).toEqual(suggestNext(incline, target, null));
   });
 });
 

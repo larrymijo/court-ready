@@ -1,8 +1,44 @@
 // What a workout's plan says about it: the warm-up, the cues and the superset notes. A workout
 // finds its plan details again by its saved planId, sessionId and each exercise's itemKey, so it
 // works whether or not that plan is the active one. If the plan or the workout has been deleted,
-// every helper returns nothing and the workout shows only what it saved itself (its name and sets).
+// the warm-up, cue and superset helpers return nothing and the workout shows only what it saved
+// itself (its name and sets); planOfWorkout falls back to the example of the same id, if any.
+import { examplePlan } from '@/data/plan-templates';
+import { planFacts } from '@/lib/planView';
+import { PHASES } from '@/lib/program';
 import type { GymWorkout, Plan, RoutineItem, Workout, WorkoutExercise } from '@/lib/types';
+
+/**
+ * The plan a workout was started from: the saved plan with its planId; if that plan was deleted,
+ * the example with the same id (so a Court-Ready workout keeps reading as one); otherwise
+ * undefined (an empty workout, or a deleted plan that is not an example).
+ */
+export function planOfWorkout(plans: readonly Plan[], workout: Pick<Workout, 'planId'>): Plan | undefined {
+  if (!workout.planId) return undefined;
+  return plans.find((p) => p.id === workout.planId) ?? examplePlan(workout.planId);
+}
+
+export interface WorkoutPhaseText {
+  /** "Week 4 · Build", "Week 4" without a phase; null without a week. */
+  tag: string | null;
+  /** What the phase asks of the sets; null when no phase shows. */
+  rule: string | null;
+}
+
+/**
+ * The week tag and phase rule of a workout. The phase shows only when the workout's plan has a
+ * cycle or a lighter week, as positionText does for the plan. A workout without a plan (an empty
+ * one), or whose plan can't be found at all, shows the phase it saved.
+ */
+export function workoutPhaseText(plans: readonly Plan[], workout: Pick<Workout, 'planId' | 'week' | 'phase'>): WorkoutPhaseText {
+  const plan = planOfWorkout(plans, workout);
+  const saved = workout.phase ? PHASES[workout.phase] : undefined;
+  const phase = saved && (!plan || planFacts(plan).hasRhythm) ? saved : null;
+  return {
+    tag: workout.week ? `Week ${workout.week}${phase ? ` · ${phase.name}` : ''}` : null,
+    rule: phase ? phase.rule : null,
+  };
+}
 
 /** The plan's gym workout that `workout` was started from, or undefined (empty workout, deleted plan or workout, sport). */
 export function planWorkoutOf(

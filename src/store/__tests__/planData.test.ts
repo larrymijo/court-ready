@@ -7,7 +7,8 @@ import { EXAMPLE_PLAN_IDS, examplePlan, examplePlans } from '@/data/plan-templat
 import { MUSCLE_MASS_PLAN } from '@/data/plan-templates/muscle-mass';
 import { addDaysISO, mondayOfISO, todayISO } from '@/lib/dates';
 import type { Plan, Workout, WorkoutSet } from '@/lib/types';
-import { normalizePlanData } from '@/store/planData';
+import { planStanding } from '@/lib/planView';
+import { buildPlanWorkout, emptyWorkoutPosition, normalizePlanData, syncProgramStart, workoutPosition } from '@/store/planData';
 import { useStore } from '@/store/useStore';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
@@ -167,6 +168,86 @@ describe('start dates', () => {
   });
 });
 
+describe('workoutPosition', () => {
+  const CR = examplePlan('court-ready')!;
+  const MM = examplePlan('muscle-mass')!;
+  // Court-Ready started 19 Oct 2026, paused in its week 4 (Wednesday 11 Nov), three weeks later.
+  const paused = { start: '2026-10-19', leftAtWeek: 4 };
+  const LATER = '2026-12-02';
+
+  it('puts a paused plan that is not active at the week it was paused at, as planStanding does', () => {
+    expect(workoutPosition(CR, paused, LATER, false)).toEqual({ week: 4, phase: 'build' });
+    const standing = planStanding(CR, paused, false, LATER);
+    expect(standing).toMatchObject({ status: 'paused', week: 4, phase: 'build' });
+    // Its own start would have made it week 7, a lighter week.
+    expect(workoutPosition(CR, { start: '2026-10-19' }, LATER, false)).toEqual({ week: 7, phase: 'deload' });
+  });
+
+  it('agrees with planStanding for a paused plan on any day, in any pass through the cycle', () => {
+    for (const left of [1, 2, 7, 12, 13, 20, 31]) {
+      for (let day = 0; day < 60; day += 5) {
+        const today = addDaysISO('2026-11-09', day);
+        const state = { start: '2025-01-06', leftAtWeek: left };
+        const s = planStanding(CR, state, false, today);
+        if (s.status !== 'paused') throw new Error('expected paused');
+        expect(workoutPosition(CR, state, today, false)).toEqual({ week: s.week, phase: s.phase });
+        const m = planStanding(MM, state, false, today);
+        if (m.status !== 'paused') throw new Error('expected paused');
+        expect(workoutPosition(MM, state, today, false)).toEqual({ week: m.week, phase: m.phase });
+      }
+    }
+  });
+
+  it('changes nothing for the active plan, a plan without leftAtWeek, or one not started', () => {
+    expect(workoutPosition(CR, paused, LATER, true)).toEqual({ week: 7, phase: 'deload' });
+    expect(workoutPosition(CR, paused, LATER)).toEqual({ week: 7, phase: 'deload' });
+    expect(workoutPosition(CR, { start: '2026-10-19' }, LATER, false)).toEqual({ week: 7, phase: 'deload' });
+    expect(workoutPosition(CR, { start: '2026-12-14' }, LATER, false)).toEqual({ week: 1, phase: 'learn' });
+    expect(workoutPosition(CR, undefined, LATER, false)).toEqual({ week: 1, phase: 'learn' });
+    for (const bad of [0, -2, 2.5]) {
+      expect(workoutPosition(CR, { start: '2026-10-19', leftAtWeek: bad }, LATER, false)).toEqual({ week: 7, phase: 'deload' });
+    }
+  });
+
+  it('buildPlanWorkout builds and saves a paused plan for the week it was paused at', () => {
+    const opts = { history: [], today: LATER, now: 0 };
+    const paused4 = buildPlanWorkout(CR, paused, 'uppera', { ...opts, isActive: false })!;
+    const week4 = buildPlanWorkout(CR, { start: '2026-10-19' }, 'uppera', { ...opts, today: '2026-11-11' })!;
+    expect(paused4).toMatchObject({ week: 4, phase: 'build' });
+    expect(paused4.exercises.map((e) => e.target)).toEqual(week4.exercises.map((e) => e.target));
+    const active = buildPlanWorkout(CR, paused, 'uppera', opts)!;
+    expect(active).toMatchObject({ week: 7, phase: 'deload' });
+  });
+});
+
+describe('emptyWorkoutPosition', () => {
+  it('keeps the phase only for a plan with a cycle or a lighter week', () => {
+    const start = { start: '2026-10-19' };
+    expect(emptyWorkoutPosition(examplePlan('court-ready')!, start, '2026-12-02')).toEqual({ week: 7, phase: 'deload' });
+    expect(emptyWorkoutPosition(examplePlan('muscle-mass')!, start, '2026-12-02')).toEqual({ week: 7, phase: 'build' });
+    expect(emptyWorkoutPosition(examplePlan('definition')!, start, '2026-12-02')).toEqual({ week: 7 });
+  });
+});
+
+describe('syncProgramStart', () => {
+  const settings = { programStart: '2026-10-12', restTimer: true, vibrate: true, keepAwake: true, lastExportAt: null };
+
+  it("takes Court-Ready's start when it is a date", () => {
+    expect(syncProgramStart(settings, { 'court-ready': { start: '2026-11-02', leftAtWeek: 3 } })).toEqual({
+      ...settings,
+      programStart: '2026-11-02',
+    });
+    expect(settings.programStart).toBe('2026-10-12');
+  });
+
+  it('leaves the settings as they are without a Court-Ready start that is a date', () => {
+    expect(syncProgramStart(settings, { 'court-ready': { start: '2026-10-12' } })).toBe(settings);
+    expect(syncProgramStart(settings, { definition: { start: '2026-11-02' } })).toBe(settings);
+    expect(syncProgramStart(settings, { 'court-ready': { start: 'odd' } })).toBe(settings);
+    expect(syncProgramStart(settings, { 'court-ready': null } as never)).toBe(settings);
+  });
+});
+
 const doneSet = (weight: number, reps: number): WorkoutSet => ({ id: `s${weight}${reps}`, type: 'normal', weight, reps, rir: 1, done: true });
 const history = (exerciseId: string, sets: WorkoutSet[]): Workout => ({
   id: `h-${exerciseId}`,
@@ -261,6 +342,22 @@ describe('startRoutine and startEmpty', () => {
     useStore.setState({ plans: [examplePlan('definition')!], activePlanId: 'definition' });
     useStore.getState().startRoutine('upperb');
     expect(useStore.getState().active).toMatchObject({ name: 'Upper B', routineId: 'upperb', planId: 'court-ready', sessionId: 'upperb' });
+  });
+
+  it('startEmpty with Court-Ready active saves its week and phase, as before', () => {
+    useStore.getState().setPlanStart('court-ready', addDaysISO(mondayOfISO(todayISO()), -42));
+    useStore.getState().startEmpty();
+    const w = useStore.getState().active!;
+    expect(w).toEqual({ id: w.id, name: 'Workout', startedAt: w.startedAt, week: 7, phase: 'deload', exercises: [] });
+    expect(Object.keys(w)).toEqual(['id', 'name', 'startedAt', 'week', 'phase', 'exercises']);
+  });
+
+  it('startEmpty with a plan without a cycle or a lighter week saves its week and no phase', () => {
+    useStore.getState().activatePlan('definition', addDaysISO(mondayOfISO(todayISO()), -14));
+    useStore.getState().startEmpty();
+    const w = useStore.getState().active!;
+    expect(w).toMatchObject({ name: 'Workout', week: 3, exercises: [] });
+    expect(w).not.toHaveProperty('phase');
   });
 
   it('startEmpty follows the active plan’s week and sets no plan fields', () => {

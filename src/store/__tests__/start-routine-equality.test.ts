@@ -230,3 +230,33 @@ describe.each(Array.from({ length: 40 }, (_, i) => i + 1))('week %i', (week) => 
     expect(built.id).not.toBe('old');
   });
 });
+
+// The screens start workouts with startPlanWorkout. With Court-Ready active it must build exactly
+// what the frozen builder made. [workout, game mode asked for, game mode that applies]: game mode
+// asked for on a workout without it is ignored.
+const PLAN_CASES: [RoutineId, boolean, boolean][] = [
+  ...CASES.map(([routineId, gameMode]): [RoutineId, boolean, boolean] => [routineId, gameMode, gameMode]),
+  ['uppera', true, false],
+  ['upperb', true, false],
+  ['bonus', true, false],
+];
+
+describe.each(Array.from({ length: 40 }, (_, i) => i + 1))("startPlanWorkout('court-ready'), week %i", (week) => {
+  const today = addDaysISO(START, (week - 1) * 7 + 3);
+
+  it.each(PLAN_CASES)('%s, game mode asked %s', (routineId, asked, applies) => {
+    const at = parseISODate(today);
+    at.setHours(12);
+    jest.setSystemTime(at);
+
+    expect(useStore.getState().activePlanId).toBe('court-ready');
+    const old = oldBuildRoutineWorkout(routineId, applies, settings, HISTORY, today);
+    expect(useStore.getState().startPlanWorkout('court-ready', routineId, { gameMode: asked })).toBe(true);
+    const built = useStore.getState().active!;
+
+    expect(built.week).toBe(fixture.weeks[week - 1].position.week);
+    expect(comparable(built)).toEqual(comparable(old));
+    expect(built).toMatchObject({ planId: 'court-ready', planName: 'Court-Ready', sessionId: routineId, routineId });
+    expect(built.id).not.toBe('old');
+  });
+});

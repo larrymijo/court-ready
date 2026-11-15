@@ -91,6 +91,27 @@ export function suggestNext(ex: ExerciseDef, target: SetTarget, last: LastPerfor
   };
 }
 
+/**
+ * What to aim for, by how the plan progresses: 'progress' is suggestNext; 'maintain' (a plan that
+ * holds its weights, as buildPlanWorkout starts it) says to match last time, never to add weight
+ * or reps. The first time is the same either way.
+ */
+export function suggestForPlan(
+  ex: ExerciseDef,
+  target: SetTarget,
+  last: LastPerformance | null,
+  progression: 'progress' | 'maintain' = 'progress',
+): Suggestion {
+  if (progression !== 'maintain' || !last || last.sets.length === 0) return suggestNext(ex, target, last);
+  const repsStr = last.sets.map((s) => s.reps ?? 0).join(' · ');
+  if (ex.tracking === 'reps') {
+    return { kind: 'repeat', weight: null, message: `Last time ${repsStr} — match it.` };
+  }
+  const top = Math.max(...last.sets.map((s) => s.weight ?? 0));
+  const load = ex.equipment === 'bodyweight' ? (top > 0 ? `+${formatKg(top)} kg` : 'BW') : `${formatKg(top)} kg`;
+  return { kind: 'repeat', weight: top > 0 ? top : null, message: `Last time ${load} × ${repsStr} — match it.` };
+}
+
 /** Ramp-up sets before the first exercise: ~50% × 10, ~70% × 5, ~85% × 2. */
 export function rampUpSets(workingWeight: number, step: number): { weight: number; reps: number }[] {
   if (workingWeight <= 0) return [];

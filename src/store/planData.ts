@@ -5,6 +5,7 @@ import { examplePlans } from '@/data/plan-templates';
 import { addDaysISO, daysBetween, isISODate, mondayOfISO } from '@/lib/dates';
 import { uid } from '@/lib/id';
 import { findWorkout, planPhaseForWeek, planPosition, prescribeItem } from '@/lib/plans';
+import { planFacts } from '@/lib/planView';
 import { lastPerformance, suggestNext } from '@/lib/progression';
 import type { PhaseId, Plan, PlanState, RoutineId, Workout, WorkoutExercise } from '@/lib/types';
 
@@ -64,13 +65,46 @@ export function normalizePlanData(
   return { plans, activePlanId, planState };
 }
 
-/** Where a plan stands for a new workout. Without a saved start it counts as not started: week 1. */
-export function workoutPosition(plan: Plan, state: PlanState | undefined, today: string): { week: number; phase: PhaseId } {
+/**
+ * Where a plan stands for a new workout. Without a saved start it counts as not started: week 1.
+ * A plan that is not the active one and was paused (`leftAtWeek`) stands at the week it was paused
+ * at, as planStanding shows it and "Continue" would bring it back; the active plan, or a plan
+ * without `leftAtWeek`, goes by its own start.
+ */
+export function workoutPosition(
+  plan: Plan,
+  state: PlanState | undefined,
+  today: string,
+  isActive: boolean = true,
+): { week: number; phase: PhaseId } {
   if (state && typeof state.start === 'string') {
-    const pos = planPosition(plan, state, today);
+    const left = state.leftAtWeek;
+    const paused = !isActive && typeof left === 'number' && Number.isInteger(left) && left >= 1;
+    const from = paused ? { start: addDaysISO(mondayOfISO(today), -(left - 1) * 7) } : state;
+    const pos = planPosition(plan, from, today);
     return { week: pos.week, phase: pos.phase };
   }
   return { week: 1, phase: planPhaseForWeek(plan, 1) };
+}
+
+/**
+ * The week and phase an empty workout saves, from the active plan. The phase only for a plan with
+ * a cycle or a lighter week: in a plan without one it would mean nothing.
+ */
+export function emptyWorkoutPosition(plan: Plan, state: PlanState | undefined, today: string): { week: number; phase?: PhaseId } {
+  const pos = workoutPosition(plan, state, today);
+  return planFacts(plan).hasRhythm ? pos : { week: pos.week };
+}
+
+/**
+ * Settings with the old `programStart` equal to Court-Ready's start, which it must stay for one
+ * more release in case the app is rolled back. Unchanged when Court-Ready has no start that is a
+ * date (the plan was deleted, or its state is broken).
+ */
+export function syncProgramStart<S extends { programStart: string }>(settings: S, planState: Record<string, PlanState>): S {
+  const start = planState['court-ready']?.start;
+  if (typeof start !== 'string' || !isISODate(start) || start === settings.programStart) return settings;
+  return { ...settings, programStart: start };
 }
 
 function newSet(weight: number | null) {
@@ -80,16 +114,18 @@ function newSet(weight: number | null) {
 /**
  * The workout in progress for one workout of a plan, or null if the plan doesn't have it. Sets,
  * reps and effort come from the plan's phase; weights from the last time each exercise was done.
+ * `isActive` (default true) says whether the plan is the active one: a paused plan that is not
+ * builds the week it was paused at (see workoutPosition).
  */
 export function buildPlanWorkout(
   plan: Plan,
   state: PlanState | undefined,
   workoutId: string,
-  opts: { gameMode?: boolean; history: Workout[]; today: string; now: number },
+  opts: { gameMode?: boolean; history: Workout[]; today: string; now: number; isActive?: boolean },
 ): Workout | null {
   const workout = findWorkout(plan, workoutId);
   if (!workout) return null;
-  const pos = workoutPosition(plan, state, opts.today);
+  const pos = workoutPosition(plan, state, opts.today, opts.isActive ?? true);
   const gameMode = !!opts.gameMode && !!workout.gameMode;
   // Deloads keep the same weights, and so does a plan that aims to match last time.
   const keepWeights = pos.phase === 'deload' || plan.progression === 'maintain';

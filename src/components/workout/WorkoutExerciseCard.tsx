@@ -9,8 +9,8 @@ import { SetHeader, SetRow, type SetGuess } from '@/components/workout/SetRow';
 import { EXERCISE_BY_ID, getExercise } from '@/data/exercises';
 import { formatClock, formatKg, setLabels } from '@/lib/format';
 import { repsText } from '@/lib/program';
-import { planItemOf, planWorkoutOf } from '@/lib/workoutPlan';
-import { lastPerformance, rampUpSets, suggestNext, type PerformedSet } from '@/lib/progression';
+import { planItemOf, planOfWorkout, planWorkoutOf } from '@/lib/workoutPlan';
+import { lastPerformance, rampUpSets, suggestForPlan, type PerformedSet } from '@/lib/progression';
 import type { PhaseId, Workout, WorkoutExercise, WorkoutSet } from '@/lib/types';
 import { useStore } from '@/store/useStore';
 import { C, R, S, T } from '@/theme';
@@ -51,7 +51,9 @@ export function WorkoutExerciseCard({
   const last = useMemo(() => lastPerformance(we.exerciseId, workouts), [we.exerciseId, workouts]);
   const weight = ex.tracking === 'weight_reps';
   const target = we.target;
-  const suggestion = target ? suggestNext(ex, target, last) : null;
+  // A plan that holds its weights says to match last time, as buildPlanWorkout started it.
+  const progression = planOfWorkout(plans, workout)?.progression;
+  const suggestion = target ? suggestForPlan(ex, target, last, progression) : null;
   const cue = planItemOf(planWorkoutOf(plans, workout), we)?.cue;
   const doneCount = we.sets.filter((s) => s.done).length;
   const workingWeight = we.sets.find((s) => s.type === 'normal')?.weight ?? null;
