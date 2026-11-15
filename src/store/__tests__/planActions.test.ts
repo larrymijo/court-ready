@@ -56,8 +56,8 @@ afterEach(() => {
 });
 
 describe('data version', () => {
-  it('stays at 3', () => {
-    expect(DATA_VERSION).toBe(3);
+  it('is 4, for sport sessions', () => {
+    expect(DATA_VERSION).toBe(4);
   });
 });
 

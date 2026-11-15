@@ -223,7 +223,8 @@ describe('a version 3 backup', () => {
     expect(s.planState).toEqual(exportV3.planState);
     const out = JSON.parse(s.exportData());
     expect(out.exportedAt).not.toBe(exportV3.exportedAt);
-    expect({ ...out, exportedAt: exportV3.exportedAt }).toEqual(exportV3);
+    // Only the version moves on (to 4, see upgrade-v4.test.ts).
+    expect({ ...out, exportedAt: exportV3.exportedAt }).toEqual({ ...exportV3, version: DATA_VERSION });
   });
 
   it('does not reach the templates when the imported plans change', () => {

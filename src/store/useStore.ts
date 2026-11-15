@@ -6,16 +6,19 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 import { EXERCISE_BY_ID, getExercise } from '@/data/exercises';
 import { examplePlan, examplePlans } from '@/data/plan-templates';
 import { STORE_KEY } from '@/lib/channel';
-import { isISODate, mondayOfISO, todayISO } from '@/lib/dates';
+import { isISODate, isoFromTimestamp, mondayOfISO, parseISODate, todayISO } from '@/lib/dates';
 import { uid } from '@/lib/id';
 import { lastPerformance } from '@/lib/progression';
+import { buildSportRecord, insertNewestFirst, minutesBetween, type SportPlanLink } from '@/lib/sportSession';
 import { detectPRs } from '@/lib/stats';
 import type {
+  ActiveSport,
   BodyEntry,
   Plan,
   PlanState,
   RoutineId,
   Settings,
+  SportId,
   Workout,
   WorkoutExercise,
   WorkoutSet,
@@ -32,6 +35,7 @@ import {
   type PlanData,
 } from '@/store/planData';
 import { keepSafetyCopy, readSafetyCopy } from '@/store/safetyCopy';
+import { isActiveSportShaped, resolveSportStart, sportPlanLink } from '@/store/sportData';
 
 export interface RestState {
   endsAt: number;
@@ -52,12 +56,34 @@ export interface ExportData {
   planState: Record<string, PlanState>;
 }
 
+/** "Log a past session": a sport session that wasn't started in the app. */
+export interface PastSportEntry {
+  sport: SportId;
+  /** YYYY-MM-DD and HH:MM, local time: when it started. */
+  date: string;
+  time: string;
+  minutes: number;
+  effort?: number;
+  match?: boolean;
+  pain?: number | null;
+  distanceKm?: number;
+  note?: string;
+  warmupDone?: boolean;
+  cooldownDone?: boolean;
+  planId?: string;
+  sessionId?: string;
+}
+
 interface State {
   settings: Settings;
-  /** Finished workouts, newest first. */
+  /** Finished workouts and sport sessions, newest first by startedAt. */
   workouts: Workout[];
   active: Workout | null;
   warmupChecked: number[];
+  /** The cool-down ticks of the gym workout in progress. */
+  cooldownChecked: number[];
+  /** The sport session in progress. Never exported. It can run alongside a gym workout in progress. */
+  activeSport: ActiveSport | null;
   body: BodyEntry[];
   rest: RestState | null;
   /** Saved plans: the examples and, later, your own. There is always at least one. */
@@ -73,7 +99,11 @@ interface State {
   startPlanWorkout: (planId: string, workoutId: string, opts?: { gameMode?: boolean }) => boolean;
   startEmpty: () => void;
   discardWorkout: () => void;
-  finishWorkout: () => string | null;
+  /**
+   * Saves the workout in progress with its ticked sets; null (nothing changes) without one. The
+   * warm-up and cool-down marks are written when given. History stays newest first.
+   */
+  finishWorkout: (opts?: { warmupDone?: boolean; cooldownDone?: boolean }) => string | null;
   renameWorkout: (name: string) => void;
 
   addExercise: (exerciseId: string) => void;
@@ -95,11 +125,39 @@ interface State {
   ) => number;
   uncompleteSet: (workoutExerciseId: string, setId: string) => void;
   toggleWarmup: (index: number) => void;
+  /** Ticks or unticks a step of the gym workout's cool-down. */
+  toggleCooldownStep: (index: number) => void;
+
+  /**
+   * Opens a sport session at its warm-up, in place of any sport session in progress (the gym
+   * workout in progress is not touched). With a plan session, its warm-up, cool-down and name;
+   * otherwise the sport's own. False (nothing changes) for an unknown sport, a plan that isn't
+   * saved, a session without a plan, or a plan session that isn't saved or is another sport.
+   */
+  startSport: (opts: { sport: SportId; planId?: string; sessionId?: string; name?: string }) => boolean;
+  toggleSportStep: (list: 'warmup' | 'cooldown', index: number) => void;
+  /** From the warm-up: starts the clock (saved at once, so a reload keeps it). */
+  startPlaying: (opts?: { skippedWarmup?: boolean }) => void;
+  /** While playing: stops the clock and opens the log sheet with the minutes played (at least 1). */
+  finishPlaying: () => void;
+  updateSportDraft: (patch: ActiveSport['draft']) => void;
+  /** From the log sheet to the cool-down. */
+  goToCooldown: () => void;
+  /**
+   * From the log sheet or the cool-down: saves the session and closes it. Returns the record's id,
+   * or null (nothing changes) when there is none or the log breaks the rules (lib/sportSession.ts).
+   * The cool-down counts as done only when saved from the cool-down without skipping it.
+   */
+  saveSport: (opts?: { skippedCooldown?: boolean }) => string | null;
+  discardSport: () => void;
+  /** Saves a session entered afterwards, in date order. Its id, or null (nothing changes) when it can't be saved. */
+  logPastSport: (entry: PastSportEntry) => string | null;
 
   startRest: (seconds: number, label: string) => void;
   adjustRest: (deltaSec: number) => void;
   clearRest: () => void;
 
+  /** Removes a finished gym workout or sport session from history. */
   deleteWorkout: (id: string) => void;
   logBody: (entry: BodyEntry) => void;
   deleteBody: (date: string) => void;
@@ -138,8 +196,49 @@ export type RestoreResult = { ok: true; workouts: number } | { ok: false; error:
 /** The part of the state that is saved on the phone. */
 type Saved = Pick<
   State,
-  'settings' | 'workouts' | 'active' | 'warmupChecked' | 'body' | 'rest' | 'plans' | 'activePlanId' | 'planState'
+  | 'settings'
+  | 'workouts'
+  | 'active'
+  | 'warmupChecked'
+  | 'cooldownChecked'
+  | 'activeSport'
+  | 'body'
+  | 'rest'
+  | 'plans'
+  | 'activePlanId'
+  | 'planState'
 >;
+
+const isNumberList = (v: unknown): v is number[] => Array.isArray(v) && v.every((n) => typeof n === 'number');
+
+/** Ticks a step on or off in a list of ticked step indexes. */
+function toggleIndex(list: readonly number[], index: number): number[] {
+  return list.includes(index) ? list.filter((i) => i !== index) : [...list, index];
+}
+
+/** Local time of a YYYY-MM-DD date and an HH:MM time (ms since 1970), or null if either isn't one. */
+function localTime(dateISO: string, time: string): number | null {
+  if (typeof dateISO !== 'string' || !isISODate(dateISO) || typeof time !== 'string') return null;
+  const m = /^(\d{1,2}):(\d{2})$/.exec(time);
+  if (!m) return null;
+  const hours = Number(m[1]);
+  const minutes = Number(m[2]);
+  if (hours > 23 || minutes > 59) return null;
+  const d = parseISODate(dateISO);
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate(), hours, minutes).getTime();
+}
+
+/** The plan fields a sport session in progress is saved with. A plan deleted since keeps its link without a week. */
+function activeSportLink(a: ActiveSport, data: PlanData): SportPlanLink | undefined {
+  if (a.planId === undefined) return undefined;
+  const plan = data.plans.find((p) => p.id === a.planId);
+  if (!plan) {
+    return { planId: a.planId, planName: a.planName ?? a.planId, ...(a.sessionId !== undefined ? { sessionId: a.sessionId } : {}) };
+  }
+  const link = sportPlanLink(plan, data.planState[plan.id], isoFromTimestamp(a.openedAt), plan.id === data.activePlanId, a.sessionId);
+  // The plan's name when the session started, as gym workouts keep it.
+  return { ...link, planName: a.planName ?? link.planName };
+}
 
 function defaultSettings(programStart: string = mondayOfISO(todayISO())): Settings {
   return {
@@ -232,6 +331,8 @@ export const useStore = create<State>()(
       workouts: [],
       active: null,
       warmupChecked: [],
+      cooldownChecked: [],
+      activeSport: null,
       body: [],
       rest: null,
 
@@ -246,7 +347,7 @@ export const useStore = create<State>()(
           today: todayISO(),
           now: Date.now(),
         });
-        if (active) set({ active, warmupChecked: [], rest: null });
+        if (active) set({ active, warmupChecked: [], cooldownChecked: [], rest: null });
       },
 
       startPlanWorkout: (planId, workoutId, opts) => {
@@ -262,7 +363,7 @@ export const useStore = create<State>()(
           isActive: planId === activePlanId,
         });
         if (!active) return false;
-        set({ active, warmupChecked: [], rest: null });
+        set({ active, warmupChecked: [], cooldownChecked: [], rest: null });
         return true;
       },
 
@@ -279,13 +380,14 @@ export const useStore = create<State>()(
             exercises: [],
           },
           warmupChecked: [],
+          cooldownChecked: [],
           rest: null,
         });
       },
 
-      discardWorkout: () => set({ active: null, rest: null, warmupChecked: [] }),
+      discardWorkout: () => set({ active: null, rest: null, warmupChecked: [], cooldownChecked: [] }),
 
-      finishWorkout: () => {
+      finishWorkout: (opts) => {
         const { active, workouts } = get();
         if (!active) return null;
         const exercises = active.exercises
@@ -293,8 +395,18 @@ export const useStore = create<State>()(
           .filter((e) => e.sets.length > 0);
         if (exercises.length === 0) return null;
         const finished: Workout = { ...active, exercises, finishedAt: Date.now() };
+        if (typeof opts?.warmupDone === 'boolean') finished.warmupDone = opts.warmupDone;
+        if (typeof opts?.cooldownDone === 'boolean') finished.cooldownDone = opts.cooldownDone;
         finished.prs = detectPRs(finished, workouts, (id) => EXERCISE_BY_ID[id]);
-        set({ workouts: [finished, ...workouts], active: null, rest: null, warmupChecked: [] });
+        // A prepend whenever the workout started after everything saved; a sport session saved or
+        // logged while it was in progress can have started later, and history stays in order.
+        set({
+          workouts: insertNewestFirst(workouts, finished),
+          active: null,
+          rest: null,
+          warmupChecked: [],
+          cooldownChecked: [],
+        });
         return finished.id;
       },
 
@@ -395,6 +507,119 @@ export const useStore = create<State>()(
         set({ warmupChecked: cur.includes(index) ? cur.filter((i) => i !== index) : [...cur, index] });
       },
 
+      toggleCooldownStep: (index) => set({ cooldownChecked: toggleIndex(get().cooldownChecked, index) }),
+
+      startSport: (opts) => {
+        const start = resolveSportStart(get().plans, opts);
+        if (!start) return false;
+        const activeSport: ActiveSport = {
+          id: uid(),
+          sport: start.def.id,
+          name: start.name,
+          ...(start.plan ? { planId: start.plan.id, planName: start.plan.name } : {}),
+          ...(start.session ? { sessionId: start.session.id } : {}),
+          warmup: start.warmup,
+          cooldown: start.cooldown,
+          openedAt: Date.now(),
+          stage: 'warmup',
+          warmupChecked: [],
+          cooldownChecked: [],
+          draft: {},
+        };
+        set({ activeSport });
+        return true;
+      },
+
+      toggleSportStep: (list, index) => {
+        const a = get().activeSport;
+        if (!a) return;
+        const key = list === 'warmup' ? 'warmupChecked' : 'cooldownChecked';
+        set({ activeSport: { ...a, [key]: toggleIndex(a[key], index) } });
+      },
+
+      startPlaying: (opts) => {
+        const a = get().activeSport;
+        if (!a || a.stage !== 'warmup') return;
+        // The clock is worked out from this time, never counted, so it survives the phone locking
+        // and the web app reloading. The store saves it at once.
+        set({ activeSport: { ...a, stage: 'playing', playStartedAt: Date.now(), warmupDone: !opts?.skippedWarmup } });
+      },
+
+      finishPlaying: () => {
+        const a = get().activeSport;
+        if (!a || a.stage !== 'playing') return;
+        const playEndedAt = Date.now();
+        const minutes = Math.max(1, minutesBetween(a.playStartedAt ?? a.openedAt, playEndedAt));
+        set({ activeSport: { ...a, stage: 'log', playEndedAt, draft: { ...a.draft, minutes } } });
+      },
+
+      updateSportDraft: (patch) => {
+        const a = get().activeSport;
+        if (a) set({ activeSport: { ...a, draft: { ...a.draft, ...patch } } });
+      },
+
+      goToCooldown: () => {
+        const a = get().activeSport;
+        if (a && a.stage === 'log') set({ activeSport: { ...a, stage: 'cooldown' } });
+      },
+
+      saveSport: (opts) => {
+        const { activeSport: a, workouts } = get();
+        if (!a || (a.stage !== 'log' && a.stage !== 'cooldown')) return null;
+        const { minutes, effort, match, pain, distanceKm, note } = a.draft;
+        const record = buildSportRecord({
+          id: a.id,
+          sport: a.sport,
+          name: a.name,
+          startedAt: a.openedAt,
+          finishedAt: Math.max(a.openedAt, Date.now()),
+          minutes,
+          effort,
+          match,
+          pain,
+          distanceKm,
+          note,
+          warmupDone: a.warmupDone,
+          cooldownDone: a.stage === 'cooldown' && !opts?.skippedCooldown,
+          plan: activeSportLink(a, pickPlanData(get())),
+        });
+        if (!record) return null;
+        set({ workouts: insertNewestFirst(workouts, record), activeSport: null });
+        return record.id;
+      },
+
+      discardSport: () => set({ activeSport: null }),
+
+      logPastSport: (entry) => {
+        const { workouts, plans, activePlanId, planState } = get();
+        const startedAt = localTime(entry.date, entry.time);
+        if (startedAt == null) return null;
+        const start = resolveSportStart(plans, { sport: entry.sport, planId: entry.planId, sessionId: entry.sessionId });
+        if (!start) return null;
+        const record = buildSportRecord({
+          id: uid(),
+          sport: start.def.id,
+          name: start.name,
+          startedAt,
+          finishedAt: startedAt + entry.minutes * 60_000,
+          minutes: entry.minutes,
+          effort: entry.effort,
+          match: entry.match,
+          pain: entry.pain,
+          distanceKm: entry.distanceKm,
+          note: entry.note,
+          warmupDone: entry.warmupDone,
+          cooldownDone: entry.cooldownDone,
+          loggedLater: true,
+          plan: start.plan
+            ? sportPlanLink(start.plan, planState[start.plan.id], entry.date, start.plan.id === activePlanId, start.session?.id)
+            : undefined,
+        });
+        if (!record) return null;
+        set({ workouts: insertNewestFirst(workouts, record) });
+        return record.id;
+      },
+
       startRest: (seconds, label) => set({ rest: { endsAt: Date.now() + seconds * 1000, duration: seconds, label } }),
 
       adjustRest: (deltaSec) => {
@@ -487,6 +712,7 @@ export const useStore = create<State>()(
       },
 
       exportData: () => {
+        // Sport sessions travel inside `workouts`. Sessions in progress (gym or sport) are never exported.
         const { settings, workouts, body, plans, activePlanId, planState } = get();
         const data: ExportData = {
           app: 'court-ready',
@@ -539,10 +765,16 @@ export const useStore = create<State>()(
           };
           // Broken plan data never refuses a file: it is made usable, and the workouts import.
           const planData = normalizePlanData(current, settings.programStart, todayISO());
+          // Every record has an exercises list (a sport session's is empty), and history is newest first.
+          const workouts = current.workouts.map((w): Workout => {
+            const record = w as unknown;
+            if (record === null || typeof record !== 'object' || Array.isArray(record)) return w;
+            return Array.isArray((record as Partial<Workout>).exercises) ? w : { ...w, exercises: [] };
+          });
           set({
             // A file whose old programStart differs from Court-Ready's start gets Court-Ready's.
             settings: syncProgramStart(settings, planData.planState),
-            workouts: [...current.workouts].sort((a, b) => b.startedAt - a.startedAt),
+            workouts: workouts.sort((a, b) => b.startedAt - a.startedAt),
             body: current.body,
             ...planData,
           });
@@ -568,6 +800,9 @@ export const useStore = create<State>()(
           body: saved.body,
           active: saved.active ?? null,
           warmupChecked: saved.warmupChecked ?? [],
+          // The copy is from before sport sessions: none is in progress.
+          cooldownChecked: [],
+          activeSport: null,
           rest: null,
           ...planData,
         });
@@ -575,7 +810,16 @@ export const useStore = create<State>()(
       },
 
       resetAll: () =>
-        set({ ...defaultData(), workouts: [], active: null, warmupChecked: [], body: [], rest: null }),
+        set({
+          ...defaultData(),
+          workouts: [],
+          active: null,
+          warmupChecked: [],
+          cooldownChecked: [],
+          activeSport: null,
+          body: [],
+          rest: null,
+        }),
     }),
     {
       name: STORE_KEY,
@@ -588,22 +832,28 @@ export const useStore = create<State>()(
       },
       // A setting added later gets its default instead of being missing from older saved data, and
       // saved plan data is made usable (see normalizePlanData), and the old programStart follows
-      // Court-Ready's start.
+      // Court-Ready's start. A sport session in progress this app can't carry on with is dropped.
       merge: (persisted, current) => {
         const saved = (persisted ?? {}) as Partial<Saved>;
+        const isSaved = persisted != null && typeof persisted === 'object';
         const merged = { ...current.settings, ...saved.settings };
-        const planData =
-          persisted != null && typeof persisted === 'object'
-            ? normalizePlanData(saved, merged.programStart, todayISO())
-            : pickPlanData(current);
+        const planData = isSaved ? normalizePlanData(saved, merged.programStart, todayISO()) : pickPlanData(current);
         const settings = syncProgramStart(merged, planData.planState);
-        return { ...current, ...saved, settings, ...planData };
+        const sport = isSaved
+          ? {
+              activeSport: isActiveSportShaped(saved.activeSport) ? saved.activeSport : null,
+              cooldownChecked: isNumberList(saved.cooldownChecked) ? saved.cooldownChecked : [],
+            }
+          : { activeSport: current.activeSport, cooldownChecked: current.cooldownChecked };
+        return { ...current, ...saved, settings, ...planData, ...sport };
       },
       partialize: (s): Saved => ({
         settings: s.settings,
         workouts: s.workouts,
         active: s.active,
         warmupChecked: s.warmupChecked,
+        cooldownChecked: s.cooldownChecked,
+        activeSport: s.activeSport,
         body: s.body,
         rest: s.rest,
         plans: s.plans,

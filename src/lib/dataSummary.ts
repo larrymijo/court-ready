@@ -58,6 +58,17 @@ export function summaryLines(s: DataSummary): string[] {
 }
 
 /**
+ * One more line for Settings → Your data, about sport: `of which 4 sport sessions`, counted among
+ * the finished workouts of summaryLines; empty when there are none. Kept apart from summaryLines,
+ * whose two lines must read the same before and after an update (sport records count as workouts
+ * there, in this app and in the one before it).
+ */
+export function sportSummaryLine(data: { workouts: readonly Workout[] }): string {
+  const count = data.workouts.filter((w) => w.finishedAt && w.kind === 'sport').length;
+  return count === 0 ? '' : `of which ${plural(count, 'sport session')}`;
+}
+
+/**
  * One more line for Settings → Your data, about plans: `3 plans · Court-Ready, week 5`, or, before
  * the active plan's first week, `3 plans · Definition, starts Mon 16 Nov`. Kept apart from
  * summaryLines, whose two lines must read the same before and after an update.

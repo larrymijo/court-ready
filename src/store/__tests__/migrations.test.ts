@@ -52,6 +52,8 @@ describe('migrate', () => {
       plans: examplePlans(),
       activePlanId: 'court-ready',
       planState: { 'court-ready': { start: '2026-10-12' } },
+      activeSport: null,
+      cooldownChecked: [],
     });
   });
 
@@ -63,6 +65,8 @@ describe('migrate', () => {
       plans: examplePlans(),
       activePlanId: 'court-ready',
       planState: { 'court-ready': { start: '2026-10-12' } },
+      activeSport: null,
+      cooldownChecked: [],
     });
   });
 

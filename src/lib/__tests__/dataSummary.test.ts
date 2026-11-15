@@ -1,7 +1,7 @@
 import { describe, expect, it } from '@jest/globals';
 
 import { examplePlans } from '@/data/plan-templates';
-import { planSummaryLine, summarizeData, summaryLines } from '@/lib/dataSummary';
+import { planSummaryLine, sportSummaryLine, summarizeData, summaryLines } from '@/lib/dataSummary';
 import type { BodyEntry, Workout, WorkoutSet } from '@/lib/types';
 import { migrate } from '@/store/migrations';
 
@@ -123,5 +123,35 @@ describe('planSummaryLine', () => {
       '3 plans · Muscle Mass Building, not started',
     );
     expect(planSummaryLine({ plans, activePlanId: 'gone', planState: {} }, TODAY)).toBe('3 plans');
+  });
+});
+
+describe('sportSummaryLine', () => {
+  const sport = (id: string, finished = true): Workout => ({
+    id,
+    name: 'Volleyball',
+    kind: 'sport',
+    sport: 'volleyball',
+    startedAt: d(2026, 10, 5),
+    finishedAt: finished ? d(2026, 10, 5) + 5_400_000 : undefined,
+    exercises: [],
+    prs: [],
+    minutes: 90,
+  });
+
+  it('counts the finished sport sessions among the workouts', () => {
+    const all = [...workouts, sport('s1'), sport('s2'), sport('s3'), sport('s4'), sport('open', false)];
+    expect(sportSummaryLine({ workouts: all })).toBe('of which 4 sport sessions');
+    expect(sportSummaryLine({ workouts: [sport('s1')] })).toBe('of which 1 sport session');
+  });
+
+  it('is empty without sport sessions', () => {
+    expect(sportSummaryLine({ workouts })).toBe('');
+    expect(sportSummaryLine({ workouts: [] })).toBe('');
+  });
+
+  it('leaves the summary as it was: sport sessions count as workouts and add no sets', () => {
+    const withSport = summarizeData([...workouts, sport('s1')], body);
+    expect(withSport).toEqual({ ...summarizeData(workouts, body), workouts: 4 });
   });
 });

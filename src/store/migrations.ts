@@ -13,7 +13,7 @@
  */
 import { examplePlans } from '@/data/plan-templates';
 
-export const DATA_VERSION = 3;
+export const DATA_VERSION = 4;
 
 /** Data as it comes out of storage or a backup file: nothing about its shape is trusted. */
 export type SavedData = Record<string, unknown>;
@@ -55,6 +55,18 @@ const STEPS: Record<number, (data: SavedData) => SavedData> = {
     if (Array.isArray(data.workouts)) out.workouts = data.workouts.map(linkToCourtReady);
     // A backup file has no workout in progress: don't add the key.
     if ('active' in data) out.active = linkToCourtReady(data.active);
+    return out;
+  },
+
+  // Version 4: sport sessions. A finished one is a workout with kind 'sport' and `exercises: []`,
+  // so workouts, plans and settings need nothing. The store gains a sport session in progress and
+  // the gym cool-down ticks; a backup file has neither (it has no `active` key either), so it gets
+  // nothing. A key that is there is left as it is, whatever it holds: the store's merge reads it.
+  3: (data) => {
+    if (!('active' in data)) return data;
+    const out: SavedData = { ...data };
+    if (data.activeSport === undefined) out.activeSport = null;
+    if (data.cooldownChecked === undefined) out.cooldownChecked = [];
     return out;
   },
 };
