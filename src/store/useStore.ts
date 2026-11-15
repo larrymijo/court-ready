@@ -6,7 +6,7 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 import { EXERCISE_BY_ID, getExercise } from '@/data/exercises';
 import { examplePlan, examplePlans } from '@/data/plan-templates';
 import { STORE_KEY } from '@/lib/channel';
-import { mondayOfISO, todayISO } from '@/lib/dates';
+import { isISODate, mondayOfISO, todayISO } from '@/lib/dates';
 import { uid } from '@/lib/id';
 import { lastPerformance } from '@/lib/progression';
 import { detectPRs } from '@/lib/stats';
@@ -120,7 +120,11 @@ interface State {
    * which becomes active as activatePlan(useInstead, 'continue') does).
    */
   deletePlan: (planId: string, useInstead?: string) => boolean;
-  /** Adds a fresh copy of each example whose id isn't saved, after the saved plans. Returns how many. */
+  /**
+   * Adds a fresh copy of each example whose id isn't saved, after the saved plans. Returns how many.
+   * A restored Court-Ready without a start gets `settings.programStart` (if it is a date) back as its
+   * start, so it stands in its 12-week cycle again.
+   */
   restoreExamples: () => number;
   exportData: () => string;
   importData: (json: string) => RestoreResult;
@@ -462,8 +466,23 @@ export const useStore = create<State>()(
       },
 
       restoreExamples: () => {
-        const add = missingExamples(get().plans);
-        if (add.length > 0) set({ plans: [...get().plans, ...add] });
+        const { plans, planState, settings } = get();
+        const add = missingExamples(plans);
+        if (add.length === 0) return 0;
+        const next: Partial<Saved> = { plans: [...plans, ...add] };
+        // Court-Ready comes back at the start the old field still holds. It is not the active plan
+        // (it was missing), and without leftAtWeek it goes on from that start, as "Continue" does.
+        const cr = planState['court-ready'];
+        const start = settings.programStart;
+        if (
+          add.some((p) => p.id === 'court-ready') &&
+          (!cr || typeof cr.start !== 'string') &&
+          typeof start === 'string' &&
+          isISODate(start)
+        ) {
+          next.planState = { ...planState, 'court-ready': { ...(cr ?? {}), start } };
+        }
+        set(next);
         return add.length;
       },
 

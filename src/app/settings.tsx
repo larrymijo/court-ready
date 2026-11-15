@@ -66,7 +66,7 @@ export default function SettingsScreen() {
   const onRestoreCopy = async () => {
     const ok = await confirm(
       'Go back to the earlier copy?',
-      'This replaces your workouts, weigh-ins and settings with the copy from before the update. Anything logged since then is lost, so export a backup first.',
+      'This replaces your workouts, weigh-ins, plans and settings with the copy from before the update. Anything logged since then is lost, so export a backup first.',
       'Go back',
       true,
     );
@@ -77,7 +77,7 @@ export default function SettingsScreen() {
   };
 
   const runImport = async (text: string) => {
-    const ok = await confirm('Import data?', 'This replaces your current workouts, weigh-ins and settings.', 'Import', true);
+    const ok = await confirm('Import data?', 'This replaces your current workouts, weigh-ins, plans and settings.', 'Import', true);
     if (!ok) return;
     const res = importData(text.trim());
     if (res.ok) {

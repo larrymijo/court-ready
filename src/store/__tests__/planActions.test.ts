@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, jest } from '@jest/globals
 import { examplePlans } from '@/data/plan-templates';
 import { addDaysISO } from '@/lib/dates';
 import { planPosition } from '@/lib/plans';
+import { planStanding } from '@/lib/planView';
 import type { Plan, Workout } from '@/lib/types';
 import { DATA_VERSION } from '@/store/migrations';
 import { useStore } from '@/store/useStore';
@@ -266,15 +267,82 @@ describe('restoreExamples', () => {
     expect(state().plans[1]).toEqual(edited);
   });
 
-  it('does not give a restored example any state, and does not change the active plan', () => {
+  it('does not give a restored example other than Court-Ready any state, and does not change the active plan', () => {
     state().activatePlan('definition', 'continue');
     state().deletePlan('court-ready', 'definition');
-    expect(state().restoreExamples()).toBe(1);
-    expect(state().plans[state().plans.length - 1].id).toBe('court-ready');
-    expect(state().planState['court-ready']).toBeUndefined();
+    state().deletePlan('muscle-mass');
+    const definition = state().planState.definition;
+    expect(state().restoreExamples()).toBe(2);
+    expect(state().plans.map((p) => p.id)).toEqual(['definition', 'court-ready', 'muscle-mass']);
+    expect(state().plans.slice(1)).toEqual([examplePlans()[0], examplePlans()[1]]);
+    expect(state().planState['muscle-mass']).toBeUndefined();
+    expect(state().planState.definition).toBe(definition);
     expect(state().activePlanId).toBe('definition');
-    // Restored, it can be used: it starts this week.
+  });
+
+  it('brings back Court-Ready that was active at the start settings.programStart still holds', () => {
+    state().activatePlan('definition', 'continue');
+    state().deletePlan('court-ready', 'definition');
+    expect(state().planState['court-ready']).toBeUndefined();
+    expect(state().restoreExamples()).toBe(1);
+    expect(state().planState['court-ready']).toEqual({ start: CR_START });
+    expect(state().settings.programStart).toBe(CR_START);
+    expect(state().activePlanId).toBe('definition');
+    // Continue puts it in week 4 of its cycle, where it stands by its start.
     state().activatePlan('court-ready', 'continue');
-    expect(state().planState['court-ready']).toEqual({ start: addDaysISO(WED, -2) });
+    expect(state().planState['court-ready']).toEqual({ start: CR_START });
+    expect(crPos(WED)).toMatchObject({ week: 4, phase: 'build' });
+  });
+
+  it('brings back Court-Ready that was paused at its start, going on from it', () => {
+    state().activatePlan('definition', 'continue'); // Court-Ready paused in week 4
+    at('2026-12-02'); // three weeks later
+    expect(state().deletePlan('court-ready')).toBe(true);
+    expect(state().settings.programStart).toBe(CR_START);
+    expect(state().restoreExamples()).toBe(1);
+    expect(state().planState['court-ready']).toEqual({ start: CR_START });
+    expect(state().settings.programStart).toBe(CR_START);
+    const plan = state().plans.find((p) => p.id === 'court-ready') as Plan;
+    expect(planStanding(plan, state().planState['court-ready'], false, '2026-12-02')).toMatchObject({
+      status: 'paused',
+      week: 7,
+      leftAtWeek: 7,
+    });
+  });
+
+  it.each([['missing', undefined], ['empty', ''], ['not a date', 'soon'], ['an impossible date', '2026-13-45']])(
+    'brings back Court-Ready without a start when settings.programStart is %s',
+    (_label, programStart) => {
+      state().activatePlan('definition', 'continue');
+      state().deletePlan('court-ready', 'definition');
+      useStore.setState({ settings: { ...state().settings, programStart: programStart as string } });
+      expect(state().restoreExamples()).toBe(1);
+      expect(state().planState['court-ready']).toBeUndefined();
+      expect(state().settings.programStart).toBe(programStart);
+      // Restored, it can be used: it starts this week.
+      state().activatePlan('court-ready', 'continue');
+      expect(state().planState['court-ready']).toEqual({ start: addDaysISO(WED, -2) });
+    },
+  );
+
+  it('changes nothing more when run twice', () => {
+    state().activatePlan('definition', 'continue');
+    state().deletePlan('court-ready', 'definition');
+    state().restoreExamples();
+    const once = JSON.stringify([state().plans, state().planState, state().activePlanId, state().settings]);
+    expect(state().restoreExamples()).toBe(0);
+    expect(JSON.stringify([state().plans, state().planState, state().activePlanId, state().settings])).toBe(once);
+  });
+
+  it("leaves Court-Ready's state alone when it was not deleted", () => {
+    useStore.setState({ planState: { 'court-ready': { start: CR_START, leftAtWeek: 2 } } });
+    state().deletePlan('muscle-mass');
+    // A programStart that differs from Court-Ready's start (deletePlan would have synced it).
+    useStore.setState({ settings: { ...state().settings, programStart: '2026-09-07' } });
+    const crState = state().planState['court-ready'];
+    expect(state().restoreExamples()).toBe(1);
+    expect(state().planState['court-ready']).toBe(crState);
+    expect(state().planState['muscle-mass']).toBeUndefined();
+    expect(state().settings.programStart).toBe('2026-09-07');
   });
 });

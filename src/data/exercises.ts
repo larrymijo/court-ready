@@ -1512,7 +1512,7 @@ export const EXERCISES: ExerciseDef[] = [
         ],
       },
     ],
-    warning: 'Heavy sets need a spotter or safety pins set just above your chest. Never clip the collars on a bar you can’t rack.',
+    warning: 'Heavy sets need a spotter, or safety bars set just below where the bar touches your chest, so they catch it if a rep fails. With neither, stop well short of failure and leave the collars off so you can tip the plates off.',
   },
   {
     id: 'shoulderpress',
@@ -1525,7 +1525,7 @@ export const EXERCISES: ExerciseDef[] = [
     tracking: 'weight_reps',
     increment: 2,
     kind: 'main',
-    swaps: ['alt_machinepress', 'alt_inclinemachine'],
+    swaps: ['alt_inclinemachine'],
     sections: [
       {
         label: 'SETUP',
@@ -1553,7 +1553,7 @@ export const EXERCISES: ExerciseDef[] = [
         label: 'IF IT HURTS',
         items: [
           'Turn your palms toward each other, lower the bench a notch, or stop a little higher.',
-          'Still pinching? Use a machine shoulder press with neutral handles.',
+          'Still pinching? Use the incline machine press instead, or leave the press out for today.',
         ],
       },
     ],
