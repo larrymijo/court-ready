@@ -1,5 +1,5 @@
 import { mondayOfISO, isoFromTimestamp } from '@/lib/dates';
-import { plannedGymWorkouts, prescribeItem } from '@/lib/plans';
+import { isNonHardKind, plannedGymWorkouts, prescribeItem } from '@/lib/plans';
 import type { ExerciseDef, MuscleGroup, PhaseId, Plan, PR, PRKind, Workout, WorkoutSet } from '@/lib/types';
 
 /** Estimated one-rep max (Epley). Reps above 15 say little about max strength, so they're capped. */
@@ -143,7 +143,34 @@ export function workoutsInWeek(workouts: Workout[], mondayISO: string): Workout[
   return workouts.filter((w) => w.finishedAt && mondayOfISO(isoFromTimestamp(w.startedAt)) === mondayISO);
 }
 
-/** Hard sets per muscle: the main muscle counts 1, helpers count ½. Care drills don't count. */
+/** What the week holds. Sport sessions add to the sessions and the time; sets and volume are gym only. */
+export interface WeekSummary {
+  sessions: number;
+  /** Gym time from start to finish, sport time as logged, rounded to minutes. */
+  minutes: number;
+  sets: number;
+  volume: number;
+}
+
+export function weekSummary(workouts: Workout[], mondayISO: string): WeekSummary {
+  const week = workoutsInWeek(workouts, mondayISO);
+  let ms = 0;
+  let sets = 0;
+  let volume = 0;
+  for (const w of week) {
+    ms += w.kind === 'sport' ? (w.minutes ?? 0) * 60_000 : workoutDurationMs(w);
+    sets += workoutSetCount(w);
+    volume += workoutVolume(w);
+  }
+  return { sessions: week.length, minutes: Math.round(ms / 60_000), sets, volume };
+}
+
+/** The finished workouts started on a day, sport sessions included, in the order given. */
+export function doneToday(workouts: readonly Workout[], todayISO: string): Workout[] {
+  return workouts.filter((w) => w.finishedAt && isoFromTimestamp(w.startedAt) === todayISO);
+}
+
+/** Hard sets per muscle: the main muscle counts 1, helpers count ½. Care drills, drills and stretches don't count. */
 export function muscleSets(
   workouts: Workout[],
   getExercise: (id: string) => ExerciseDef | undefined,
@@ -152,7 +179,7 @@ export function muscleSets(
   for (const w of workouts) {
     for (const ex of w.exercises) {
       const def = getExercise(ex.exerciseId);
-      if (!def || def.kind === 'care') continue;
+      if (!def || isNonHardKind(def.kind)) continue;
       const n = ex.sets.filter(isWorkingSet).length;
       if (n === 0) continue;
       out[def.primary] = (out[def.primary] ?? 0) + n;
@@ -165,7 +192,7 @@ export function muscleSets(
 /**
  * The hard sets a plan prescribes per muscle in a week of the given phase, to compare with
  * `muscleSets`. The week's planned gym workouts (optional ones left out, one per time planned) go
- * through `prescribeItem` without game mode; care drills don't count; the main muscle counts 1,
+ * through `prescribeItem` without game mode; care drills, drills and stretches don't count; the main muscle counts 1,
  * helpers ½. Sport sessions have no sets.
  */
 export function plannedMuscleSets(
@@ -177,7 +204,7 @@ export function plannedMuscleSets(
   for (const workout of plannedGymWorkouts(plan)) {
     for (const item of workout.items) {
       const def = getExercise(item.exerciseId);
-      if (!def || def.kind === 'care') continue;
+      if (!def || isNonHardKind(def.kind)) continue;
       const sets = prescribeItem(item, def, workout, { phase }).sets;
       out[def.primary] = (out[def.primary] ?? 0) + sets;
       for (const m of def.secondary ?? []) out[m] = (out[m] ?? 0) + sets / 2;

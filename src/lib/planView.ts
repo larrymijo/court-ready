@@ -1,21 +1,34 @@
 // What the plan screens show, worked out from saved data. Pure functions with "today" passed in,
 // so the screens hold no plan logic (docs/polish-plan.md, sections 3 and 4).
 //
-// Phase 3: only gym workouts can be started. Sport sessions are shown but never startable and
-// never count as done; phase 4 adds logging them.
+// Phase 4: sport sessions can be started and done like gym workouts. A record matches a planned
+// session by kind as well as id.
 import { examplePlans } from '@/data/plan-templates';
 import { DAY_LONG } from '@/data/schedule';
+import { SPORTS } from '@/data/sports';
 import { addDaysISO, daysBetween, isoFromTimestamp, mondayOfISO, parseISODate, weekdayIndex } from '@/lib/dates';
 import {
   daySessions,
   planPosition,
+  recordKind,
+  sessionKey,
   sessionRefId,
   weekProgress,
   type DaySession,
   type PlanPosition,
 } from '@/lib/plans';
 import { PHASES } from '@/lib/program';
-import type { GymWorkout, PhaseId, Plan, PlanState, RoutineItem, SessionRef, SportId, Workout } from '@/lib/types';
+import type {
+  GymWorkout,
+  PhaseId,
+  Plan,
+  PlanState,
+  RoutineItem,
+  SessionRef,
+  SportId,
+  SportSession,
+  Workout,
+} from '@/lib/types';
 
 // ---------------------------------------------------------------------------------------------
 // The week of a plan
@@ -32,11 +45,10 @@ export interface WeekSessionView {
   minutes?: number;
   sport?: SportId;
   optional: boolean;
-  /** Always false for sport in phase 3. */
   done: boolean;
-  /** The weekday (Monday = 0) a done gym session was done on. Not necessarily its planned day. */
+  /** The weekday (Monday = 0) a done session was done on. Not necessarily its planned day. */
   doneOnWeekday?: number;
-  /** Gym only in phase 3. */
+  /** Gym and sport sessions can both be started. */
   startable: boolean;
 }
 
@@ -57,10 +69,14 @@ export interface PlanWeekView {
   mondayISO: string;
   /** Monday first. */
   days: WeekDayView[];
-  /** Required gym sessions done this week ("1 of 3 sessions done"). Sport joins in phase 4. */
+  /** Required gym sessions done this week ("1 of 3 sessions done"). Sport is not in this number. */
   sessionsDone: number;
-  /** Required gym sessions planned this week. Sport joins in phase 4. */
+  /** Required gym sessions planned this week. */
   sessionsPlanned: number;
+  /** Required gym and sport sessions done this week. */
+  sessionsDoneAll: number;
+  /** Required gym and sport sessions planned this week. */
+  sessionsPlannedAll: number;
   /** Where the plan stands today, or null if it has no state. */
   position: PlanPosition | null;
 }
@@ -95,9 +111,10 @@ function matchWeek(plan: Plan, workouts: readonly Workout[], mondayISO: string):
     })
     .sort((a, b) => a.startedAt - b.startedAt);
   for (const w of chronological) {
-    const list = doneDays.get(w.sessionId as string) ?? [];
+    const key = sessionKey(recordKind(w), w.sessionId as string);
+    const list = doneDays.get(key) ?? [];
     list.push(weekdayOf(w));
-    doneDays.set(w.sessionId as string, list);
+    doneDays.set(key, list);
   }
 
   const out: Matched[] = [];
@@ -112,7 +129,7 @@ function matchWeek(plan: Plan, workouts: readonly Workout[], mondayISO: string):
   for (const pass of ['same', 'any'] as const) {
     for (const m of out) {
       if (!m.done || m.doneOnWeekday != null) continue;
-      const days = doneDays.get(sessionRefId(m.session.ref));
+      const days = doneDays.get(sessionKey(m.session.ref.kind, sessionRefId(m.session.ref)));
       if (!days || days.length === 0) continue;
       const at = pass === 'same' ? days.indexOf(m.weekday) : 0;
       if (at < 0) continue;
@@ -147,8 +164,9 @@ function sessionView(m: Matched): WeekSessionView {
     minutes: s.session.minutes,
     sport: s.session.sport,
     optional: s.optional,
-    done: false, // sport can't be logged until phase 4
-    startable: false,
+    done: m.done,
+    doneOnWeekday: m.done ? m.doneOnWeekday : undefined,
+    startable: true,
   };
 }
 
@@ -164,11 +182,16 @@ export function planWeekView(
   const days: WeekDayView[] = [];
   let done = 0;
   let planned = 0;
+  let doneAll = 0;
+  let plannedAll = 0;
   for (let d = 0; d < 7; d++) {
     const date = addDaysISO(monday, d);
     const sessions = matched.filter((m) => m.weekday === d).map(sessionView);
     for (const s of sessions) {
-      if (s.kind === 'gym' && !s.optional) {
+      if (s.optional) continue;
+      plannedAll++;
+      if (s.done) doneAll++;
+      if (s.kind === 'gym') {
         planned++;
         if (s.done) done++;
       }
@@ -188,6 +211,8 @@ export function planWeekView(
     days,
     sessionsDone: done,
     sessionsPlanned: planned,
+    sessionsDoneAll: doneAll,
+    sessionsPlannedAll: plannedAll,
     position: state && typeof state.start === 'string' ? planPosition(plan, state, today) : null,
   };
 }
@@ -220,6 +245,44 @@ export interface ChooseWorkoutView {
   otherInPlan: ChooseWorkoutItem[];
   /** Each other saved plan with all its gym workouts, in saved order. */
   otherPlans: { planId: string; planName: string; workouts: ChooseWorkoutItem[] }[];
+  /** The four sports, in the order of src/data/sports.ts, each with the plan session it would count for. */
+  sports: ChooseSportItem[];
+}
+
+export interface ChooseSportItem {
+  sport: SportId;
+  name: string;
+  /** The active plan's session this sport counts for when started from the list; absent when the plan has none. */
+  planId?: string;
+  sessionId?: string;
+  sessionName?: string;
+}
+
+/**
+ * Which session of a plan a session of this sport, started from the list today, counts for: the
+ * plan's sport session of that sport planned today if there is one, otherwise the first in the
+ * plan's list; undefined when the plan has no session of that sport.
+ */
+export function sportSessionForToday(plan: Plan, sport: SportId, today: string): SportSession | undefined {
+  const planned = daySessions(plan, weekdayIndex(parseISODate(today))).find(
+    (s) => s.kind === 'sport' && s.session.sport === sport,
+  );
+  if (planned && planned.kind === 'sport') return planned.session;
+  return plan.sports.find((s) => s.sport === sport);
+}
+
+/**
+ * The line for Lower + Core's game mode hint: when one of today's gym workouts offers game mode
+ * and tomorrow's planned sessions (optional ones too, required first) include a sport, the name of
+ * that sport session ("Volleyball"); otherwise undefined. Sunday looks at Monday. It only informs.
+ */
+export function gameModeHint(plan: Plan, today: string): string | undefined {
+  const weekday = weekdayIndex(parseISODate(today));
+  const offers = daySessions(plan, weekday).some((s) => s.kind === 'gym' && !!s.workout.gameMode);
+  if (!offers) return undefined;
+  const sports = daySessions(plan, (weekday + 1) % 7).filter((s) => s.kind === 'sport');
+  const pick = sports.find((s) => !s.optional) ?? sports[0];
+  return pick && pick.kind === 'sport' ? pick.session.name : undefined;
 }
 
 function chooseItem(plan: Plan, w: GymWorkout, extra: Partial<ChooseWorkoutItem> = {}): ChooseWorkoutItem {
@@ -243,7 +306,15 @@ export function chooseWorkoutView(
   today: string,
 ): ChooseWorkoutView {
   const active = plans.find((p) => p.id === activePlanId);
-  const out: ChooseWorkoutView = { today: [], restOfWeek: [], otherInPlan: [], otherPlans: [] };
+  const out: ChooseWorkoutView = { today: [], restOfWeek: [], otherInPlan: [], otherPlans: [], sports: [] };
+  out.sports = SPORTS.map((def) => {
+    const session = active ? sportSessionForToday(active, def.id, today) : undefined;
+    return {
+      sport: def.id,
+      name: def.name,
+      ...(active && session ? { planId: active.id, sessionId: session.id, sessionName: session.name } : {}),
+    };
+  });
   if (active) {
     const todayWeekday = weekdayIndex(parseISODate(today));
     const used = new Set<string>();

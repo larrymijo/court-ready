@@ -3,6 +3,7 @@
 import { addDaysISO, daysBetween, isoFromTimestamp } from '@/lib/dates';
 import type {
   ExerciseDef,
+  ExerciseKind,
   GymWorkout,
   PhaseId,
   Plan,
@@ -118,7 +119,12 @@ export function prescribeItem(
   };
 }
 
-/** Hard sets of a workout in a phase: care drills and skipped items don't count. */
+/** Exercises that never count as hard sets or volume: care drills, sport drills and stretches. */
+export function isNonHardKind(kind: ExerciseKind): boolean {
+  return kind === 'care' || kind === 'drill' || kind === 'stretch';
+}
+
+/** Hard sets of a workout in a phase: care drills, drills, stretches and skipped items don't count. */
 export function workoutHardSets(
   workout: GymWorkout,
   getExercise: (id: string) => ExerciseDef,
@@ -126,7 +132,7 @@ export function workoutHardSets(
 ): number {
   return workout.items.reduce((sum, item) => {
     const ex = getExercise(item.exerciseId);
-    if (ex.kind === 'care') return sum;
+    if (isNonHardKind(ex.kind)) return sum;
     const p = prescribeItem(item, ex, workout, opts);
     return p.skip ? sum : sum + p.sets;
   }, 0);
@@ -155,6 +161,16 @@ export function resolveSession(plan: Plan, ref: SessionRef): ResolvedSession | u
 /** The id a finished workout stores as `sessionId` for this entry. */
 export function sessionRefId(ref: SessionRef): string {
   return ref.kind === 'gym' ? ref.workoutId : ref.sessionId;
+}
+
+/** Whether a finished record is a sport session or a gym workout (a missing kind means gym). */
+export function recordKind(w: Pick<Workout, 'kind'>): 'gym' | 'sport' {
+  return w.kind === 'sport' ? 'sport' : 'gym';
+}
+
+/** The key that matches a record to a planned session: by kind as well as id, as ids may repeat across kinds. */
+export function sessionKey(kind: 'gym' | 'sport', id: string): string {
+  return `${kind}:${id}`;
 }
 
 export type DaySession = ResolvedSession & { ref: SessionRef; optional: boolean };
@@ -197,7 +213,7 @@ export interface PlannedSessionStatus {
 
 /**
  * For each planned session of the week starting `mondayISO`, whether it is done. A finished
- * workout of this plan with the session's id counts on any day of that week, once: a workout
+ * workout of this plan with the session's kind (sport or gym) and id counts on any day of that week, once: a workout
  * planned twice needs two. Required sessions are matched before optional ones.
  */
 export function weekProgress(plan: Plan, workouts: readonly Workout[], mondayISO: string): PlannedSessionStatus[] {
@@ -208,7 +224,8 @@ export function weekProgress(plan: Plan, workouts: readonly Workout[], mondayISO
     if (!w.finishedAt || w.planId !== plan.id || !w.sessionId) continue;
     const day = isoFromTimestamp(w.startedAt);
     if (day < mondayISO || day > sunday) continue;
-    left.set(w.sessionId, (left.get(w.sessionId) ?? 0) + 1);
+    const key = sessionKey(recordKind(w), w.sessionId);
+    left.set(key, (left.get(key) ?? 0) + 1);
   }
 
   const out: PlannedSessionStatus[] = [];
@@ -220,11 +237,11 @@ export function weekProgress(plan: Plan, workouts: readonly Workout[], mondayISO
   for (const pass of [false, true]) {
     for (const s of out) {
       if (s.optional !== pass) continue;
-      const id = sessionRefId(s.ref);
-      const n = left.get(id) ?? 0;
+      const key = sessionKey(s.ref.kind, sessionRefId(s.ref));
+      const n = left.get(key) ?? 0;
       if (n > 0) {
         s.done = true;
-        left.set(id, n - 1);
+        left.set(key, n - 1);
       }
     }
   }

@@ -62,10 +62,10 @@ describe('planWeekView', () => {
       { kind: 'gym', id: 'uppera', name: 'Upper A', minutes: expect.any(Number), optional: false, done: false, startable: true },
     ]);
     expect(view.days[0].sessions[0].focus.length).toBeGreaterThan(0);
-    expect(view.days[1].sessions).toMatchObject([{ kind: 'sport', id: 'volleyball', name: 'Volleyball', optional: false, startable: false }]);
+    expect(view.days[1].sessions).toMatchObject([{ kind: 'sport', id: 'volleyball', name: 'Volleyball', optional: false, startable: true }]);
     // Court-Ready's Thursday: optional volleyball, then the optional Bonus.
     expect(view.days[3].sessions).toMatchObject([
-      { kind: 'sport', id: 'volleyball', optional: true, startable: false },
+      { kind: 'sport', id: 'volleyball', optional: true, startable: true },
       { kind: 'gym', id: 'bonus', optional: true, startable: true },
     ]);
     expect(view.days[6].sessions).toMatchObject([{ kind: 'sport', optional: true }]);
