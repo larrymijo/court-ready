@@ -79,7 +79,9 @@ function SportSession({ active, setLeaving }: { active: ActiveSport; setLeaving:
   const left =
     active.stage === 'cooldown' && !reviewLog
       ? { icon: 'chevron-back' as const, label: 'Back to the log', onPress: () => setReviewLog(true) }
-      : { icon: 'chevron-down' as const, label: 'Minimise session', onPress: minimize };
+      : active.stage === 'log' && !reviewLog
+        ? { icon: 'chevron-back' as const, label: 'Back to the clock', onPress: () => useStore.getState().resumePlaying() }
+        : { icon: 'chevron-down' as const, label: 'Minimise session', onPress: minimize };
 
   return (
     <View style={styles.screen}>
@@ -229,6 +231,7 @@ function LogStage({
             else goToCooldown();
           }}
         />
+        <Button title="Minimise session" variant="ghost" onPress={minimize} />
       </SessionBar>
     </>
   );

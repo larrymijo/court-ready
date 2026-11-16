@@ -202,6 +202,46 @@ describe('startPlaying', () => {
   });
 });
 
+describe('resumePlaying', () => {
+  it('goes back to the clock from the saved start, without an end', () => {
+    playFor(30);
+    state().resumePlaying();
+    const a = state().activeSport!;
+    expect(a.stage).toBe('playing');
+    expect(a.playStartedAt).toBe(NOW + 10 * MIN);
+    expect(a).not.toHaveProperty('playEndedAt');
+    expect(a.draft.minutes).toBe(30);
+  });
+
+  it('lets a later Finish work the minutes out from the original start, and saves them', () => {
+    playFor(30);
+    state().resumePlaying();
+    jest.setSystemTime(NOW + 10 * MIN + 45 * MIN);
+    state().finishPlaying();
+    expect(state().activeSport?.draft.minutes).toBe(45);
+    const id = state().saveSport();
+    expect(id).not.toBeNull();
+    expect(state().workouts.find((w) => w.id === id)?.minutes).toBe(45);
+  });
+
+  it('does nothing in the warm-up, while playing, in the cool-down or without a session', () => {
+    state().resumePlaying();
+    expect(state().activeSport).toBeNull();
+    state().startSport({ sport: 'volleyball' });
+    state().resumePlaying();
+    expect(state().activeSport?.stage).toBe('warmup');
+    state().startPlaying();
+    const playing = state().activeSport;
+    state().resumePlaying();
+    expect(state().activeSport).toEqual(playing);
+    state().finishPlaying();
+    state().goToCooldown();
+    const cooling = state().activeSport;
+    state().resumePlaying();
+    expect(state().activeSport).toEqual(cooling);
+  });
+});
+
 describe('finishPlaying', () => {
   it('stops the clock and fills in the minutes played', () => {
     playFor(83);

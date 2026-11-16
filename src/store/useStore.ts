@@ -140,6 +140,8 @@ interface State {
   startPlaying: (opts?: { skippedWarmup?: boolean }) => void;
   /** While playing: stops the clock and opens the log sheet with the minutes played (at least 1). */
   finishPlaying: () => void;
+  /** From the log sheet back to the clock: it runs on from the saved start, as if Finish had not been tapped. */
+  resumePlaying: () => void;
   updateSportDraft: (patch: ActiveSport['draft']) => void;
   /** From the log sheet to the cool-down. */
   goToCooldown: () => void;
@@ -551,6 +553,14 @@ export const useStore = create<State>()(
         const playEndedAt = Date.now();
         const minutes = Math.max(1, minutesBetween(a.playStartedAt ?? a.openedAt, playEndedAt));
         set({ activeSport: { ...a, stage: 'log', playEndedAt, draft: { ...a.draft, minutes } } });
+      },
+
+      resumePlaying: () => {
+        const a = get().activeSport;
+        if (!a || a.stage !== 'log') return;
+        const { playEndedAt: _ended, ...rest } = a;
+        void _ended;
+        set({ activeSport: { ...rest, stage: 'playing' } });
       },
 
       updateSportDraft: (patch) => {
