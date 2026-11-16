@@ -2,7 +2,7 @@ import { describe, expect, it } from '@jest/globals';
 
 import { examplePlans } from '@/data/plan-templates';
 import { PHASES } from '@/lib/program';
-import { groupHeaderFor, planItemOf, planOfWorkout, planWorkoutOf, warmupKindOf, workoutPhaseText } from '@/lib/workoutPlan';
+import { cooldownOf, groupHeaderFor, planItemOf, planOfWorkout, planWorkoutOf, warmupKindOf, workoutPhaseText } from '@/lib/workoutPlan';
 import type { PhaseId, Workout, WorkoutExercise } from '@/lib/types';
 
 const plans = examplePlans();
@@ -123,5 +123,37 @@ describe('groupHeaderFor', () => {
 
   it('gives nothing without the plan workout', () => {
     expect(groupHeaderFor(undefined, [{ group }], 0)).toBeNull();
+  });
+});
+
+describe('cooldownOf', () => {
+  it('follows the warm-up kind', () => {
+    expect(cooldownOf({ ...UPPER_A, warmup: 'upper', cooldown: undefined })?.id).toBe('cool-upper');
+    expect(cooldownOf({ ...UPPER_A, warmup: 'lower', cooldown: undefined })?.id).toBe('cool-lower');
+  });
+
+  it('gives each example workout a cool-down', () => {
+    for (const plan of plans) {
+      for (const w of plan.workouts) {
+        const c = cooldownOf(w);
+        expect(c?.kind).toBe('cooldown');
+        expect(c?.id).toBe(w.cooldown ?? `cool-${w.warmup}`);
+      }
+    }
+  });
+
+  it("prefers the workout's own cool-down", () => {
+    expect(cooldownOf({ ...UPPER_A, warmup: 'upper', cooldown: 'cool-lower' })?.id).toBe('cool-lower');
+    expect(cooldownOf({ ...UPPER_A, warmup: 'none', cooldown: 'after-playing' })?.id).toBe('after-playing');
+  });
+
+  it('falls back to the warm-up kind for a cool-down id this app does not know, or one that is a warm-up', () => {
+    expect(cooldownOf({ ...UPPER_A, warmup: 'lower', cooldown: 'nope' })?.id).toBe('cool-lower');
+    expect(cooldownOf({ ...UPPER_A, warmup: 'upper', cooldown: 'upper' })?.id).toBe('cool-upper');
+  });
+
+  it('gives none for a workout without a warm-up kind, or without a workout', () => {
+    expect(cooldownOf({ ...UPPER_A, warmup: 'none', cooldown: undefined })).toBeUndefined();
+    expect(cooldownOf(undefined)).toBeUndefined();
   });
 });

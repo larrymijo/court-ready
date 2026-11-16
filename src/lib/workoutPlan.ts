@@ -3,10 +3,11 @@
 // works whether or not that plan is the active one. If the plan or the workout has been deleted,
 // the warm-up, cue and superset helpers return nothing and the workout shows only what it saved
 // itself (its name and sets); planOfWorkout falls back to the example of the same id, if any.
+import { checklist } from '@/data/checklists';
 import { examplePlan } from '@/data/plan-templates';
 import { planFacts } from '@/lib/planView';
 import { PHASES } from '@/lib/program';
-import type { GymWorkout, Plan, RoutineItem, Workout, WorkoutExercise } from '@/lib/types';
+import type { Checklist, GymWorkout, Plan, RoutineItem, Workout, WorkoutExercise } from '@/lib/types';
 
 /**
  * The plan a workout was started from: the saved plan with its planId; if that plan was deleted,
@@ -58,6 +59,19 @@ export function planItemOf(gym: GymWorkout | undefined, we: Pick<WorkoutExercise
 /** The warm-up checklist the app has for a workout ('upper' or 'lower'), or null if the workout has none. */
 export function warmupKindOf(gym: GymWorkout | undefined): 'upper' | 'lower' | null {
   return gym?.warmup === 'upper' || gym?.warmup === 'lower' ? gym.warmup : null;
+}
+
+/**
+ * The cool-down checklist a gym workout ends with: the workout's own `cooldown` if it names a
+ * cool-down this app has, otherwise the one that goes with its warm-up kind ('upper' gives
+ * 'cool-upper', 'lower' gives 'cool-lower'). Undefined for a workout without a warm-up kind (an
+ * empty workout, or a deleted plan or workout) and no cool-down of its own.
+ */
+export function cooldownOf(gym: GymWorkout | undefined): Checklist | undefined {
+  const own = gym?.cooldown ? checklist(gym.cooldown) : undefined;
+  if (own && own.kind === 'cooldown') return own;
+  const kind = warmupKindOf(gym);
+  return kind ? checklist(`cool-${kind}`) : undefined;
 }
 
 /**

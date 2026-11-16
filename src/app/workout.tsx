@@ -5,14 +5,16 @@ import { useEffect, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { GymCooldown } from '@/components/sport/GymCooldown';
 import { Button, IconButton, ProgressBar, Row, Tag, Txt } from '@/components/ui';
 import { REST_BAR_SPACE, RestTimerBar } from '@/components/workout/RestTimerBar';
 import { WarmupCard } from '@/components/workout/WarmupCard';
 import { WorkoutExerciseCard } from '@/components/workout/WorkoutExerciseCard';
+import { checklist } from '@/data/checklists';
 import { formatElapsed, formatVolume } from '@/lib/format';
 import { confirm, successFeedback } from '@/lib/platform';
 import { workoutVolume } from '@/lib/stats';
-import { groupHeaderFor, planWorkoutOf, warmupKindOf, workoutPhaseText } from '@/lib/workoutPlan';
+import { cooldownOf, groupHeaderFor, planWorkoutOf, warmupKindOf, workoutPhaseText } from '@/lib/workoutPlan';
 import { useNow } from '@/lib/useNow';
 import { useStore } from '@/store/useStore';
 import { C, S, T } from '@/theme';
@@ -24,10 +26,13 @@ export default function WorkoutScreen() {
   const discardWorkout = useStore((s) => s.discardWorkout);
   const renameWorkout = useStore((s) => s.renameWorkout);
   const rest = useStore((s) => s.rest);
+  const warmupChecked = useStore((s) => s.warmupChecked);
   const plans = useStore((s) => s.plans);
   const insets = useSafeAreaInsets();
   const now = useNow(1000, !!active);
   const [editingName, setEditingName] = useState(false);
+  // After Finish, a workout with a cool-down shows it before the workout is saved.
+  const [cooling, setCooling] = useState(false);
 
   useEffect(() => {
     if (!keepAwake || !active) return;
@@ -48,6 +53,7 @@ export default function WorkoutScreen() {
 
   const gym = planWorkoutOf(plans, active);
   const warmupKind = warmupKindOf(gym);
+  const cooldown = cooldownOf(gym);
   const phaseText = workoutPhaseText(plans, active);
   const sets = active.exercises.flatMap((e) => e.sets);
   const doneSets = sets.filter((s) => s.done).length;
@@ -77,7 +83,24 @@ export default function WorkoutScreen() {
       );
       if (!ok) return;
     }
-    const id = finishWorkout();
+    if (cooldown) {
+      setCooling(true);
+      return;
+    }
+    save(undefined);
+  };
+
+  /**
+   * Saves the workout with its marks: the warm-up is done when every step of it is ticked (left out
+   * for a workout without a warm-up checklist), and the cool-down when the workout was finished
+   * through it (left out for a workout without one).
+   */
+  const save = (cooldownDone: boolean | undefined) => {
+    const warm = warmupKind ? checklist(warmupKind) : undefined;
+    const id = finishWorkout({
+      ...(warm ? { warmupDone: warm.steps.every((_, i) => warmupChecked.includes(i)) } : {}),
+      ...(cooldownDone !== undefined ? { cooldownDone } : {}),
+    });
     if (id) {
       successFeedback();
       router.replace(`/history/${id}?new=1`);
@@ -90,6 +113,10 @@ export default function WorkoutScreen() {
       router.back();
     }
   };
+
+  if (cooling && cooldown) {
+    return <GymCooldown workout={active} cooldown={cooldown} onFinish={save} onBack={() => setCooling(false)} />;
+  }
 
   return (
     <View style={{ flex: 1, backgroundColor: C.bg }}>

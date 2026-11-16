@@ -14,6 +14,7 @@ import { planFacts, plannedDaysText } from '@/lib/planView';
 import { PHASES, repsText } from '@/lib/program';
 import { lastPerformance, suggestForPlan } from '@/lib/progression';
 import { startPlanWorkoutFlow } from '@/lib/startWorkout';
+import { cooldownOf } from '@/lib/workoutPlan';
 import { workoutPosition } from '@/store/planData';
 import { useStore } from '@/store/useStore';
 import { C, S } from '@/theme';
@@ -37,6 +38,7 @@ export default function WorkoutPage() {
   const gm = !!workout.gameMode && gameMode;
   const sets = workoutHardSets(workout, (x) => EXERCISE_BY_ID[x], { phase: pos.phase, gameMode: gm });
   const days = plannedDaysText(plan, workout.id);
+  const cooldown = cooldownOf(workout);
   const warmup = workout.warmup === 'upper' || workout.warmup === 'lower' ? checklist(workout.warmup) : undefined;
 
   return (
@@ -125,6 +127,18 @@ export default function WorkoutPage() {
             </View>
           );
         })}
+        {cooldown ? (
+          <Card variant="list">
+            <ListRow
+              leading={<RowBadge icon="snow-outline" />}
+              title={cooldown.title}
+              subtitle={cooldown.steps.map((s) => s.text.split(' — ')[0]).join(' · ')}
+              subtitleLines={2}
+              chevron
+              onPress={() => router.push(`/checklists/${cooldown.id}`)}
+            />
+          </Card>
+        ) : null}
         {workout.shortOnTime ? <Txt v="small">{workout.shortOnTime}</Txt> : null}
         <Button
           variant="ghost"

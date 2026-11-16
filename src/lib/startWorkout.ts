@@ -1,6 +1,7 @@
 import { router } from 'expo-router';
 
 import { confirm } from '@/lib/platform';
+import type { SportId } from '@/lib/types';
 import { useStore } from '@/store/useStore';
 
 /**
@@ -42,4 +43,33 @@ export async function startEmptyWorkoutFlow(): Promise<void> {
   discardWorkout();
   startEmpty();
   router.push('/workout');
+}
+
+/**
+ * Starts a sport session at its warm-up and opens the sport screen. A sport session in progress
+ * is replaced only when the person agrees; if they decline, the screen opens on the session in
+ * progress. A gym workout in progress is not touched. If the sport, plan or plan session isn't
+ * saved, nothing changes (the session in progress, if any, is kept).
+ */
+export async function startSportFlow(opts: {
+  sport: SportId;
+  planId?: string;
+  sessionId?: string;
+  name?: string;
+}): Promise<void> {
+  const current = useStore.getState().activeSport;
+  if (current) {
+    const replace = await confirm(
+      'Session in progress',
+      `You’re in the middle of “${current.name}”. Discard it and start a new one?`,
+      'Discard & start',
+      true,
+    );
+    if (!replace) {
+      router.push('/sport');
+      return;
+    }
+  }
+  // startSport replaces the session in progress only when it starts a new one.
+  if (useStore.getState().startSport(opts)) router.push('/sport');
 }
