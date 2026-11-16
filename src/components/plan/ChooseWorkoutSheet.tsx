@@ -4,7 +4,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 
 import { Button, Check, Sheet, Txt } from '@/components/ui';
 import { DAY_LONG } from '@/data/schedule';
-import { chooseWorkoutView, type ChooseWorkoutItem } from '@/lib/planView';
+import { chooseWorkoutView, type ChooseSportItem, type ChooseWorkoutItem } from '@/lib/planView';
 import type { Plan, Workout } from '@/lib/types';
 import { C, S } from '@/theme';
 
@@ -28,8 +28,9 @@ function lineFor(item: ChooseWorkoutItem, where: 'today' | 'week' | 'other'): st
 }
 
 /**
- * "Choose another workout": starts any gym workout of any saved plan, or an empty workout. It never
- * changes the plan in use.
+ * "Choose another workout": starts any gym workout of any saved plan, one of the four sports, or an
+ * empty workout. It never changes the plan in use. A sport counts for the plan in use when the plan
+ * has a session of that sport.
  */
 export function ChooseWorkoutSheet({
   visible,
@@ -38,6 +39,7 @@ export function ChooseWorkoutSheet({
   workouts,
   today,
   onStart,
+  onStartSport,
   onStartEmpty,
   onClose,
 }: {
@@ -47,6 +49,7 @@ export function ChooseWorkoutSheet({
   workouts: readonly Workout[];
   today: string;
   onStart: (planId: string, workoutId: string) => void;
+  onStartSport: (item: ChooseSportItem) => void;
   onStartEmpty: () => void;
   onClose: () => void;
 }) {
@@ -108,6 +111,32 @@ export function ChooseWorkoutSheet({
         </>
       ) : null}
 
+      {view.sports.length > 0 ? (
+        <>
+          <Txt v="label" style={styles.section}>
+            Sports
+          </Txt>
+          {view.sports.map((item, i) => (
+            <View key={item.sport} style={[styles.row, i < view.sports.length - 1 && styles.divider]}>
+              <View style={styles.badge}>
+                <View style={styles.ring} />
+              </View>
+              <View style={styles.text}>
+                <Txt v="h2">{item.name}</Txt>
+                <Txt v="small">{item.planId && active ? `Counts for ${active.name}` : 'Not part of your plan'}</Txt>
+              </View>
+              <Button
+                size="pill"
+                variant="outline"
+                title="Start"
+                accessibilityLabel={`Start ${item.name}`}
+                onPress={() => onStartSport(item)}
+              />
+            </View>
+          ))}
+        </>
+      ) : null}
+
       {view.otherPlans.length > 0 ? (
         <>
           <Txt v="label" style={styles.section}>
@@ -162,6 +191,7 @@ const styles = StyleSheet.create({
   divider: { borderBottomWidth: 1, borderBottomColor: C.hairline },
   badge: { width: 32, height: 32, borderRadius: 16, backgroundColor: C.control, alignItems: 'center', justifyContent: 'center' },
   dot: { width: 6, height: 6, borderRadius: 3, backgroundColor: C.text },
+  ring: { width: 6, height: 6, borderRadius: 3, borderWidth: 1.5, borderColor: C.textMuted },
   text: { flex: 1, minWidth: 0, gap: 2 },
   planRow: { minHeight: 56, flexDirection: 'row', alignItems: 'center', gap: S.md },
   chevron: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },

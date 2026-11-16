@@ -487,6 +487,28 @@ export function weekSessionLine(day: WeekDayView, session: WeekSessionView): str
   return parts.join(' · ');
 }
 
+/**
+ * The second line of a sport session in the week list: "Sport", "Sport · optional", then "done",
+ * "done Thursday" (done on another day) or, while open, its minutes if it has them and "today".
+ */
+export function sportWeekSessionLine(day: WeekDayView, session: WeekSessionView): string {
+  const parts: string[] = [weekSessionLine(day, session)];
+  if (session.done) {
+    const at = session.doneOnWeekday;
+    parts.push(at == null || at === day.weekday ? 'done' : `done ${DAY_LONG[at]}`);
+    return parts.join(' · ');
+  }
+  if (session.minutes) parts.push(`${session.minutes} min`);
+  if (day.isToday) parts.push('today');
+  return parts.join(' · ');
+}
+
+/** The suggestion under a workout that offers game mode: "Tomorrow is volleyball. Game mode?" `sessionName` is what `gameModeHint` gives. */
+export function gameModeHintText(sessionName: string): string {
+  const name = sessionName.length > 1 && sessionName[1] === sessionName[1].toLowerCase() ? sessionName[0].toLowerCase() + sessionName.slice(1) : sessionName;
+  return `Tomorrow is ${name}. Game mode?`;
+}
+
 /** "3 gym and 2 sport sessions a week", "4 gym sessions a week". */
 export function sessionsPerWeekText(facts: Pick<PlanFacts, 'gymPerWeek' | 'sportPerWeek'>): string {
   const { gymPerWeek: g, sportPerWeek: s } = facts;

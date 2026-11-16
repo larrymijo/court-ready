@@ -8,7 +8,7 @@ import { Button, Card, ListRow, PageHeader, RowBadge, SectionTitle, Txt } from '
 import { todayISO } from '@/lib/dates';
 import { plural } from '@/lib/format';
 import { planFacts, planWeekView, positionText, sessionsPerWeekText } from '@/lib/planView';
-import { startEmptyWorkoutFlow, startPlanWorkoutFlow } from '@/lib/startWorkout';
+import { startEmptyWorkoutFlow, startPlanWorkoutFlow, startSportFlow } from '@/lib/startWorkout';
 import { useNow } from '@/lib/useNow';
 import { useStore } from '@/store/useStore';
 import { C, S } from '@/theme';
@@ -55,14 +55,18 @@ export default function PlanScreen() {
         <SectionTitle
           title="This week"
           right={
-            view.sessionsPlanned > 0 ? (
+            view.sessionsPlannedAll > 0 ? (
               <Txt v="small">
-                {view.sessionsDone} of {plural(view.sessionsPlanned, 'session')} done
+                {view.sessionsDoneAll} of {plural(view.sessionsPlannedAll, 'session')} done
               </Txt>
             ) : undefined
           }
         />
-        <WeekList days={view.days} onStart={(id) => startPlanWorkoutFlow(plan.id, id)} />
+        <WeekList
+          days={view.days}
+          onStart={(id) => startPlanWorkoutFlow(plan.id, id)}
+          onStartSport={(s) => s.sport && startSportFlow({ sport: s.sport, planId: plan.id, sessionId: s.id })}
+        />
         <WeekLegend />
       </View>
 

@@ -17,6 +17,8 @@ import {
   positionText,
   sessionsPerWeekText,
   weekSessionLine,
+  sportWeekSessionLine,
+  gameModeHintText,
   planSpecificArticleSlugs,
   planStanding,
   planWeekView,
@@ -397,5 +399,33 @@ describe('exercises in a plan', () => {
     expect(found[0]).toEqual({ workout: COURT_READY.workouts[0], item: first });
     expect(exerciseUsage(undefined, first.exerciseId)).toEqual([]);
     expect(exerciseUsage(COURT_READY, 'no-such-exercise')).toEqual([]);
+  });
+});
+
+describe('sport lines of the Plan tab and the game mode suggestion', () => {
+  const state = { start: '2026-10-19' };
+  const sportRecord = (dateISO: string): Workout => {
+    const [y, m, d] = dateISO.split('-').map(Number);
+    const start = new Date(y, m - 1, d, 12).getTime();
+    return {
+      id: `sp${n++}`, name: 'Volleyball', kind: 'sport', sport: 'volleyball', minutes: 60, planId: 'court-ready',
+      sessionId: 'volleyball', startedAt: start, finishedAt: start + 3600_000, exercises: [],
+    };
+  };
+
+  it('words an open and a done sport session', () => {
+    const open = planWeekView(COURT_READY, state, [], '2026-11-10');
+    expect(sportWeekSessionLine(open.days[1], open.days[1].sessions[0])).toMatch(/^Sport( · \d+ min)? · today$/);
+    const wed = planWeekView(COURT_READY, state, [], WED);
+    expect(sportWeekSessionLine(wed.days[3], wed.days[3].sessions[0])).toMatch(/^Sport · optional/);
+    const done = planWeekView(COURT_READY, state, [sportRecord('2026-11-10')], WED);
+    expect(sportWeekSessionLine(done.days[1], done.days[1].sessions[0])).toBe('Sport · done');
+    const late = planWeekView(COURT_READY, state, [sportRecord('2026-11-11')], WED);
+    expect(sportWeekSessionLine(late.days[1], late.days[1].sessions[0])).toBe('Sport · done Wednesday');
+  });
+
+  it('words the game mode suggestion', () => {
+    expect(gameModeHintText('Volleyball')).toBe('Tomorrow is volleyball. Game mode?');
+    expect(gameModeHintText('PR day')).toBe('Tomorrow is PR day. Game mode?');
   });
 });

@@ -5,11 +5,13 @@ import { View } from 'react-native';
 
 import { ChooseWorkoutSheet } from '@/components/plan/ChooseWorkoutSheet';
 import { NumInput } from '@/components/NumInput';
+import { logPastSession, SportMark, SportSessionCard, startPlannedSport } from '@/components/today/SportSessionCard';
 import { TabScreen } from '@/components/TabScreen';
 import {
   Button,
   Card,
   Check,
+  Divider,
   IconButton,
   ListRow,
   PageHeader,
@@ -26,14 +28,24 @@ import { WeekStrip } from '@/components/WeekStrip';
 import { EXERCISE_BY_ID, getExercise } from '@/data/exercises';
 import { DAY_LONG } from '@/data/schedule';
 import { backupStatus, daysAgoText } from '@/lib/backupStatus';
-import { isoFromTimestamp, mondayOfISO, todayISO, weekdayIndex } from '@/lib/dates';
+import { mondayOfISO, todayISO, weekdayIndex } from '@/lib/dates';
 import { exportBackup } from '@/lib/exportBackup';
 import { formatDuration, formatElapsed, formatKg, formatShortDate, formatVolume, plural } from '@/lib/format';
-import { prescribeItem } from '@/lib/plans';
-import { offDayTitle, planTargetTiles, planWeekView, positionText, type WeekDayView } from '@/lib/planView';
+import { prescribeItem, recordKind } from '@/lib/plans';
+import {
+  gameModeHint,
+  gameModeHintText,
+  offDayTitle,
+  planTargetTiles,
+  planWeekView,
+  positionText,
+  type ChooseSportItem,
+  type WeekDayView,
+} from '@/lib/planView';
 import { routineAreas, routineSummary } from '@/lib/routineSummary';
-import { startEmptyWorkoutFlow, startPlanWorkoutFlow } from '@/lib/startWorkout';
-import { workoutDurationMs, workoutSetCount, workoutsInWeek, workoutVolume } from '@/lib/stats';
+import { sportRecordName, sportSummary } from '@/lib/sportView';
+import { startEmptyWorkoutFlow, startPlanWorkoutFlow, startSportFlow } from '@/lib/startWorkout';
+import { doneToday as finishedToday, weekSummary, workoutDurationMs, workoutSetCount, workoutVolume } from '@/lib/stats';
 import type { GymWorkout, PhaseId, Plan } from '@/lib/types';
 import { useNow } from '@/lib/useNow';
 import { workoutPosition } from '@/store/planData';
@@ -56,11 +68,9 @@ export default function TodayScreen() {
   const plan = plans.find((p) => p.id === activePlanId) ?? plans[0];
   const weekView = plan ? planWeekView(plan, planState[plan.id], workouts, today) : null;
   const day = weekView?.days[weekdayIndex(nowDate)];
-  const weekWorkouts = workoutsInWeek(workouts, monday);
-  const doneToday = workouts.filter((w) => isoFromTimestamp(w.startedAt) === today);
-  const weekVolume = weekWorkouts.reduce((a, w) => a + workoutVolume(w), 0);
-  const weekSets = weekWorkouts.reduce((a, w) => a + workoutSetCount(w), 0);
-  const weekTime = weekWorkouts.reduce((a, w) => a + workoutDurationMs(w), 0);
+  const doneToday = finishedToday(workouts, today);
+  // Gym and sport sessions of the week: sport counts its sessions and its minutes, never sets or kg.
+  const week = weekSummary(workouts, monday);
   const [gameMode, setGameMode] = useState(false);
   const [picking, setPicking] = useState(false);
   const todayWeight = body.find((b) => b.date === today)?.weight ?? null;
@@ -77,10 +87,15 @@ export default function TodayScreen() {
   const sportDay = sportToday.some((s) => !s.optional);
   const targets = planTargetTiles(plan, sportDay);
   const hasFood = !!plan.articles?.includes('food');
+  const gameHint = gameModeHint(plan, today);
 
   const startFromPicker = (planId: string, workoutId: string) => {
     setPicking(false);
     startPlanWorkoutFlow(planId, workoutId);
+  };
+  const startSportFromPicker = (item: ChooseSportItem) => {
+    setPicking(false);
+    startSportFlow({ sport: item.sport, planId: item.planId, sessionId: item.sessionId });
   };
 
   return (
@@ -99,15 +114,23 @@ export default function TodayScreen() {
 
       {doneToday.length > 0 ? (
         <Card variant="list">
-          <ListRow
-            leading={<Check done size={28} />}
-            title={`Done today: ${doneToday[0].name}`}
-            subtitle={`${formatDuration(workoutDurationMs(doneToday[0]))} · ${plural(workoutSetCount(doneToday[0]), 'set')} · ${formatVolume(workoutVolume(doneToday[0]))}${
-              doneToday[0].prs?.length ? ` · ${plural(doneToday[0].prs.length, 'PR')}` : ''
-            }`}
-            chevron
-            onPress={() => router.push(`/history/${doneToday[0].id}`)}
-          />
+          {doneToday.map((w, i) => (
+            <ListRow
+              key={w.id}
+              leading={<Check done size={28} />}
+              title={`Done today: ${recordKind(w) === 'sport' ? sportRecordName(w) : w.name}`}
+              subtitle={
+                recordKind(w) === 'sport'
+                  ? sportSummary(w) || 'Sport session'
+                  : `${formatDuration(workoutDurationMs(w))} · ${plural(workoutSetCount(w), 'set')} · ${formatVolume(workoutVolume(w))}${
+                      w.prs?.length ? ` · ${plural(w.prs.length, 'PR')}` : ''
+                    }`
+              }
+              chevron
+              divider={i < doneToday.length - 1}
+              onPress={() => router.push(`/history/${w.id}`)}
+            />
+          ))}
         </Card>
       ) : null}
 
@@ -123,8 +146,9 @@ export default function TodayScreen() {
               phase={phase}
               gameMode={gameMode}
               setGameMode={setGameMode}
-              done={doneToday.some((w) => w.planId === plan.id && w.sessionId === workout.id)}
+              done={doneToday.some((w) => recordKind(w) === 'gym' && w.planId === plan.id && w.sessionId === workout.id)}
               primary={!active && i === 0}
+              gameModeHint={gameHint}
               onChooseAnother={() => setPicking(true)}
             />
           );
@@ -132,26 +156,15 @@ export default function TodayScreen() {
       ) : (
         <OffDayCard plan={plan} day={day} onTrainAnyway={() => setPicking(true)} />
       )}
-      {gymCards.length > 0 && sportToday.length > 0 ? (
-        <Card variant="list">
-          {sportToday.map((s, i) => (
-            <ListRow
-              key={s.id}
-              title={s.name}
-              subtitle={s.optional ? 'Sport · optional. Open the game warm-up.' : 'Sport. Open the game warm-up.'}
-              chevron
-              divider={i < sportToday.length - 1}
-              onPress={() => router.push('/guide/warmups')}
-            />
-          ))}
-        </Card>
-      ) : null}
+      {gymCards.length > 0
+        ? sportToday.map((s) => <SportSessionCard key={`${s.kind}-${s.id}`} plan={plan} session={s} />)
+        : null}
 
-      <SectionTitle title="This week" />
+      <SectionTitle title="This week" right={week.sessions > 0 ? <Txt v="small">{plural(week.sessions, 'session')}</Txt> : undefined} />
       <Row gap={S.sm} align="stretch">
-        <StatTile label="Hard sets" value={String(weekSets)} />
-        <StatTile label="Volume" value={formatVolume(weekVolume)} />
-        <StatTile label="Time" value={formatDuration(weekTime)} />
+        <StatTile label="Hard sets" value={String(week.sets)} />
+        <StatTile label="Volume" value={formatVolume(week.volume)} />
+        <StatTile label="Time" value={formatDuration(week.minutes * 60_000)} />
       </Row>
 
       {targets.length > 0 ? (
@@ -216,6 +229,7 @@ export default function TodayScreen() {
         workouts={workouts}
         today={today}
         onStart={startFromPicker}
+        onStartSport={startSportFromPicker}
         onStartEmpty={() => {
           setPicking(false);
           startEmptyWorkoutFlow();
@@ -253,9 +267,9 @@ function PlanCard({ plan, view }: { plan: Plan; view: ReturnType<typeof planWeek
             {pos ? `Starts in ${plural(pos.daysUntilStart, 'day')}` : plan.name}
           </Txt>
         )}
-        {view.sessionsPlanned > 0 ? (
+        {view.sessionsPlannedAll > 0 ? (
           <Txt v="small">
-            {view.sessionsDone} of {view.sessionsPlanned} sessions
+            {view.sessionsDoneAll} of {view.sessionsPlannedAll} sessions
           </Txt>
         ) : null}
       </Row>
@@ -301,6 +315,7 @@ function GymCard({
   setGameMode,
   done,
   primary,
+  gameModeHint: sportTomorrow,
   onChooseAnother,
 }: {
   plan: Plan;
@@ -311,6 +326,8 @@ function GymCard({
   done: boolean;
   /** False while another workout is open: then "Resume" is the main action of the screen. */
   primary: boolean;
+  /** The sport session planned tomorrow, if any: a suggestion line shows, game mode stays the person's choice. */
+  gameModeHint?: string;
   onChooseAnother: () => void;
 }) {
   const gm = !!workout.gameMode && gameMode;
@@ -330,12 +347,19 @@ function GymCard({
         ))}
       </Row>
       {workout.gameMode ? (
-        <ToggleRow
-          title="Game mode"
-          subtitle="Volleyball tomorrow? 2 sets per exercise, RIR 3, no split squats."
-          value={gameMode}
-          onChange={setGameMode}
-        />
+        <>
+          {sportTomorrow && !gameMode ? <Txt v="small">{gameModeHintText(sportTomorrow)}</Txt> : null}
+          <ToggleRow
+            title="Game mode"
+            subtitle={
+              sportTomorrow
+                ? '2 sets per exercise, RIR 3, no split squats.'
+                : 'Volleyball tomorrow? 2 sets per exercise, RIR 3, no split squats.'
+            }
+            value={gameMode}
+            onChange={setGameMode}
+          />
+        </>
       ) : null}
       <Button
         size="large"
@@ -352,11 +376,16 @@ function GymCard({
   );
 }
 
-/** A day with no required gym session: sport, optional sessions or rest. Says what is planned and still lets you train. */
+/**
+ * A day with no required gym session: sport, optional sessions or rest. Says what is planned and
+ * still lets you train. A planned sport session gets Start, "Log a past session" and the game warm-up.
+ */
 function OffDayCard({ plan, day, onTrainAnyway }: { plan: Plan; day: WeekDayView; onTrainAnyway: () => void }) {
-  const sport = day.sessions.some((s) => s.kind === 'sport');
-  const requiredSport = day.sessions.some((s) => s.kind === 'sport' && !s.optional);
+  const sports = day.sessions.filter((s) => s.kind === 'sport');
+  const sport = sports.length > 0;
+  const requiredSport = sports.some((s) => !s.optional);
   const optionalGym = day.sessions.find((s) => s.kind === 'gym');
+  const allDone = sport && sports.every((s) => s.done);
   const body =
     day.note ??
     (requiredSport
@@ -364,12 +393,39 @@ function OffDayCard({ plan, day, onTrainAnyway }: { plan: Plan; day: WeekDayView
       : 'Nothing planned today. Rest, or train if you feel like it.');
   return (
     <Card variant="hero">
-      <Txt v="label">{day.sessions.length > 0 ? 'Scheduled today' : 'Rest day'}</Txt>
+      <Txt v="label">
+        {sport ? (allDone ? 'Scheduled today · done' : 'Up next · scheduled today') : day.sessions.length > 0 ? 'Scheduled today' : 'Rest day'}
+      </Txt>
       <View style={{ gap: 4 }}>
-        <Txt v="hero">{offDayTitle(day)}</Txt>
+        <Row gap={10}>
+          {sport ? <SportMark size={10} /> : null}
+          <Txt v="hero" style={{ flexShrink: 1 }}>
+            {offDayTitle(day)}
+          </Txt>
+        </Row>
         <Txt color={C.textMuted}>{body}</Txt>
       </View>
-      <Button size="large" variant="secondary" title="Train anyway" onPress={onTrainAnyway} />
+      {sport ? (
+        <>
+          {sports.map((s, i) => (
+            <Button
+              key={s.id}
+              size="large"
+              variant={i === 0 && !s.done ? 'primary' : 'secondary'}
+              icon="play"
+              title={s.done ? 'Start again' : sports.length > 1 ? `Start ${s.name}` : 'Start'}
+              onPress={() => startPlannedSport(plan, s)}
+            />
+          ))}
+          <Row style={{ justifyContent: 'center', flexWrap: 'wrap', marginVertical: -8 }}>
+            <Button variant="ghost" title="Log a past session" onPress={() => logPastSession(sports[0].sport)} />
+            <Button variant="ghost" title="Choose another workout" onPress={onTrainAnyway} />
+          </Row>
+          <Divider />
+        </>
+      ) : (
+        <Button size="large" variant="secondary" title="Train anyway" onPress={onTrainAnyway} />
+      )}
       {sport || optionalGym ? (
         <Row style={{ justifyContent: 'space-between', marginTop: -6, marginBottom: -10, marginHorizontal: -S.sm }}>
           {sport ? <Button variant="ghost" title="Game warm-up" onPress={() => router.push('/guide/warmups')} /> : <View />}

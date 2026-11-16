@@ -4,8 +4,9 @@ import { View, type ColorValue } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { UpdateNotice } from '@/components/UpdateNotice';
-import { WorkoutBanner } from '@/components/WorkoutBanner';
+import { FLOATING_BAR_SPACE, FLOATING_BAR_STEP, SportBanner, WorkoutBanner } from '@/components/WorkoutBanner';
 import type { IconName } from '@/components/ui';
+import { useStore } from '@/store/useStore';
 import { C, SIZE, T } from '@/theme';
 
 function icon(name: IconName, active: IconName) {
@@ -16,6 +17,8 @@ function icon(name: IconName, active: IconName) {
 
 export default function TabLayout() {
   const insets = useSafeAreaInsets();
+  const sportOpen = useStore((s) => s.activeSport != null);
+  const gymOpen = useStore((s) => s.active != null);
   // Icon (24) + label (14) fit in the bar with room to spare; each tab is a full-height target.
   const height = SIZE.tabBar + insets.bottom;
   return (
@@ -34,7 +37,8 @@ export default function TabLayout() {
             paddingBottom: insets.bottom,
           },
           tabBarLabelStyle: { ...T.smallest, fontWeight: '600' },
-          sceneStyle: { backgroundColor: C.bg },
+          // The tab screens keep room for the workout bar themselves (TabScreen); the sport bar's room is kept here.
+          sceneStyle: { backgroundColor: C.bg, paddingBottom: sportOpen ? FLOATING_BAR_SPACE : 0 },
         }}>
         <Tabs.Screen name="index" options={{ title: 'Today', tabBarIcon: icon('calendar-clear-outline', 'calendar-clear') }} />
         <Tabs.Screen name="plan" options={{ title: 'Plan', tabBarIcon: icon('list-outline', 'list') }} />
@@ -42,7 +46,8 @@ export default function TabLayout() {
         <Tabs.Screen name="library" options={{ title: 'Library', tabBarIcon: icon('book-outline', 'book') }} />
       </Tabs>
       <WorkoutBanner bottom={height} />
-      <UpdateNotice bottom={height} />
+      <SportBanner bottom={height} />
+      <UpdateNotice bottom={height + (sportOpen && !gymOpen ? FLOATING_BAR_STEP : 0)} />
     </View>
   );
 }
