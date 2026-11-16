@@ -6,6 +6,7 @@ import {
   insertNewestFirst,
   minutesBetween,
   paceMinPerKm,
+  paceText,
   sportEntryErrors,
   type SportRecordInput,
 } from '@/lib/sportSession';
@@ -40,6 +41,28 @@ describe('minutesBetween', () => {
     expect(minutesBetween(T, T)).toBe(0);
     expect(minutesBetween(Number.NaN, T)).toBe(0);
     expect(minutesBetween(T, Number.POSITIVE_INFINITY)).toBe(0);
+  });
+});
+
+describe('paceText', () => {
+  it('writes minutes and seconds per km', () => {
+    expect(paceText(5, 25)).toBe('5:00 /km');
+    expect(paceText(4, 22)).toBe('5:30 /km');
+    expect(paceText(8, 46)).toBe('5:45 /km');
+  });
+
+  it('pads the seconds and rounds to the second', () => {
+    expect(paceText(10, 61)).toBe('6:06 /km');
+    expect(paceText(3, 10)).toBe('3:20 /km');
+    expect(paceText(7, 40)).toBe('5:43 /km');
+  });
+
+  it('is null when there is no pace', () => {
+    expect(paceText(undefined, 25)).toBeNull();
+    expect(paceText(5, undefined)).toBeNull();
+    expect(paceText(0, 25)).toBeNull();
+    expect(paceText(5, 0)).toBeNull();
+    expect(paceText(null, null)).toBeNull();
   });
 });
 

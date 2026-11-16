@@ -5,6 +5,8 @@ import { View } from 'react-native';
 import { Card, Row, Tag, Txt, type IconName } from '@/components/ui';
 import { EXERCISE_BY_ID } from '@/data/exercises';
 import { formatDate, formatDuration, formatSet, formatTime, formatVolume, plural } from '@/lib/format';
+import { recordKind } from '@/lib/plans';
+import { matchTag, sportFigures, sportRecordName, sportSummary } from '@/lib/sportView';
 import { e1rm, isWorkingSet, workoutDurationMs, workoutSetCount, workoutVolume } from '@/lib/stats';
 import type { Workout } from '@/lib/types';
 import { C, S } from '@/theme';
@@ -20,8 +22,47 @@ function Figure({ icon, text }: { icon: IconName; text: string }) {
   );
 }
 
+/** A sport day's marker: a ring, where a gym day's is a filled dot (docs/design.md). */
+export function SportRing() {
+  return (
+    <View
+      accessible
+      accessibilityRole="image"
+      accessibilityLabel="Sport session"
+      style={{ width: 12, height: 12, borderRadius: 6, borderWidth: 2, borderColor: C.textMuted }}
+    />
+  );
+}
+
+/** A sport session in the history list: its name, whether it was a match, and its numbers. No sets, no kg. */
+function SportCard({ w }: { w: Workout }) {
+  const tag = matchTag(w);
+  const figures = sportFigures(w);
+  const name = sportRecordName(w);
+  return (
+    <Card
+      onPress={() => router.push(`/history/${w.id}`)}
+      accessibilityLabel={`${name}, ${formatDate(w.startedAt)}${sportSummary(w) ? `, ${sportSummary(w)}` : ''}`}>
+      <Row gap={S.md}>
+        <View style={{ flex: 1, gap: 2 }}>
+          <Row gap={S.sm}>
+            <Txt v="h2" numberOfLines={1} style={{ flexShrink: 1 }}>
+              {name}
+            </Txt>
+            {tag ? <Tag label={tag} style={{ height: 22 }} /> : null}
+          </Row>
+          <Txt v="small">{[formatDate(w.startedAt), ...figures].join(' · ')}</Txt>
+        </View>
+        <SportRing />
+        <Ionicons name="chevron-forward" size={18} color={C.textFaint} />
+      </Row>
+    </Card>
+  );
+}
+
 /** One finished workout in the history list. */
 export function WorkoutCard({ w }: { w: Workout }) {
+  if (recordKind(w) === 'sport') return <SportCard w={w} />;
   return (
     <Card onPress={() => router.push(`/history/${w.id}`)} accessibilityLabel={`${w.name}, ${formatDate(w.startedAt)}`}>
       <View style={{ gap: 2 }}>

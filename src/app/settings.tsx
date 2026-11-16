@@ -7,7 +7,7 @@ import { Button, Card, Divider, Row, Screen, SectionTitle, ToggleRow, Txt, field
 import { canPickBackupFile, pickBackupFile } from '@/lib/backup';
 import { backupStatus, daysAgoText } from '@/lib/backupStatus';
 import { IS_BETA } from '@/lib/channel';
-import { planSummaryLine, summarizeData, summaryLines } from '@/lib/dataSummary';
+import { planSummaryLine, sportSummaryLine, summarizeData, summaryLines } from '@/lib/dataSummary';
 import { todayISO } from '@/lib/dates';
 import { exportBackup } from '@/lib/exportBackup';
 import { formatDataSize, formatDateLong, plural } from '@/lib/format';
@@ -47,6 +47,12 @@ export default function SettingsScreen() {
   const [safetyCopy, setSafetyCopy] = useState<SafetyCopy | null>(null);
   const now = useNow(60_000);
   const today = todayISO();
+  // The summary lines first, then the sport line (only when there are sport sessions), then the plans line.
+  const dataLines = [
+    ...summaryLines(summary),
+    sportSummaryLine({ workouts }),
+    planSummaryLine({ plans, activePlanId, planState }, today),
+  ].filter(Boolean);
   const backup = backupStatus(workouts, settings.lastExportAt, now);
   const showSafetyCopy = safetyCopy != null && now - Date.parse(safetyCopy.savedAt) < SAFETY_COPY_DAYS * DAY_MS;
 
@@ -134,7 +140,7 @@ export default function SettingsScreen() {
       <SectionTitle title="Your data" />
       <Card>
         <View style={{ gap: 2 }}>
-          {[...summaryLines(summary), planSummaryLine({ plans, activePlanId, planState }, today)].map((line, i) => (
+          {dataLines.map((line, i) => (
             <Txt key={line} v={i === 0 ? 'h2' : 'small'} color={i === 0 ? C.text : C.textMuted}>
               {line}
             </Txt>

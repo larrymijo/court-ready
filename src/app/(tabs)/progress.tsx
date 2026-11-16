@@ -23,10 +23,11 @@ import {
 import { EXERCISE_BY_ID } from '@/data/exercises';
 import { weeklyAdvice, weeklyAverages } from '@/lib/body';
 import { addDaysISO, mondayOfISO, parseISODate, todayISO } from '@/lib/dates';
-import { formatChange, formatKg, formatShortDate, plural } from '@/lib/format';
+import { formatChange, formatDuration, formatKg, formatShortDate, plural } from '@/lib/format';
 import { confirm } from '@/lib/platform';
-import { planFacts } from '@/lib/planView';
-import { muscleSets, plannedMuscleSets, workoutsInWeek } from '@/lib/stats';
+import { planFacts, planWeekView } from '@/lib/planView';
+import { weekKindCounts } from '@/lib/sportView';
+import { muscleSets, plannedMuscleSets, weekSummary, workoutsInWeek } from '@/lib/stats';
 import type { MuscleGroup } from '@/lib/types';
 import { workoutPosition } from '@/store/planData';
 import { useStore } from '@/store/useStore';
@@ -77,11 +78,15 @@ export default function ProgressScreen() {
     plan && week ? plannedMuscleSets(plan, week.phase, (id) => EXERCISE_BY_ID[id]) : {};
   const sessionsText = plan ? plural(planFacts(plan).gymPerWeek, 'session') : 'sessions';
 
+  // Sessions and minutes count gym and sport; the planned number is the active plan's required sessions.
+  const weekNow = weekSummary(workouts, monday);
+  const weekView = plan ? planWeekView(plan, planState[plan.id], workouts, today) : null;
   const perWeek = Array.from({ length: 8 }, (_, i) => {
     const m = addDaysISO(monday, -7 * (7 - i));
-    return { monday: m, count: workoutsInWeek(workouts, m).length };
+    return { monday: m, ...weekKindCounts(workouts, m) };
   });
-  const maxCount = Math.max(3, ...perWeek.map((w) => w.count));
+  const gymPlanned = plan ? planFacts(plan).gymPerWeek : 0;
+  const maxCount = Math.max(gymPlanned, 1, ...perWeek.map((w) => w.gym + w.sport));
 
   const save = () => {
     if (weight == null && waist == null) return;
@@ -101,7 +106,7 @@ export default function ProgressScreen() {
             variant="secondary"
             title="History"
             icon="time-outline"
-            accessibilityLabel={`History: ${plural(workouts.length, 'workout')}`}
+            accessibilityLabel={`History: ${plural(workouts.length, 'session')}`}
             onPress={() => router.push('/history')}
           />
         }
@@ -248,27 +253,59 @@ export default function ProgressScreen() {
         </Card>
       )}
 
-      <SectionTitle title="Workouts per week" />
+      <SectionTitle title="Sessions per week" />
       <Card>
-        <Row align="flex-end" gap={S.sm} style={{ height: 112 }}>
-          {perWeek.map((w) => (
-            <View key={w.monday} style={styles.weekColumn}>
-              <Txt v="tiny" color={C.text}>
-                {w.count || ''}
-              </Txt>
-              <View
-                style={{
-                  width: '70%',
-                  height: Math.max(4, (w.count / maxCount) * 70),
-                  borderRadius: 4,
-                  backgroundColor: w.count >= 3 ? C.text : w.count > 0 ? C.textFaint : C.track,
-                }}
-              />
-              <Txt v="tiny">{formatShortDate(parseISODate(w.monday).getTime()).split(' ')[0]}</Txt>
-            </View>
-          ))}
+        <Row gap={S.md} align="flex-start">
+          <Stat
+            value={weekView ? `${weekView.sessionsDoneAll} of ${weekView.sessionsPlannedAll}` : String(weekNow.sessions)}
+            label={weekView ? 'planned sessions done this week' : 'sessions this week'}
+          />
+          <Stat value={formatDuration(weekNow.minutes * 60_000)} label="time this week" />
         </Row>
-        <Txt v="caption">Weeks starting Monday. White means all 3 sessions were done.</Txt>
+        <Row align="flex-end" gap={S.sm} style={{ height: 112 }}>
+          {perWeek.map((w) => {
+            const total = w.gym + w.sport;
+            const unit = 70 / maxCount;
+            return (
+              <View key={w.monday} style={styles.weekColumn}>
+                <Txt v="tiny" color={C.text}>
+                  {total || ''}
+                </Txt>
+                {total === 0 ? (
+                  <View style={{ width: '70%', height: 4, borderRadius: 4, backgroundColor: C.track }} />
+                ) : (
+                  <View style={{ width: '70%' }}>
+                    {w.sport > 0 ? (
+                      <View
+                        style={{
+                          height: Math.max(4, w.sport * unit),
+                          borderRadius: 4,
+                          borderWidth: 1.5,
+                          borderColor: C.textMuted,
+                        }}
+                      />
+                    ) : null}
+                    {w.gym > 0 ? (
+                      <View
+                        style={{
+                          height: Math.max(4, w.gym * unit),
+                          borderRadius: 4,
+                          backgroundColor: gymPlanned > 0 && w.gym >= gymPlanned ? C.text : C.textFaint,
+                        }}
+                      />
+                    ) : null}
+                  </View>
+                )}
+                <Txt v="tiny">{formatShortDate(parseISODate(w.monday).getTime()).split(' ')[0]}</Txt>
+              </View>
+            );
+          })}
+        </Row>
+        <Txt v="caption">
+          Weeks starting Monday.
+          {gymPlanned > 0 ? ` White means ${gymPlanned} or more gym sessions, as the plan asks.` : ''} The outlined part is
+          sport.
+        </Txt>
       </Card>
 
       <Button title="How to read your progress" variant="ghost" iconRight="chevron-forward" onPress={() => router.push('/guide/track')} />

@@ -25,6 +25,14 @@ export function paceMinPerKm(distanceKm: number | null | undefined, minutes: num
   return minutes / distanceKm;
 }
 
+/** The pace as text, "5:30 /km" (minutes and seconds per km); null when paceMinPerKm gives none. */
+export function paceText(distanceKm: number | null | undefined, minutes: number | null | undefined): string | null {
+  const pace = paceMinPerKm(distanceKm, minutes);
+  if (pace === null) return null;
+  const totalSec = Math.round(pace * 60);
+  return `${Math.floor(totalSec / 60)}:${String(totalSec % 60).padStart(2, '0')} /km`;
+}
+
 /** What the log sheet asks for. */
 export interface SportEntry {
   minutes?: number;

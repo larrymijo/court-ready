@@ -3,15 +3,20 @@ import { useState } from 'react';
 import { View } from 'react-native';
 
 import { ExerciseList, isLift } from '@/components/ExerciseList';
+import { SportRing } from '@/components/WorkoutCard';
 import { TabScreen } from '@/components/TabScreen';
 import { Card, ListRow, PageHeader, RowBadge, SectionTitle, Segmented, Txt, type IconName } from '@/components/ui';
+import { CHECKLISTS } from '@/data/checklists';
 import { EXERCISES } from '@/data/exercises';
 import { ARTICLES, ARTICLE_SECTIONS } from '@/data/guide';
+import { SPORTS } from '@/data/sports';
+import { plural } from '@/lib/format';
 import { visibleGuideSlugs } from '@/lib/planView';
+import { checklistKindLabel, sportLogsText } from '@/lib/sportView';
 import { useStore } from '@/store/useStore';
-import { S } from '@/theme';
+import { C, S } from '@/theme';
 
-type View_ = 'exercises' | 'guide';
+type View_ = 'exercises' | 'sports' | 'guide';
 
 const ICONS: Record<string, IconName> = {
   how: 'compass-outline',
@@ -47,18 +52,67 @@ export default function LibraryScreen() {
         onChange={setView}
         options={[
           { value: 'exercises', label: 'Exercises' },
+          { value: 'sports', label: 'Sports' },
           { value: 'guide', label: 'Guide' },
         ]}
       />
 
-      {/* Both stay mounted, so a search survives a look at the guide. */}
+      {/* All stay mounted, so a search survives a look at the guide. */}
       <View style={view === 'exercises' ? null : { display: 'none' }}>
         <ExerciseList initialFilter="plan" onChoose={(e) => router.push(`/exercise/${e.id}`)} />
+      </View>
+      <View style={view === 'sports' ? { gap: S.lg } : { display: 'none' }}>
+        <SportsList />
       </View>
       <View style={view === 'guide' ? { gap: S.lg } : { display: 'none' }}>
         <GuideList />
       </View>
     </TabScreen>
+  );
+}
+
+/** The four sports, and every warm-up and cool-down, the gym ones included. Each opens on its own page. */
+function SportsList() {
+  return (
+    <>
+      <View style={{ gap: S.md }}>
+        <SectionTitle title="Sports" />
+        <Card variant="list">
+          {SPORTS.map((s, i) => (
+            <ListRow
+              key={s.id}
+              leading={
+                <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: C.control, alignItems: 'center', justifyContent: 'center' }}>
+                  <SportRing />
+                </View>
+              }
+              title={s.name}
+              subtitle={sportLogsText(s)}
+              subtitleLines={2}
+              chevron
+              divider={i < SPORTS.length - 1}
+              onPress={() => router.push(`/sports/${s.id}`)}
+            />
+          ))}
+        </Card>
+      </View>
+      <View style={{ gap: S.md }}>
+        <SectionTitle title="Warm-ups and cool-downs" />
+        <Card variant="list">
+          {CHECKLISTS.map((c, i) => (
+            <ListRow
+              key={c.id}
+              leading={<RowBadge icon={c.kind === 'warmup' ? 'flame-outline' : 'snow-outline'} />}
+              title={c.title}
+              subtitle={`${checklistKindLabel(c)} · ${plural(c.steps.length, 'step')}`}
+              chevron
+              divider={i < CHECKLISTS.length - 1}
+              onPress={() => router.push(`/checklists/${c.id}`)}
+            />
+          ))}
+        </Card>
+      </View>
+    </>
   );
 }
 

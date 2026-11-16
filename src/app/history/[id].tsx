@@ -2,11 +2,13 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { SportSessionView } from '@/components/history/SportSessionView';
 import { ItemBadge } from '@/components/ItemBadge';
 import { BOTTOM_BAR_SPACE, BottomBar, Button, Card, Divider, Row, Screen, SectionTitle, StatTile, Tag, Txt } from '@/components/ui';
 import { painTone } from '@/components/workout/PainPicker';
 import { EXERCISE_BY_ID } from '@/data/exercises';
 import { formatDateLong, formatDuration, formatKg, formatSet, formatTime, formatVolume, plural, setLabels } from '@/lib/format';
+import { recordKind } from '@/lib/plans';
 import { confirm } from '@/lib/platform';
 import { workoutDurationMs, workoutSetCount, workoutVolume } from '@/lib/stats';
 import type { PR } from '@/lib/types';
@@ -40,6 +42,8 @@ export default function WorkoutDetailScreen() {
       </Screen>
     );
   }
+
+  if (recordKind(workout) === 'sport') return <SportSessionView workout={workout} />;
 
   const phaseTag = workoutPhaseText(plans, workout).tag;
 

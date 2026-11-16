@@ -53,6 +53,8 @@ export default function ExerciseScreen() {
 
   const usedIn = exerciseUsage(plan, ex.id);
   const weight = ex.tracking === 'weight_reps';
+  // A drill or a stretch is read, never lifted or logged: how-to only, no lift tag, tabs or tempo line.
+  const readOnly = ex.kind === 'drill' || ex.kind === 'stretch';
 
   return (
     <>
@@ -74,7 +76,7 @@ export default function ExerciseScreen() {
           <Txt color={C.textMuted}>{ex.muscles}</Txt>
           <Row gap={6} style={{ flexWrap: 'wrap' }}>
             <Tag label={capitalise(ex.equipment)} />
-            <Tag label={ex.isolation ? 'Isolation' : 'Big lift'} />
+            {readOnly ? null : <Tag label={ex.isolation ? 'Isolation' : 'Big lift'} />}
             {ex.dose ? <Tag label={ex.dose} /> : null}
           </Row>
         </View>
@@ -93,17 +95,19 @@ export default function ExerciseScreen() {
           </Row>
         ) : null}
 
-        <Segmented<Tab>
-          value={tab}
-          onChange={setTab}
-          options={[
-            { value: 'how', label: 'How to' },
-            { value: 'history', label: `History${sessions.length ? ` (${sessions.length})` : ''}` },
-            { value: 'records', label: 'Records' },
-          ]}
-        />
+        {readOnly ? null : (
+          <Segmented<Tab>
+            value={tab}
+            onChange={setTab}
+            options={[
+              { value: 'how', label: 'How to' },
+              { value: 'history', label: `History${sessions.length ? ` (${sessions.length})` : ''}` },
+              { value: 'records', label: 'Records' },
+            ]}
+          />
+        )}
 
-        {tab === 'how' ? (
+        {readOnly || tab === 'how' ? (
           <>
             {ex.warning ? (
               <Card>
@@ -138,16 +142,18 @@ export default function ExerciseScreen() {
                 </Row>
               </Card>
             ) : null}
-            <Button
-              variant="ghost"
-              title="Every rep: 2–3 s down, a short pause in the stretch, controlled up. See the rules"
-              iconRight="chevron-forward"
-              onPress={() => router.push('/guide/technique')}
-            />
+            {readOnly ? null : (
+              <Button
+                variant="ghost"
+                title="Every rep: 2–3 s down, a short pause in the stretch, controlled up. See the rules"
+                iconRight="chevron-forward"
+                onPress={() => router.push('/guide/technique')}
+              />
+            )}
           </>
         ) : null}
 
-        {tab === 'history' ? (
+        {!readOnly && tab === 'history' ? (
           sessions.length === 0 ? (
             <EmptyState icon="barbell-outline" title="Not logged yet" body="Your sets for this exercise will show here." />
           ) : (
@@ -172,7 +178,7 @@ export default function ExerciseScreen() {
           )
         ) : null}
 
-        {tab === 'records' ? (
+        {!readOnly && tab === 'records' ? (
           series.length === 0 ? (
             <EmptyState icon="trophy-outline" title="No records yet" body="Log this exercise and your bests and progress chart show up here." />
           ) : (
