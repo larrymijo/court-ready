@@ -37,6 +37,7 @@ export default function SettingsScreen() {
   const resetAll = useStore((s) => s.resetAll);
   const workouts = useStore((s) => s.workouts);
   const body = useStore((s) => s.body);
+  const customExercises = useStore((s) => s.customExercises);
   const plans = useStore((s) => s.plans);
   const activePlanId = useStore((s) => s.activePlanId);
   const planState = useStore((s) => s.planState);
@@ -47,11 +48,12 @@ export default function SettingsScreen() {
   const [safetyCopy, setSafetyCopy] = useState<SafetyCopy | null>(null);
   const now = useNow(60_000);
   const today = todayISO();
-  // The summary lines first, then the sport line (only when there are sport sessions), then the plans line.
+  const customCount = customExercises.filter((ex) => !ex.archived).length;
   const dataLines = [
     ...summaryLines(summary),
     sportSummaryLine({ workouts }),
     planSummaryLine({ plans, activePlanId, planState }, today),
+    customCount > 0 ? plural(customCount, 'custom exercise') : '',
   ].filter(Boolean);
   const backup = backupStatus(workouts, settings.lastExportAt, now);
   const showSafetyCopy = safetyCopy != null && now - Date.parse(safetyCopy.savedAt) < SAFETY_COPY_DAYS * DAY_MS;
@@ -67,12 +69,12 @@ export default function SettingsScreen() {
       cancelled = true;
       clearTimeout(timer);
     };
-  }, [workouts.length, settings]);
+  }, [workouts.length, settings, customExercises]);
 
   const onRestoreCopy = async () => {
     const ok = await confirm(
       'Go back to the earlier copy?',
-      'This replaces your workouts, weigh-ins, plans and settings with the copy from before the update. Anything logged since then is lost, so export a backup first.',
+      'This replaces your workouts, weigh-ins, plans, custom exercises and settings with the copy from before the update. Anything logged since then is lost, so export a backup first.',
       'Go back',
       true,
     );
@@ -83,7 +85,7 @@ export default function SettingsScreen() {
   };
 
   const runImport = async (text: string) => {
-    const ok = await confirm('Import data?', 'This replaces your current workouts, weigh-ins, plans and settings.', 'Import', true);
+    const ok = await confirm('Import data?', 'This replaces your current workouts, weigh-ins, plans, custom exercises and settings.', 'Import', true);
     if (!ok) return;
     const res = importData(text.trim());
     if (res.ok) {
@@ -106,7 +108,7 @@ export default function SettingsScreen() {
   const onReset = async () => {
     const ok = await confirm(
       'Delete everything?',
-      `All ${workouts.length} workouts, weigh-ins and settings will be deleted. Export first if you want a backup.`,
+      `Your ${plural(workouts.length, 'workout')}, weigh-ins and custom exercises will be deleted. Plans and settings will reset to their defaults. Export first if you want a backup.`,
       'Delete all',
       true,
     );

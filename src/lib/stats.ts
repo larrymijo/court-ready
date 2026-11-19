@@ -1,4 +1,4 @@
-import { EXERCISE_BY_ID } from '@/data/exercises';
+import { findExercise } from '@/lib/exerciseCatalog';
 import { mondayOfISO, isoFromTimestamp } from '@/lib/dates';
 import { isNonHardKind, plannedGymWorkouts, prescribeItem } from '@/lib/plans';
 import type { ExerciseDef, MuscleGroup, PhaseId, Plan, PR, PRKind, Workout, WorkoutSet } from '@/lib/types';
@@ -56,7 +56,7 @@ function consider(bests: ExerciseBests, kind: PRKind, value: number, s: WorkoutS
 }
 
 /** Best sets for one exercise across finished workouts (optionally only those before a time). */
-export function exerciseBests(exerciseId: string, workouts: Workout[], before?: number, def = EXERCISE_BY_ID[exerciseId]): ExerciseBests {
+export function exerciseBests(exerciseId: string, workouts: Workout[], before?: number, def = findExercise(exerciseId)): ExerciseBests {
   const bests: ExerciseBests = {};
   for (const w of workouts) {
     if (!w.finishedAt) continue;
@@ -123,9 +123,9 @@ export interface SeriesPoint {
 }
 
 /** One point per workout for an exercise, oldest first. */
-export function exerciseSeries(exerciseId: string, workouts: Workout[]): SeriesPoint[] {
+export function exerciseSeries(exerciseId: string, workouts: Workout[], def = findExercise(exerciseId)): SeriesPoint[] {
   const points: SeriesPoint[] = [];
-  const estimateMax = EXERCISE_BY_ID[exerciseId]?.estimate1RM !== false;
+  const estimateMax = def?.estimate1RM !== false;
   for (const w of workouts) {
     if (!w.finishedAt) continue;
     const sets = w.exercises.filter((e) => e.exerciseId === exerciseId).flatMap((e) => e.sets.filter(isWorkingSet));
@@ -206,7 +206,7 @@ export function plannedMuscleSets(
   for (const workout of plannedGymWorkouts(plan)) {
     for (const item of workout.items) {
       const def = getExercise(item.exerciseId);
-      if (!def || isNonHardKind(def.kind)) continue;
+      if (!def || def.archived || isNonHardKind(def.kind)) continue;
       const sets = prescribeItem(item, def, workout, { phase }).sets;
       out[def.primary] = (out[def.primary] ?? 0) + sets;
       for (const m of def.secondary ?? []) out[m] = (out[m] ?? 0) + sets / 2;

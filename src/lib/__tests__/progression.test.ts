@@ -67,6 +67,12 @@ describe('suggestNext (double progression)', () => {
     expect(suggestNext(fly, { sets: 2, repsMin: 10, repsMax: 15, rir: '1' }, last).weight).toBe(17.5);
   });
 
+  it('adds the exact weight step saved for a custom exercise', () => {
+    const ex = { ...incline, id: 'custom_microload', increment: 0.1 };
+    const last = lastPerformance(ex.id, [workout('a', 1, ex.id, [[7.25, 10]])]);
+    expect(suggestNext(ex, target, last).weight).toBe(7.35);
+  });
+
   it('asks for a starting weight the first time', () => {
     expect(suggestNext(incline, target, null)).toMatchObject({ kind: 'start', weight: null });
   });

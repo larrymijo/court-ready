@@ -3,10 +3,10 @@ import { useSyncExternalStore } from 'react';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
-import { EXERCISE_BY_ID, getExercise } from '@/data/exercises';
 import { examplePlan, examplePlans } from '@/data/plan-templates';
 import { STORE_KEY } from '@/lib/channel';
 import { isISODate, isoFromTimestamp, mondayOfISO, parseISODate, todayISO } from '@/lib/dates';
+import { findExercise, isLoggableExercise, makeCustomExercise, readCustomExercises, type CustomExerciseInput } from '@/lib/exerciseCatalog';
 import { uid } from '@/lib/id';
 import { lastPerformance } from '@/lib/progression';
 import { buildSportRecord, insertNewestFirst, minutesBetween, type SportPlanLink } from '@/lib/sportSession';
@@ -14,9 +14,11 @@ import { detectPRs } from '@/lib/stats';
 import type {
   ActiveSport,
   BodyEntry,
+  ExerciseDef,
   Plan,
   PlanState,
   RoutineId,
+  RoutineItem,
   Settings,
   SportId,
   Workout,
@@ -52,6 +54,7 @@ export interface ExportData {
   workouts: Workout[];
   body: BodyEntry[];
   plans: Plan[];
+  customExercises: ExerciseDef[];
   activePlanId: string;
   planState: Record<string, PlanState>;
 }
@@ -88,6 +91,7 @@ interface State {
   rest: RestState | null;
   /** Saved plans: the examples and, later, your own. There is always at least one. */
   plans: Plan[];
+  customExercises: ExerciseDef[];
   /** Always the id of one of `plans`. */
   activePlanId: string;
   /** Where each plan stands, by plan id. The active plan always has one. */
@@ -107,6 +111,10 @@ interface State {
   renameWorkout: (name: string) => void;
 
   addExercise: (exerciseId: string) => void;
+  addExercises: (exerciseIds: string[]) => number;
+  addPlanExercises: (planId: string, workoutId: string, exerciseIds: string[]) => number;
+  createCustomExercise: (input: CustomExerciseInput) => { ok: true; id: string } | { ok: false; error: string };
+  removeCustomExercise: (id: string) => boolean;
   removeExercise: (workoutExerciseId: string) => void;
   swapExercise: (workoutExerciseId: string, exerciseId: string) => void;
   setPain: (workoutExerciseId: string, pain: number | null) => void;
@@ -207,6 +215,7 @@ type Saved = Pick<
   | 'body'
   | 'rest'
   | 'plans'
+  | 'customExercises'
   | 'activePlanId'
   | 'planState'
 >;
@@ -257,11 +266,12 @@ function defaultSettings(programStart: string = mondayOfISO(todayISO())): Settin
  * when nothing is saved, so these are the plan defaults the upgrade would give, with one start
  * date for both Court-Ready and the old settings field.
  */
-function defaultData(): Pick<Saved, 'settings' | 'plans' | 'activePlanId' | 'planState'> {
+function defaultData(): Pick<Saved, 'settings' | 'plans' | 'activePlanId' | 'planState' | 'customExercises'> {
   const start = mondayOfISO(todayISO());
   return {
     settings: defaultSettings(start),
     plans: examplePlans(),
+    customExercises: [],
     activePlanId: 'court-ready',
     planState: { 'court-ready': { start } },
   };
@@ -280,22 +290,19 @@ function newSet(weight: number | null): WorkoutSet {
   return { id: uid(), type: 'normal', weight, reps: null, rir: null, done: false };
 }
 
-function defaultRest(exerciseId: string): number {
-  const ex = EXERCISE_BY_ID[exerciseId];
-  if (!ex) return 90;
+function defaultRest(ex: ExerciseDef): number {
   if (ex.kind === 'care') return 30;
   return ex.isolation ? 75 : 120;
 }
 
-function freeExercise(exerciseId: string, workouts: Workout[]): WorkoutExercise {
-  const ex = getExercise(exerciseId);
-  const last = lastPerformance(exerciseId, workouts);
+function freeExercise(ex: ExerciseDef, workouts: Workout[]): WorkoutExercise {
+  const last = lastPerformance(ex.id, workouts);
   const weight = ex.tracking === 'weight_reps' ? (last?.sets[0]?.weight ?? null) : null;
   const count = Math.max(1, Math.min(last?.sets.length ?? 3, 5));
   return {
     id: uid(),
-    exerciseId,
-    restSec: defaultRest(exerciseId),
+    exerciseId: ex.id,
+    restSec: defaultRest(ex),
     sets: Array.from({ length: count }, () => newSet(weight)),
     pain: null,
     note: '',
@@ -339,11 +346,12 @@ export const useStore = create<State>()(
       rest: null,
 
       startRoutine: (routineId, opts) => {
-        const { plans, planState, settings, workouts } = get();
+        const { plans, planState, settings, workouts, customExercises } = get();
         // Until the screens move to plans they show the week from settings.programStart, which the
         // store keeps equal to Court-Ready's start; it is the fallback if Court-Ready has no state.
         const state = planState['court-ready'] ?? { start: settings.programStart };
         const active = buildPlanWorkout(courtReadyPlan(plans), state, routineId, {
+          customExercises,
           gameMode: opts?.gameMode,
           history: workouts,
           today: todayISO(),
@@ -353,11 +361,12 @@ export const useStore = create<State>()(
       },
 
       startPlanWorkout: (planId, workoutId, opts) => {
-        const { plans, activePlanId, planState, workouts } = get();
+        const { plans, activePlanId, planState, workouts, customExercises } = get();
         const plan = plans.find((p) => p.id === planId);
         if (!plan) return false;
         // A paused plan is built for the week it was paused at.
         const active = buildPlanWorkout(plan, planState[planId], workoutId, {
+          customExercises,
           gameMode: opts?.gameMode,
           history: workouts,
           today: todayISO(),
@@ -390,7 +399,7 @@ export const useStore = create<State>()(
       discardWorkout: () => set({ active: null, rest: null, warmupChecked: [], cooldownChecked: [] }),
 
       finishWorkout: (opts) => {
-        const { active, workouts } = get();
+        const { active, workouts, customExercises } = get();
         if (!active) return null;
         const exercises = active.exercises
           .map((e) => ({ ...e, sets: e.sets.filter((s) => s.done && (s.reps ?? 0) > 0) }))
@@ -399,7 +408,7 @@ export const useStore = create<State>()(
         const finished: Workout = { ...active, exercises, finishedAt: Date.now() };
         if (typeof opts?.warmupDone === 'boolean') finished.warmupDone = opts.warmupDone;
         if (typeof opts?.cooldownDone === 'boolean') finished.cooldownDone = opts.cooldownDone;
-        finished.prs = detectPRs(finished, workouts, (id) => EXERCISE_BY_ID[id]);
+        finished.prs = detectPRs(finished, workouts, (id) => findExercise(id, customExercises));
         // A prepend whenever the workout started after everything saved; a sport session saved or
         // logged while it was in progress can have started later, and history stays in order.
         set({
@@ -417,10 +426,63 @@ export const useStore = create<State>()(
         if (active) set({ active: { ...active, name } });
       },
 
-      addExercise: (exerciseId) => {
-        const { active, workouts } = get();
-        if (!active) return;
-        set({ active: { ...active, exercises: [...active.exercises, freeExercise(exerciseId, workouts)] } });
+      createCustomExercise: (input) => {
+        const { customExercises } = get();
+        const result = makeCustomExercise(input, `custom_${uid()}`, customExercises);
+        if (!result.ok) return result;
+        set({ customExercises: [...customExercises, result.exercise] });
+        return { ok: true, id: result.exercise.id };
+      },
+
+      removeCustomExercise: (id) => {
+        const { customExercises, plans } = get();
+        const exercise = customExercises.find((ex) => ex.id === id && !ex.archived);
+        if (!exercise) return false;
+        set({
+          customExercises: customExercises.map((ex) => ex === exercise ? { ...ex, archived: true } : ex),
+          plans: plans.map((plan) => ({
+            ...plan,
+            workouts: plan.workouts.map((w) => ({ ...w, items: w.items.filter((item) => item.exerciseId !== id) })),
+          })),
+        });
+        return true;
+      },
+
+      addExercise: (exerciseId) => { get().addExercises([exerciseId]); },
+
+      addExercises: (exerciseIds) => {
+        const { active, workouts, customExercises } = get();
+        if (!active) return 0;
+        const additions = [...new Set(exerciseIds)].map((id) => findExercise(id, customExercises))
+          .filter(isLoggableExercise).map((ex) => freeExercise(ex, workouts));
+        if (additions.length) set({ active: { ...active, exercises: [...active.exercises, ...additions] } });
+        return additions.length;
+      },
+
+      addPlanExercises: (planId, workoutId, exerciseIds) => {
+        const { plans, customExercises } = get();
+        const plan = plans.find((p) => p.id === planId);
+        const workout = plan?.workouts.find((w) => w.id === workoutId);
+        if (!workout) return 0;
+        const existing = new Set(workout.items.map((item) => item.exerciseId));
+        const keys = new Set(workout.items.map((item) => item.key));
+        let next = workout.items.length + 1;
+        const items: RoutineItem[] = [];
+        for (const id of new Set(exerciseIds)) {
+          const ex = findExercise(id, customExercises);
+          if (existing.has(id) || !isLoggableExercise(ex)) continue;
+          while (keys.has(String(next))) next++;
+          items.push({
+            key: String(next++), exerciseId: id, sets: 3, repsMin: ex.isolation ? 10 : 8,
+            repsMax: ex.isolation ? 15 : 12, rir: '2', restSec: defaultRest(ex), cue: ex.dose ?? '',
+            ...(ex.perSide && { perSide: true }),
+          });
+        }
+        if (items.length) {
+          const updated = { ...workout, items: [...workout.items, ...items] };
+          set({ plans: plans.map((p) => p === plan ? { ...p, workouts: p.workouts.map((w) => w === workout ? updated : w) } : p) });
+        }
+        return items.length;
       },
 
       removeExercise: (workoutExerciseId) => {
@@ -430,8 +492,9 @@ export const useStore = create<State>()(
       },
 
       swapExercise: (workoutExerciseId, exerciseId) => {
-        const { workouts } = get();
-        const ex = getExercise(exerciseId);
+        const { workouts, customExercises } = get();
+        const ex = findExercise(exerciseId, customExercises);
+        if (!isLoggableExercise(ex)) return;
         const last = lastPerformance(exerciseId, workouts);
         const weight = ex.tracking === 'weight_reps' ? (last?.sets[0]?.weight ?? null) : null;
         set({
@@ -723,11 +786,12 @@ export const useStore = create<State>()(
 
       exportData: () => {
         // Sport sessions travel inside `workouts`. Sessions in progress (gym or sport) are never exported.
-        const { settings, workouts, body, plans, activePlanId, planState } = get();
+        const { settings, workouts, body, plans, activePlanId, planState, customExercises } = get();
         const data: ExportData = {
           app: 'court-ready',
           version: DATA_VERSION,
           exportedAt: new Date().toISOString(),
+          customExercises,
           settings,
           workouts,
           body,
@@ -757,15 +821,28 @@ export const useStore = create<State>()(
               workouts: data.workouts,
               body: data.body,
               plans: data.plans,
+              customExercises: data.customExercises,
               activePlanId: data.activePlanId,
               planState: data.planState,
             },
             version,
           ) as unknown as Pick<Saved, 'settings' | 'workouts' | 'body'> & {
             plans?: unknown;
+            customExercises?: unknown;
             activePlanId?: unknown;
             planState?: unknown;
           };
+          const customExercises = readCustomExercises(current.customExercises);
+          if (!Array.isArray(current.customExercises) || current.customExercises.length !== customExercises.length) {
+            return { ok: false, error: 'The custom exercise list in this backup could not be read.' };
+          }
+          // Import replaces the Library, but the current gym session stays on the phone. Retain the
+          // definitions it still needs as archived entries if they are absent from this backup.
+          const before = get();
+          const activeIds = new Set(before.active?.exercises.map((exercise) => exercise.exerciseId));
+          for (const ex of before.customExercises) {
+            if (activeIds.has(ex.id) && !findExercise(ex.id, customExercises)) customExercises.push({ ...ex, archived: true });
+          }
           // The phone now holds exactly what the file holds, so it counts as backed up when the file was made.
           const exportedAt = typeof data.exportedAt === 'string' ? Date.parse(data.exportedAt) : NaN;
           const settings: Settings = {
@@ -785,6 +862,7 @@ export const useStore = create<State>()(
             // A file whose old programStart differs from Court-Ready's start gets Court-Ready's.
             settings: syncProgramStart(settings, planData.planState),
             workouts: workouts.sort((a, b) => b.startedAt - a.startedAt),
+            customExercises,
             body: current.body,
             ...planData,
           });
@@ -808,11 +886,11 @@ export const useStore = create<State>()(
           settings: syncProgramStart(settings, planData.planState),
           workouts: saved.workouts,
           body: saved.body,
+          customExercises: readCustomExercises(saved.customExercises),
           active: saved.active ?? null,
           warmupChecked: saved.warmupChecked ?? [],
-          // The copy is from before sport sessions: none is in progress.
-          cooldownChecked: [],
-          activeSport: null,
+          cooldownChecked: isNumberList(saved.cooldownChecked) ? saved.cooldownChecked : [],
+          activeSport: isActiveSportShaped(saved.activeSport) ? saved.activeSport : null,
           rest: null,
           ...planData,
         });
@@ -855,7 +933,8 @@ export const useStore = create<State>()(
               cooldownChecked: isNumberList(saved.cooldownChecked) ? saved.cooldownChecked : [],
             }
           : { activeSport: current.activeSport, cooldownChecked: current.cooldownChecked };
-        return { ...current, ...saved, settings, ...planData, ...sport };
+        const customExercises = isSaved ? readCustomExercises(saved.customExercises) : current.customExercises;
+        return { ...current, ...saved, settings, ...planData, ...sport, customExercises };
       },
       partialize: (s): Saved => ({
         settings: s.settings,
@@ -867,6 +946,7 @@ export const useStore = create<State>()(
         body: s.body,
         rest: s.rest,
         plans: s.plans,
+        customExercises: s.customExercises,
         activePlanId: s.activePlanId,
         planState: s.planState,
       }),

@@ -6,7 +6,7 @@ import { ItemBadge } from '@/components/ItemBadge';
 import { Button, Check, Chip, IconButton, Row, Sheet, Txt, fieldStyle, type SheetAction } from '@/components/ui';
 import { PainPicker, painTone } from '@/components/workout/PainPicker';
 import { SetHeader, SetRow, type SetGuess } from '@/components/workout/SetRow';
-import { EXERCISE_BY_ID, getExercise } from '@/data/exercises';
+import { useExerciseLookup } from '@/store/useExerciseLookup';
 import { formatClock, formatKg, setLabels } from '@/lib/format';
 import { repsText } from '@/lib/program';
 import { planItemOf, planOfWorkout, planWorkoutOf } from '@/lib/workoutPlan';
@@ -26,7 +26,8 @@ export function WorkoutExerciseCard({
   isFirst: boolean;
   phase?: PhaseId;
 }) {
-  const ex = getExercise(we.exerciseId);
+  const lookup = useExerciseLookup();
+  const ex = lookup.get(we.exerciseId);
   const workouts = useStore((s) => s.workouts);
   const plans = useStore((s) => s.plans);
   const settings = useStore((s) => s.settings);
@@ -87,10 +88,9 @@ export function WorkoutExerciseCard({
     { label: 'Rate pain (0–10)', icon: 'medkit-outline', onPress: () => setPainOpen(true) },
     { label: 'Remove exercise', icon: 'trash-outline', destructive: true, onPress: () => removeExercise(we.id) },
   ];
+  const swaps = ex.swaps.filter(lookup.available).map(lookup.get);
   const swapActions: SheetAction[] = [
-    ...ex.swaps
-      .map((id) => EXERCISE_BY_ID[id])
-      .filter(Boolean)
+    ...swaps
       .map((s) => ({ label: s.name, hint: s.muscles, icon: 'swap-horizontal' as const, onPress: () => swapExercise(we.id, s.id) })),
     { label: 'Browse all exercises', icon: 'search-outline', onPress: () => router.push(`/exercises?swap=${we.id}`) },
   ];
@@ -174,9 +174,7 @@ export function WorkoutExerciseCard({
             sessions, see a physio.
           </Txt>
           <Row gap={S.sm} style={{ flexWrap: 'wrap' }}>
-            {ex.swaps
-              .map((id) => EXERCISE_BY_ID[id])
-              .filter(Boolean)
+            {swaps
               .slice(0, 3)
               .map((s) => (
                 <Chip key={s.id} icon="swap-horizontal" label={s.name} style={{ flexShrink: 1 }} onPress={() => swapExercise(we.id, s.id)} />

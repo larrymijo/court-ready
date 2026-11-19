@@ -13,7 +13,7 @@
  */
 import { examplePlans } from '@/data/plan-templates';
 
-export const DATA_VERSION = 4;
+export const DATA_VERSION = 5;
 
 /** Data as it comes out of storage or a backup file: nothing about its shape is trusted. */
 export type SavedData = Record<string, unknown>;
@@ -69,6 +69,9 @@ const STEPS: Record<number, (data: SavedData) => SavedData> = {
     if (data.cooldownChecked === undefined) out.cooldownChecked = [];
     return out;
   },
+
+  // Version 5: custom definitions belong to backups as well as to the store on the phone.
+  4: (data) => data.customExercises === undefined ? { ...data, customExercises: [] } : data,
 };
 
 /** True when the data was saved by a newer version of the app than this one. */

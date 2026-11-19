@@ -19,7 +19,7 @@ import {
   Txt,
   type SheetAction,
 } from '@/components/ui';
-import { EXERCISE_BY_ID } from '@/data/exercises';
+import { useExerciseLookup } from '@/store/useExerciseLookup';
 import { DAY_SHORT } from '@/data/schedule';
 import { addDaysISO, isISODate, mondayOfISO, parseISODate, todayISO } from '@/lib/dates';
 import { formatDateLong, formatShortDate, plural } from '@/lib/format';
@@ -35,6 +35,7 @@ type Ask = 'start' | 'continue' | 'delete' | null;
 export default function PlanPage() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const plans = useStore((s) => s.plans);
+  const lookup = useExerciseLookup();
   const activePlanId = useStore((s) => s.activePlanId);
   const planState = useStore((s) => s.planState);
   const activatePlan = useStore((s) => s.activatePlan);
@@ -184,7 +185,7 @@ export default function PlanPage() {
 
         <SectionTitle title="Workouts" />
         {plan.workouts.map((w) => {
-          const items = w.items.filter((i) => EXERCISE_BY_ID[i.exerciseId]);
+          const items = w.items.filter((i) => lookup.available(i.exerciseId));
           return (
             <Card
               key={w.id}
@@ -207,7 +208,7 @@ export default function PlanPage() {
                   <View
                     key={item.key}
                     style={{ minHeight: 32, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: S.md }}>
-                    <Txt style={{ flexShrink: 1 }}>{EXERCISE_BY_ID[item.exerciseId].name}</Txt>
+                    <Txt style={{ flexShrink: 1 }}>{lookup.get(item.exerciseId).name}</Txt>
                     <Txt color={C.textMuted}>
                       {item.sets} × {repsText(item, item.perSide)}
                     </Txt>

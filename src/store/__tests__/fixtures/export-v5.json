@@ -1,0 +1,30 @@
+{
+  "app": "court-ready",
+  "version": 5,
+  "exportedAt": "2026-11-18T12:00:00.000Z",
+  "settings": {
+    "programStart": "2026-11-16", "restTimer": true, "vibrate": true, "keepAwake": true, "lastExportAt": 1795003200000
+  },
+  "customExercises": [
+    {
+      "id": "custom_example", "name": "Example band row", "primary": "back", "secondary": ["biceps"],
+      "muscles": "Back, Biceps", "equipment": "band", "tracking": "reps", "increment": 0,
+      "isolation": false, "kind": "standard", "sections": [{"label": "Technique notes", "items": ["Pause at the top."]}], "swaps": []
+    }
+  ],
+  "workouts": [{
+    "id": "w5-example", "name": "Workout", "startedAt": 1794996000000, "finishedAt": 1794996300000,
+    "exercises": [{
+      "id": "e5-row", "exerciseId": "custom_example", "restSec": 120, "pain": null, "note": "",
+      "sets": [{ "id": "s5-row", "type": "normal", "weight": null, "reps": 10, "rir": null, "done": true }]
+    }],
+    "prs": []
+  }],
+  "body": [],
+  "plans": [{
+    "id": "example", "name": "Example", "workouts": [], "sports": [], "progression": "maintain",
+    "week": [{"sessions":[]},{"sessions":[]},{"sessions":[]},{"sessions":[]},{"sessions":[]},{"sessions":[]},{"sessions":[]}]
+  }],
+  "activePlanId": "example",
+  "planState": { "example": { "start": "2026-11-16" } }
+}

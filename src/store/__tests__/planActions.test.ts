@@ -6,7 +6,6 @@ import { addDaysISO } from '@/lib/dates';
 import { planPosition } from '@/lib/plans';
 import { planStanding } from '@/lib/planView';
 import type { Plan, Workout } from '@/lib/types';
-import { DATA_VERSION } from '@/store/migrations';
 import { useStore } from '@/store/useStore';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
@@ -53,12 +52,6 @@ beforeEach(() => {
 });
 afterEach(() => {
   jest.useRealTimers();
-});
-
-describe('data version', () => {
-  it('is 4, for sport sessions', () => {
-    expect(DATA_VERSION).toBe(4);
-  });
 });
 
 describe('activatePlan', () => {

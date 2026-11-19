@@ -62,7 +62,6 @@ const gymOnly = (exportV4.workouts as Workout[]).filter((w) => w.kind !== 'sport
 
 it('the made-up version 4 data has sport sessions of every kind, and a gym workout with its marks', () => {
   expect(exportV4.version).toBe(4);
-  expect(DATA_VERSION).toBe(4);
   expect(sportRecords.map((w) => w.sport).sort()).toEqual(['basketball', 'running', 'volleyball']);
   expect(sportRecords.some((w) => w.planId === 'court-ready' && w.sessionId === 'volleyball')).toBe(true);
   expect(sportRecords.some((w) => w.loggedLater && w.distanceKm)).toBe(true);
@@ -84,7 +83,7 @@ describe.each(FILES)('made-up %s data', (_name, file, version) => {
   const workouts = file.workouts as Workout[];
   const body = file.body as BodyEntry[];
 
-  it('upgrades from a backup file to version 4 with the same workouts, sets, records and weigh-ins', async () => {
+  it('upgrades from a backup file with the same workouts, sets, records and weigh-ins', async () => {
     await AsyncStorage.clear();
     useStore.getState().resetAll();
     expect(useStore.getState().importData(JSON.stringify(file))).toEqual({ ok: true, workouts: workouts.length });
@@ -92,10 +91,10 @@ describe.each(FILES)('made-up %s data', (_name, file, version) => {
     expect(s.workouts).toEqual(workouts.map(expectedAfter));
     expect(numbers(s.workouts, s.body)).toEqual(numbers(workouts, body));
     expect(s.body).toEqual(body);
-    expect(JSON.parse(s.exportData()).version).toBe(4);
+    expect(JSON.parse(s.exportData()).version).toBe(DATA_VERSION);
   });
 
-  it('upgrades from the phone to version 4, keeps a safety copy, and adds only the two store keys', async () => {
+  it('upgrades on the phone, keeps a safety copy and adds the sport and cool-down keys', async () => {
     const saved = {
       settings: file.settings,
       workouts,
@@ -117,7 +116,7 @@ describe.each(FILES)('made-up %s data', (_name, file, version) => {
     expect(s.warmupChecked).toEqual([0, 2]);
 
     const stored = JSON.parse((await AsyncStorage.getItem('court-ready')) ?? '{}');
-    expect(stored.version).toBe(4);
+    expect(stored.version).toBe(DATA_VERSION);
     expect(stored.state.workouts).toEqual(workouts.map(expectedAfter));
     expect(stored.state.activeSport).toBeNull();
     expect(stored.state.cooldownChecked).toEqual([]);
@@ -191,7 +190,7 @@ describe('a version 4 backup with sport sessions', () => {
     const s = useStore.getState();
     expect(s.workouts).toEqual(exportV4.workouts);
     const out = JSON.parse(s.exportData());
-    expect({ ...out, exportedAt: exportV4.exportedAt }).toEqual(exportV4);
+    expect({ ...out, exportedAt: exportV4.exportedAt }).toEqual({ ...exportV4, version: DATA_VERSION, customExercises: [] });
   });
 
   it('never exports a session in progress, and its export imports back the same', () => {
@@ -200,7 +199,7 @@ describe('a version 4 backup with sport sessions', () => {
     useStore.getState().startEmpty();
     const file = useStore.getState().exportData();
     expect(Object.keys(JSON.parse(file)).sort()).toEqual(
-      ['activePlanId', 'app', 'body', 'exportedAt', 'planState', 'plans', 'settings', 'version', 'workouts'],
+      ['activePlanId', 'app', 'body', 'customExercises', 'exportedAt', 'planState', 'plans', 'settings', 'version', 'workouts'],
     );
     const before = useStore.getState();
     useStore.getState().resetAll();
@@ -247,17 +246,17 @@ describe('the step to version 4', () => {
     planState: exportV3.planState,
   };
 
-  it('adds the two store keys to store data and changes nothing else', () => {
+  it('adds the two sport keys to store data', () => {
     const out = migrate(v3Store, 3);
-    expect(out).toEqual({ ...v3Store, activeSport: null, cooldownChecked: [] });
+    expect(out).toEqual({ ...v3Store, activeSport: null, cooldownChecked: [], customExercises: [] });
     expect(out.workouts).toBe(v3Store.workouts);
     expect(out.plans).toBe(v3Store.plans);
     expect(out.settings).toBe(v3Store.settings);
   });
 
-  it('adds nothing to a backup file', () => {
+  it('adds no store-only keys to a backup file', () => {
     const out = migrate(v3File, 3);
-    expect(out).toEqual(v3File);
+    expect(out).toEqual({ ...v3File, customExercises: [] });
     for (const key of STORE_ONLY) expect(out).not.toHaveProperty(key);
     // A backup file from any version gets none of the store's keys either.
     for (const [file, version] of [
@@ -276,7 +275,7 @@ describe('the step to version 4', () => {
     expect(migrate(once, DATA_VERSION)).toEqual(once);
     const withSport = { ...once, activeSport: { id: 'x', sport: 'running' }, cooldownChecked: [1, 3] };
     expect(migrate(withSport, 3)).toEqual(withSport);
-    expect(migrate(migrate(v3File, 3), 3)).toEqual(v3File);
+    expect(migrate(migrate(v3File, 3), 3)).toEqual({ ...v3File, customExercises: [] });
   });
 
   it('keeps fields it does not know about', () => {
@@ -286,17 +285,19 @@ describe('the step to version 4', () => {
   });
 
   it('survives junk and leaves what it cannot read alone', () => {
-    expect(migrate(null, 3)).toEqual({});
-    expect(migrate('nonsense', 3)).toEqual({});
-    expect(migrate([1, 2], 3)).toEqual({});
+    expect(migrate(null, 3)).toEqual({ customExercises: [] });
+    expect(migrate('nonsense', 3)).toEqual({ customExercises: [] });
+    expect(migrate([1, 2], 3)).toEqual({ customExercises: [] });
     expect(migrate({ active: 'x', activeSport: 'junk', cooldownChecked: 7 }, 3)).toEqual({
       active: 'x',
       activeSport: 'junk',
       cooldownChecked: 7,
+      customExercises: [],
     });
     expect(migrate({ active: undefined, workouts: 'nope' }, 3)).toEqual({
       active: undefined,
       workouts: 'nope',
+      customExercises: [],
       activeSport: null,
       cooldownChecked: [],
     });

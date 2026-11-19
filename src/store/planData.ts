@@ -1,13 +1,13 @@
 // Plan data as the store saves it (data version 3): the plans, which one is active and where each
 // plan stands. Helpers here are pure apart from new ids, so they can be tested on their own.
-import { EXERCISE_BY_ID } from '@/data/exercises';
 import { examplePlans } from '@/data/plan-templates';
 import { addDaysISO, daysBetween, isISODate, mondayOfISO } from '@/lib/dates';
+import { findExercise } from '@/lib/exerciseCatalog';
 import { uid } from '@/lib/id';
 import { findWorkout, planPhaseForWeek, planPosition, prescribeItem } from '@/lib/plans';
 import { planFacts } from '@/lib/planView';
 import { lastPerformance, suggestNext } from '@/lib/progression';
-import type { PhaseId, Plan, PlanState, RoutineId, Workout, WorkoutExercise } from '@/lib/types';
+import type { ExerciseDef, PhaseId, Plan, PlanState, RoutineId, Workout, WorkoutExercise } from '@/lib/types';
 
 export interface PlanData {
   plans: Plan[];
@@ -121,7 +121,7 @@ export function buildPlanWorkout(
   plan: Plan,
   state: PlanState | undefined,
   workoutId: string,
-  opts: { gameMode?: boolean; history: Workout[]; today: string; now: number; isActive?: boolean },
+  opts: { gameMode?: boolean; history: Workout[]; today: string; now: number; isActive?: boolean; customExercises?: ExerciseDef[] },
 ): Workout | null {
   const workout = findWorkout(plan, workoutId);
   if (!workout) return null;
@@ -133,8 +133,8 @@ export function buildPlanWorkout(
   const exercises: WorkoutExercise[] = [];
   for (const item of workout.items) {
     // An exercise this app doesn't know can't be prescribed; leave it out rather than fail.
-    const ex = EXERCISE_BY_ID[item.exerciseId];
-    if (!ex) continue;
+    const ex = findExercise(item.exerciseId, opts.customExercises);
+    if (!ex || ex.archived) continue;
     const p = prescribeItem(item, ex, workout, { phase: pos.phase, gameMode });
     if (p.skip) continue;
     const last = lastPerformance(item.exerciseId, opts.history);

@@ -11,6 +11,8 @@ import { useStore } from '@/store/useStore';
 import activeWorkout from './fixtures/active-workout.json';
 import exportV1 from './fixtures/export-v1.json';
 import exportV2 from './fixtures/export-v2.json';
+import exportV4 from './fixtures/export-v4.json';
+import exportV5 from './fixtures/export-v5.json';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
   // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -44,10 +46,22 @@ const linked = <W extends AnyWorkout>(w: W) =>
   w.routineId ? { ...w, planId: 'court-ready', planName: 'Court-Ready', sessionId: w.routineId } : w;
 
 describe('migrate', () => {
+  it('adds an empty custom catalog to version 4 backups and phone storage without changing prior data', () => {
+    for (const old of [exportV4, { ...exportV4, active: activeWorkout, cooldownChecked: [0] }]) {
+      const current = migrate(old, 4);
+      expect(current).toEqual({ ...old, customExercises: [] });
+      expect(current.workouts).toBe(old.workouts);
+      expect(current.plans).toBe(old.plans);
+      expect(migrate(current, 4)).toEqual(current);
+    }
+    expect(migrate(exportV5, 4).customExercises).toBe(exportV5.customExercises);
+  });
+
   it('brings version 1 data up to date and leaves the rest alone', () => {
     expect(migrate(v1State, 1)).toEqual({
       ...v1State,
       settings: { ...exportV1.settings, lastExportAt: null },
+      customExercises: [],
       workouts: exportV1.workouts.map(linked),
       plans: examplePlans(),
       activePlanId: 'court-ready',
@@ -62,6 +76,7 @@ describe('migrate', () => {
       ...v2State,
       workouts: exportV2.workouts.map(linked),
       active: linked(activeWorkout),
+      customExercises: [],
       plans: examplePlans(),
       activePlanId: 'court-ready',
       planState: { 'court-ready': { start: '2026-10-12' } },
@@ -101,10 +116,10 @@ describe('migrate', () => {
   });
 
   it('does not throw on unreadable data', () => {
-    const empty = { settings: { lastExportAt: null }, plans: examplePlans(), activePlanId: 'court-ready', planState: {} };
+    const empty = { settings: { lastExportAt: null }, plans: examplePlans(), activePlanId: 'court-ready', planState: {}, customExercises: [] };
     expect(migrate(null, 1)).toEqual(empty);
     expect(migrate('nonsense', 1)).toEqual(empty);
-    expect(migrate([1, 2], 2)).toEqual({ plans: examplePlans(), activePlanId: 'court-ready', planState: {} });
+    expect(migrate([1, 2], 2)).toEqual({ plans: examplePlans(), activePlanId: 'court-ready', planState: {}, customExercises: [] });
   });
 });
 

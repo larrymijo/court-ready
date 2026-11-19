@@ -12,6 +12,7 @@ import exportV1 from './fixtures/export-v1.json';
 import exportV2 from './fixtures/export-v2.json';
 import exportV3 from './fixtures/export-v3.json';
 import exportV4 from './fixtures/export-v4.json';
+import exportV5 from './fixtures/export-v5.json';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
   // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -93,14 +94,16 @@ describe('backups made before the rename', () => {
     expect(exportV1.version).toBe(1);
     expect(exportV2.version).toBe(2);
     expect(exportV3.version).toBe(3);
-    expect(exportV4.version).toBe(DATA_VERSION);
+    expect(exportV4.version).toBe(4);
+    expect(exportV5.version).toBe(DATA_VERSION);
   });
 
   it.each([
     ['version 1', exportV1],
     ['version 2', exportV2],
     ['version 3', exportV3],
-    ['the current version', exportV4],
+    ['version 4', exportV4],
+    ['the current version', exportV5],
   ])('imports a backup in the shape of %s', (_name, file) => {
     expect(useStore.getState().importData(JSON.stringify(file))).toEqual({ ok: true, workouts: file.workouts.length });
     const state = useStore.getState();

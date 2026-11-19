@@ -3,13 +3,13 @@ import { useState, type ReactNode } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { Check, IconButton, Sheet, Txt } from '@/components/ui';
-import { EXERCISE_BY_ID } from '@/data/exercises';
+import { findExercise, getExercise } from '@/lib/exerciseCatalog';
 import type { Checklist, ChecklistStep } from '@/lib/types';
 import { C, R, S, SIZE, T } from '@/theme';
 
 /** The drills or stretches a step links to that this app has. */
 function linkedIds(step: ChecklistStep): string[] {
-  return (step.exerciseIds ?? []).filter((id) => EXERCISE_BY_ID[id]);
+  return (step.exerciseIds ?? []).filter((id) => findExercise(id));
 }
 
 /** The step's words before the first dash or dot: "Cross-body stretch" for the how-to's label. */
@@ -89,7 +89,7 @@ export function ChecklistCard({
         title="How to do it"
         subtitle={choosing ? shortName(choosing) : undefined}
         actions={(choosing ? linkedIds(choosing) : []).map((id) => ({
-          label: EXERCISE_BY_ID[id].name,
+          label: getExercise(id).name,
           icon: 'information-circle-outline' as const,
           onPress: () => router.push(`/exercise/${id}`),
         }))}

@@ -40,6 +40,8 @@ export interface ExerciseDef {
   /** Weight step in kg when it's time to go up. */
   increment: number;
   kind: ExerciseKind;
+  /** A removed custom exercise stays available to workout history. */
+  archived?: boolean;
   /** One of the guide's curated alternatives shown by the Swaps filter. */
   swapOption?: boolean;
   sections: TechniqueSection[];

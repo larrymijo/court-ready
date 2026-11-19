@@ -1,14 +1,15 @@
 import { router } from 'expo-router';
 import { Text, type StyleProp, type TextStyle } from 'react-native';
 
-import { EXERCISE_BY_ID } from '@/data/exercises';
+import { findExercise } from '@/lib/exerciseCatalog';
+import { useStore } from '@/store/useStore';
 import { ARTICLE_BY_SLUG } from '@/data/guide';
 import { C, T } from '@/theme';
 
 /** Opens a guide article or an exercise page from a [[target|label]] link. */
 export function openTarget(target: string): void {
   if (ARTICLE_BY_SLUG[target]) router.push(`/guide/${target}`);
-  else if (EXERCISE_BY_ID[target]) router.push(`/exercise/${target}`);
+  else if (findExercise(target, useStore.getState().customExercises)) router.push(`/exercise/${target}`);
 }
 
 type Part = { kind: 'text' | 'bold' | 'link'; text: string; target?: string };

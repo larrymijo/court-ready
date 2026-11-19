@@ -5,7 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ChecklistCard } from '@/components/ChecklistCard';
 import { SessionBar } from '@/components/sport/SessionBar';
 import { Button, Card, Check, IconButton, ProgressBar, Row, Txt } from '@/components/ui';
-import { EXERCISE_BY_ID } from '@/data/exercises';
+import { useExerciseLookup } from '@/store/useExerciseLookup';
 import { formatElapsed } from '@/lib/format';
 import { useNow } from '@/lib/useNow';
 import type { Checklist, Workout } from '@/lib/types';
@@ -30,6 +30,7 @@ export function GymCooldown({
   onBack: () => void;
 }) {
   const checked = useStore((s) => s.cooldownChecked);
+  const lookup = useExerciseLookup();
   const toggle = useStore((s) => s.toggleCooldownStep);
   const insets = useSafeAreaInsets();
   const now = useNow(1000, true);
@@ -74,7 +75,7 @@ export function GymCooldown({
               <Check done={last.sets.length > 0 && lastDone === last.sets.length} size={24} />
               <View style={{ flex: 1 }}>
                 <Txt v="body" numberOfLines={1}>
-                  Exercise {workout.exercises.length} of {workout.exercises.length} · {EXERCISE_BY_ID[last.exerciseId]?.name ?? 'Exercise'}
+                  Exercise {workout.exercises.length} of {workout.exercises.length} · {lookup.get(last.exerciseId).name}
                 </Txt>
                 <Txt v="small">
                   {lastDone} {lastDone === 1 ? 'set' : 'sets'} done

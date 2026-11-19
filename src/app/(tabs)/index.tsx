@@ -25,7 +25,7 @@ import {
   Txt,
 } from '@/components/ui';
 import { WeekStrip } from '@/components/WeekStrip';
-import { EXERCISE_BY_ID, getExercise } from '@/data/exercises';
+import { useExerciseLookup } from '@/store/useExerciseLookup';
 import { DAY_LONG } from '@/data/schedule';
 import { backupStatus, daysAgoText } from '@/lib/backupStatus';
 import { mondayOfISO, todayISO, weekdayIndex } from '@/lib/dates';
@@ -330,9 +330,10 @@ function GymCard({
   gameModeHint?: string;
   onChooseAnother: () => void;
 }) {
+  const lookup = useExerciseLookup();
   const gm = !!workout.gameMode && gameMode;
-  const known = workout.items.filter((item) => EXERCISE_BY_ID[item.exerciseId]);
-  const exercises = known.filter((item) => !prescribeItem(item, getExercise(item.exerciseId), workout, { phase, gameMode: gm }).skip).length;
+  const known = workout.items.filter((item) => lookup.available(item.exerciseId));
+  const exercises = known.filter((item) => !prescribeItem(item, lookup.get(item.exerciseId), workout, { phase, gameMode: gm }).skip).length;
   const shown: GymWorkout = { ...workout, items: known };
   return (
     <Card variant="hero">
@@ -342,7 +343,7 @@ function GymCard({
         <Txt color={C.textMuted}>{routineSummary(shown, exercises)}</Txt>
       </View>
       <Row gap={6} style={{ flexWrap: 'wrap' }}>
-        {routineAreas(shown, getExercise).map((area) => (
+        {routineAreas(shown, lookup.get).map((area) => (
           <Tag key={area} label={area} />
         ))}
       </Row>

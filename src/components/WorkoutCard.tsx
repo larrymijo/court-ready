@@ -3,7 +3,7 @@ import { router } from 'expo-router';
 import { View } from 'react-native';
 
 import { Card, Row, Tag, Txt, type IconName } from '@/components/ui';
-import { EXERCISE_BY_ID } from '@/data/exercises';
+import { useExerciseLookup } from '@/store/useExerciseLookup';
 import { formatDate, formatDuration, formatSet, formatTime, formatVolume, plural } from '@/lib/format';
 import { recordKind } from '@/lib/plans';
 import { matchTag, sportFigures, sportRecordName, sportSummary } from '@/lib/sportView';
@@ -62,6 +62,7 @@ function SportCard({ w }: { w: Workout }) {
 
 /** One finished workout in the history list. */
 export function WorkoutCard({ w }: { w: Workout }) {
+  const lookup = useExerciseLookup();
   if (recordKind(w) === 'sport') return <SportCard w={w} />;
   return (
     <Card onPress={() => router.push(`/history/${w.id}`)} accessibilityLabel={`${w.name}, ${formatDate(w.startedAt)}`}>
@@ -84,10 +85,13 @@ export function WorkoutCard({ w }: { w: Workout }) {
       </Row>
       <View style={{ gap: 4 }}>
         {w.exercises.slice(0, 5).map((e) => {
-          const ex = EXERCISE_BY_ID[e.exerciseId];
+          const ex = lookup.get(e.exerciseId);
           const working = e.sets.filter(isWorkingSet);
-          const score = (set: (typeof working)[number]) =>
-            ex?.estimate1RM === false ? (set.weight ?? 0) : e1rm(set.weight ?? 0, set.reps ?? 0);
+          const score = (set: (typeof working)[number]) => {
+            if (ex.tracking === 'reps') return set.reps ?? 0;
+            if (ex.estimate1RM === false) return set.weight ?? 0;
+            return e1rm(set.weight ?? 0, set.reps ?? 0);
+          };
           const best = working.reduce<(typeof working)[number] | null>(
             (b, s) => (!b || score(s) > score(b) ? s : b),
             null,
@@ -95,11 +99,11 @@ export function WorkoutCard({ w }: { w: Workout }) {
           return (
             <Row key={e.id} style={{ justifyContent: 'space-between' }} gap={S.md}>
               <Txt v="small" numberOfLines={1} style={{ flex: 1 }}>
-                {working.length} × {ex?.name ?? e.exerciseId}
+                {working.length} × {ex.name}
               </Txt>
               {best ? (
                 <Txt v="small" color={C.text}>
-                  {ex ? formatSet(ex, best.weight, best.reps) : ''}
+                  {formatSet(ex, best.weight, best.reps)}
                 </Txt>
               ) : null}
             </Row>

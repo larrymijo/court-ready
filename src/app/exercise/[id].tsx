@@ -6,24 +6,34 @@ import { View } from 'react-native';
 import { LineChart } from '@/components/LineChart';
 import { Bullet, Button, Card, Chip, EmptyState, Row, Screen, Segmented, StatTile, Tag, Txt } from '@/components/ui';
 import { painTone } from '@/components/workout/PainPicker';
-import { EXERCISE_BY_ID } from '@/data/exercises';
+import { exerciseLabel, findExercise, getExercise } from '@/lib/exerciseCatalog';
 import { formatDate, formatKg, formatSet } from '@/lib/format';
 import { exerciseUsage } from '@/lib/planView';
+import { confirm } from '@/lib/platform';
 import { repsText } from '@/lib/program';
 import { exerciseBests, exerciseSeries, isWorkingSet } from '@/lib/stats';
+import type { ExerciseDef } from '@/lib/types';
 import { useStore } from '@/store/useStore';
 import { C, S } from '@/theme';
 
 type Tab = 'how' | 'history' | 'records';
 
-/** "dumbbell" → "Dumbbell" */
-function capitalise(word: string): string {
-  return word.charAt(0).toUpperCase() + word.slice(1).replace(/_/g, ' ');
+function exerciseCategory(exercise: ExerciseDef, custom: boolean, inPlan: boolean): string {
+  if (custom) return exercise.archived ? 'Removed from Library' : 'Your exercise';
+  if (exercise.kind === 'care') return 'Shoulder care';
+  if (exercise.kind === 'drill') return 'Warm-up drill';
+  if (exercise.kind === 'stretch') return 'Stretch';
+  if (exercise.swapOption) return 'Swap option';
+  return inPlan ? 'In your plan' : 'Exercise';
 }
 
 export default function ExerciseScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const ex = EXERCISE_BY_ID[id];
+  const customExercises = useStore((s) => s.customExercises);
+  const removeCustomExercise = useStore((s) => s.removeCustomExercise);
+  const custom = customExercises.find((exercise) => exercise.id === id);
+  const ex = useMemo(() => getExercise(id, customExercises), [id, customExercises]);
+  const missing = !findExercise(id, customExercises);
   const workouts = useStore((s) => s.workouts);
   const plan = useStore((s) => s.plans.find((p) => p.id === s.activePlanId));
   const [tab, setTab] = useState<Tab>('how');
@@ -40,22 +50,27 @@ export default function ExerciseScreen() {
         .filter((s) => s.sets.length > 0),
     [workouts, id],
   );
-  const series = useMemo(() => exerciseSeries(id, workouts), [workouts, id]);
-  const bests = useMemo(() => exerciseBests(id, workouts), [workouts, id]);
-
-  if (!ex) {
-    return (
-      <Screen edgesTop={false}>
-        <Txt>Exercise not found.</Txt>
-      </Screen>
-    );
-  }
+  const series = useMemo(() => exerciseSeries(id, workouts, ex), [ex, workouts, id]);
+  const bests = useMemo(() => exerciseBests(id, workouts, undefined, ex), [ex, workouts, id]);
 
   const usedIn = exerciseUsage(plan, ex.id);
-  const weight = ex.tracking === 'weight_reps';
+  const weight = missing ? series.some((s) => s.topWeight > 0) : ex.tracking === 'weight_reps';
   const showEstimatedMax = weight && ex.estimate1RM !== false;
   // A drill or a stretch is read, never lifted or logged: how-to only, no lift tag, tabs or tempo line.
   const readOnly = ex.kind === 'drill' || ex.kind === 'stretch';
+  const showSections = !!custom || missing;
+  const remove = async () => {
+    const ok = await confirm(
+      `Remove ${ex.name}?`,
+      'This removes the exercise from the Library and future plan workouts. Your current workout, history and records are kept.',
+      'Remove',
+      true,
+    );
+    if (ok && removeCustomExercise(id)) {
+      if (router.canGoBack()) router.back();
+      else router.replace('/library');
+    }
+  };
 
   return (
     <>
@@ -63,23 +78,21 @@ export default function ExerciseScreen() {
       <Screen edgesTop={false}>
         <View style={{ gap: S.sm }}>
           <View style={{ gap: 2 }}>
-            <Txt v="label">{ex.kind === 'care'
-                ? 'Shoulder care'
-                : ex.swapOption
-                  ? 'Swap option'
-                  : ex.kind === 'drill'
-                    ? 'Warm-up drill'
-                    : ex.kind === 'stretch'
-                      ? 'Stretch'
-                      : usedIn.length ? 'In your plan' : 'Exercise'}</Txt>
-            <Txt v="title">{ex.name}</Txt>
+            <Txt v="label">{exerciseCategory(ex, !!custom, usedIn.length > 0)}</Txt>
+            <Txt v="title" accessibilityRole="header">{ex.name}</Txt>
           </View>
-          <Txt color={C.textMuted}>{ex.muscles}</Txt>
-          <Row gap={6} style={{ flexWrap: 'wrap' }}>
-            <Tag label={capitalise(ex.equipment)} />
-            {readOnly ? null : <Tag label={ex.isolation ? 'Isolation' : 'Big lift'} />}
-            {ex.dose ? <Tag label={ex.dose} /> : null}
-          </Row>
+          {missing ? null : <Txt color={C.textMuted}>{custom ? exerciseLabel(ex.primary) : ex.muscles}</Txt>}
+          {custom && ex.secondary?.length ? (
+            <Txt v="small">Also works {ex.secondary.map(exerciseLabel).join(', ').toLowerCase()}</Txt>
+          ) : null}
+          {missing ? null : (
+            <Row gap={6} style={{ flexWrap: 'wrap' }}>
+              <Tag label={exerciseLabel(ex.equipment)} />
+              {custom ? <Tag label={weight ? `Weight and reps · ${formatKg(ex.increment)} kg steps` : 'Reps only'} /> : null}
+              {!custom && !readOnly ? <Tag label={ex.isolation ? 'Isolation' : 'Big lift'} /> : null}
+              {ex.dose ? <Tag label={ex.dose} /> : null}
+            </Row>
+          )}
         </View>
 
         {usedIn.length > 0 ? (
@@ -96,7 +109,7 @@ export default function ExerciseScreen() {
           </Row>
         ) : null}
 
-        {readOnly ? null : (
+        {readOnly || showSections ? null : (
           <Segmented<Tab>
             value={tab}
             onChange={setTab}
@@ -108,7 +121,7 @@ export default function ExerciseScreen() {
           />
         )}
 
-        {readOnly || tab === 'how' ? (
+        {readOnly || showSections || tab === 'how' ? (
           <>
             {ex.warning ? (
               <Card>
@@ -135,15 +148,14 @@ export default function ExerciseScreen() {
                 <Txt v="label">Swaps</Txt>
                 <Row gap={S.sm} style={{ flexWrap: 'wrap' }}>
                   {ex.swaps
-                    .map((s) => EXERCISE_BY_ID[s])
-                    .filter(Boolean)
+                    .map((s) => getExercise(s, customExercises))
                     .map((s) => (
                       <Chip key={s.id} label={s.name} style={{ flexShrink: 1 }} onPress={() => router.push(`/exercise/${s.id}`)} />
                     ))}
                 </Row>
               </Card>
             ) : null}
-            {readOnly ? null : (
+            {readOnly || showSections ? null : (
               <Button
                 variant="ghost"
                 title="Technique guide"
@@ -154,7 +166,8 @@ export default function ExerciseScreen() {
           </>
         ) : null}
 
-        {!readOnly && tab === 'history' ? (
+        {showSections ? <Txt v="h1" accessibilityRole="header">History</Txt> : null}
+        {!readOnly && (showSections || tab === 'history') ? (
           sessions.length === 0 ? (
             <EmptyState icon="barbell-outline" title="Not logged yet" body="Your sets for this exercise will show here." />
           ) : (
@@ -171,7 +184,10 @@ export default function ExerciseScreen() {
                 </Row>
                 <Txt>
                   {sets
-                    .map((s) => formatSet(ex, s.weight, s.reps, true))
+                    .map((s) => {
+                      if (!missing) return formatSet(ex, s.weight, s.reps, true);
+                      return s.weight == null ? `${s.reps ?? 0} reps` : `${formatKg(s.weight)} kg × ${s.reps ?? 0}`;
+                    })
                     .join('   ·   ')}
                 </Txt>
               </Card>
@@ -179,7 +195,8 @@ export default function ExerciseScreen() {
           )
         ) : null}
 
-        {!readOnly && tab === 'records' ? (
+        {showSections && series.length ? <Txt v="h1" accessibilityRole="header">Records</Txt> : null}
+        {!readOnly && (showSections ? series.length > 0 : tab === 'records') ? (
           series.length === 0 ? (
             <EmptyState icon="trophy-outline" title="No records yet" body="Log this exercise and your bests and progress chart show up here." />
           ) : (
@@ -216,6 +233,7 @@ export default function ExerciseScreen() {
             </>
           )
         ) : null}
+        {custom && !custom.archived ? <Button title="Remove exercise" variant="danger" onPress={remove} /> : null}
       </Screen>
     </>
   );

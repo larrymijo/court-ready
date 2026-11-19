@@ -5,7 +5,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { Check, IconButton, Txt } from '@/components/ui';
 import { checklist } from '@/data/checklists';
-import { EXERCISE_BY_ID } from '@/data/exercises';
+import { findExercise } from '@/lib/exerciseCatalog';
 import { useStore } from '@/store/useStore';
 import { C, R, S, SIZE, T } from '@/theme';
 
@@ -14,7 +14,7 @@ import { C, R, S, SIZE, T } from '@/theme';
  * loops in phase 5, so this card shows the same links as before.
  */
 function linkedId(ids?: string[]): string | undefined {
-  return ids?.find((id) => EXERCISE_BY_ID[id]?.kind === 'care');
+  return ids?.find((id) => findExercise(id)?.kind === 'care');
 }
 
 /** The warm-up checklist at the top of a workout. Folds away once every step is ticked. */

@@ -6,7 +6,7 @@ import { SportSessionView } from '@/components/history/SportSessionView';
 import { ItemBadge } from '@/components/ItemBadge';
 import { BOTTOM_BAR_SPACE, BottomBar, Button, Card, Divider, Row, Screen, SectionTitle, StatTile, Tag, Txt } from '@/components/ui';
 import { painTone } from '@/components/workout/PainPicker';
-import { EXERCISE_BY_ID } from '@/data/exercises';
+import { useExerciseLookup } from '@/store/useExerciseLookup';
 import { formatDateLong, formatDuration, formatKg, formatSet, formatTime, formatVolume, plural, setLabels } from '@/lib/format';
 import { recordKind } from '@/lib/plans';
 import { confirm } from '@/lib/platform';
@@ -35,6 +35,7 @@ export default function WorkoutDetailScreen() {
   const workout = useStore((s) => s.workouts.find((w) => w.id === id));
   const deleteWorkout = useStore((s) => s.deleteWorkout);
   const plans = useStore((s) => s.plans);
+  const lookup = useExerciseLookup();
   if (!workout) {
     return (
       <Screen edgesTop={false}>
@@ -102,7 +103,7 @@ export default function WorkoutDetailScreen() {
                 <Row key={i} gap={S.md} align="flex-start">
                   <Tag label="PR" style={{ marginTop: 1 }} />
                   <View style={{ flex: 1, gap: 2 }}>
-                    <Txt v="h2">{EXERCISE_BY_ID[pr.exerciseId]?.name}</Txt>
+                    <Txt v="h2">{lookup.get(pr.exerciseId).name}</Txt>
                     <Txt v="small">
                       {PR_LABEL[pr.kind]}: {prValue(pr)}
                     </Txt>
@@ -115,18 +116,18 @@ export default function WorkoutDetailScreen() {
 
         <SectionTitle title="Exercises" />
         {workout.exercises.map((e) => {
-          const ex = EXERCISE_BY_ID[e.exerciseId];
+          const ex = lookup.get(e.exerciseId);
           const labels = setLabels(e.sets);
           return (
             <Card key={e.id}>
               <Pressable
                 accessibilityRole="button"
-                accessibilityLabel={`${ex?.name ?? e.exerciseId}: open the exercise`}
+                accessibilityLabel={`${ex.name}: open the exercise`}
                 onPress={() => router.push(`/exercise/${e.exerciseId}`)}
                 style={styles.exercise}>
                 {e.itemKey ? <ItemBadge label={e.itemKey} superset={!!e.group} /> : null}
                 <Txt v="h2" style={{ flex: 1 }}>
-                  {ex?.name ?? e.exerciseId}
+                  {ex.name}
                 </Txt>
                 {e.pain != null ? <Tag label={`Pain ${e.pain}/10`} tone={painTone(e.pain)} /> : null}
                 <Ionicons name="chevron-forward" size={18} color={C.textFaint} />
@@ -138,7 +139,7 @@ export default function WorkoutDetailScreen() {
                     <View style={styles.setBadge}>
                       <Text style={styles.setBadgeText}>{labels[i]}</Text>
                     </View>
-                    <Txt style={{ flex: 1 }}>{ex ? formatSet(ex, s.weight, s.reps) : `${s.reps}`}</Txt>
+                    <Txt style={{ flex: 1 }}>{formatSet(ex, s.weight, s.reps)}</Txt>
                     {s.rir != null ? <Txt v="small">RIR {s.rir}</Txt> : null}
                   </Row>
                 ))}

@@ -20,7 +20,7 @@ import {
   Stat,
   Txt,
 } from '@/components/ui';
-import { EXERCISE_BY_ID } from '@/data/exercises';
+import { useExerciseLookup } from '@/store/useExerciseLookup';
 import { weeklyAdvice, weeklyAverages } from '@/lib/body';
 import { addDaysISO, mondayOfISO, parseISODate, todayISO } from '@/lib/dates';
 import { formatChange, formatDuration, formatKg, formatShortDate, plural } from '@/lib/format';
@@ -75,9 +75,10 @@ export default function ProgressScreen() {
   const monday = mondayOfISO(today);
   const plan = plans.find((p) => p.id === activePlanId);
   const week = plan ? workoutPosition(plan, planState[plan.id], today) : null;
-  const thisWeek = muscleSets(workoutsInWeek(workouts, monday), (id) => EXERCISE_BY_ID[id]);
+  const lookup = useExerciseLookup();
+  const thisWeek = muscleSets(workoutsInWeek(workouts, monday), lookup.find);
   const planned: Partial<Record<MuscleGroup, number>> =
-    plan && week ? plannedMuscleSets(plan, week.phase, (id) => EXERCISE_BY_ID[id]) : {};
+    plan && week ? plannedMuscleSets(plan, week.phase, lookup.find) : {};
   const sessionsText = plan ? plural(planFacts(plan).gymPerWeek, 'session') : 'sessions';
 
   // Sessions and minutes count gym and sport; the planned number is the active plan's required sessions.

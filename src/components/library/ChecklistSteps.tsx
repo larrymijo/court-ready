@@ -2,7 +2,7 @@ import { router } from 'expo-router';
 import { View } from 'react-native';
 
 import { Chip, Divider, Row, RowBadge, Txt } from '@/components/ui';
-import { EXERCISE_BY_ID } from '@/data/exercises';
+import { findExercise } from '@/lib/exerciseCatalog';
 import type { Checklist } from '@/lib/types';
 import { S } from '@/theme';
 
@@ -14,7 +14,7 @@ export function ChecklistSteps({ list }: { list: Checklist }) {
   return (
     <View style={{ gap: S.md }}>
       {list.steps.map((step, i) => {
-        const links = (step.exerciseIds ?? []).map((id) => EXERCISE_BY_ID[id]).filter(Boolean);
+        const links = (step.exerciseIds ?? []).map((id) => findExercise(id)).filter((ex) => ex !== undefined);
         return (
           <View key={i} style={{ gap: S.md }}>
             {i > 0 ? <Divider /> : null}

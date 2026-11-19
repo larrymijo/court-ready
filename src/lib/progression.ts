@@ -43,7 +43,7 @@ export interface Suggestion {
 
 function roundToStep(value: number, step: number): number {
   if (step <= 0) return value;
-  return Math.round(value / step) * step;
+  return Number((Math.round(value / step) * step).toFixed(2));
 }
 
 /** Double progression from the guide: top of the range on every set → next weight up. */
@@ -74,7 +74,10 @@ export function suggestNext(ex: ExerciseDef, target: SetTarget, last: LastPerfor
   const allTop = last.sets.every((s) => (s.weight ?? 0) === top && (s.reps ?? 0) >= target.repsMax);
   const bodyweight = ex.equipment === 'bodyweight';
   if (allTop && ex.increment > 0) {
-    const next = roundToStep(top + ex.increment, ex.increment >= 1 ? 0.5 : 0.25);
+    // A custom lift uses the weight step the owner entered, including fractional plates.
+    const next = ex.id.startsWith('custom_')
+      ? Number((top + ex.increment).toFixed(2))
+      : roundToStep(top + ex.increment, ex.increment >= 1 ? 0.5 : 0.25);
     return {
       kind: 'increase',
       weight: next,

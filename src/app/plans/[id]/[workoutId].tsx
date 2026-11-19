@@ -5,7 +5,7 @@ import { View } from 'react-native';
 
 import { ItemBadge } from '@/components/ItemBadge';
 import { BOTTOM_BAR_SPACE, BottomBar, Button, Card, ListRow, Row, RowBadge, Screen, Tag, ToggleRow, Txt } from '@/components/ui';
-import { EXERCISE_BY_ID } from '@/data/exercises';
+import { useExerciseLookup } from '@/store/useExerciseLookup';
 import { checklist } from '@/data/checklists';
 import { todayISO } from '@/lib/dates';
 import { formatClock, formatKg } from '@/lib/format';
@@ -26,17 +26,18 @@ export default function WorkoutPage() {
   const state = useStore((s) => (id ? s.planState[id] : undefined));
   const isActive = useStore((s) => s.activePlanId === id);
   const workouts = useStore((s) => s.workouts);
+  const lookup = useExerciseLookup();
   const [gameMode, setGameMode] = useState(false);
   const found = plan && workoutId ? findWorkout(plan, workoutId) : undefined;
   if (!plan || !found) return null;
 
   // Exercises this app does not know are left out, as when the workout is started.
-  const workout = { ...found, items: found.items.filter((i) => EXERCISE_BY_ID[i.exerciseId]) };
+  const workout = { ...found, items: found.items.filter((i) => lookup.available(i.exerciseId)) };
   // A paused plan shows the week it was paused at, as starting it builds that week.
   const pos = workoutPosition(plan, state, todayISO(), isActive);
   const rhythm = planFacts(plan).hasRhythm;
   const gm = !!workout.gameMode && gameMode;
-  const sets = workoutHardSets(workout, (x) => EXERCISE_BY_ID[x], { phase: pos.phase, gameMode: gm });
+  const sets = workoutHardSets(workout, lookup.get, { phase: pos.phase, gameMode: gm });
   const days = plannedDaysText(plan, workout.id);
   const cooldown = cooldownOf(workout);
   const warmup = workout.warmup === 'upper' || workout.warmup === 'lower' ? checklist(workout.warmup) : undefined;
@@ -85,7 +86,7 @@ export default function WorkoutPage() {
         ) : null}
 
         {workout.items.map((item, i) => {
-          const ex = EXERCISE_BY_ID[item.exerciseId];
+          const ex = lookup.get(item.exerciseId);
           const p = prescribeItem(item, ex, workout, { phase: pos.phase, gameMode: gm });
           const last = lastPerformance(item.exerciseId, workouts);
           const sug = suggestForPlan(ex, p, last, plan.progression);
@@ -127,6 +128,12 @@ export default function WorkoutPage() {
             </View>
           );
         })}
+        <Button
+          title="Add exercises to this workout"
+          variant="outline"
+          icon="add"
+          onPress={() => router.push({ pathname: '/exercises', params: { planId: plan.id, workoutId: workout.id } })}
+        />
         {cooldown ? (
           <Card variant="list">
             <ListRow

@@ -4,10 +4,9 @@ import { View } from 'react-native';
 
 import { ExerciseList } from '@/components/ExerciseList';
 import { SportRing } from '@/components/WorkoutCard';
-import { TabScreen } from '@/components/TabScreen';
-import { Card, ListRow, PageHeader, RowBadge, SectionTitle, Segmented, Txt, type IconName } from '@/components/ui';
+import { TabScreen, useTabBottomPadding } from '@/components/TabScreen';
+import { Button, Card, ListRow, PageHeader, RowBadge, SectionTitle, Segmented, Txt, type IconName } from '@/components/ui';
 import { CHECKLISTS } from '@/data/checklists';
-import { EXERCISES } from '@/data/exercises';
 import { ARTICLES, ARTICLE_SECTIONS } from '@/data/guide';
 import { SPORTS } from '@/data/sports';
 import { plural } from '@/lib/format';
@@ -41,12 +40,13 @@ const ICONS: Record<string, IconName> = {
 
 export default function LibraryScreen() {
   const [view, setView] = useState<View_>('exercises');
-  const plan = useStore((s) => s.plans.find((p) => p.id === s.activePlanId));
-  const guideCount = visibleGuideSlugs(ARTICLES.map((a) => a.slug), plan).length;
-
-  return (
-    <TabScreen>
-      <PageHeader subtitle={`${EXERCISES.length} exercises · ${guideCount} guide pages`} title="Library" />
+  const bottomPad = useTabBottomPadding();
+  const customCount = useStore((s) => s.customExercises.length);
+  const header = (
+    <View style={{ gap: S.lg }}>
+      <PageHeader title="Library" right={view === 'exercises' ? (
+        <Button title="New exercise" icon="add" size="pill" onPress={() => router.push('/exercise/new')} />
+      ) : undefined} />
       <Segmented<View_>
         value={view}
         onChange={setView}
@@ -57,17 +57,21 @@ export default function LibraryScreen() {
         ]}
       />
 
-      {/* All stay mounted, so a search survives a look at the guide. */}
-      <View style={view === 'exercises' ? null : { display: 'none' }}>
-        <ExerciseList initialFilter="plan" onChoose={(e) => router.push(`/exercise/${e.id}`)} />
+    </View>
+  );
+
+  return (
+    <>
+      <View style={view === 'exercises' ? { flex: 1 } : { display: 'none' }}>
+        <ExerciseList key={customCount} header={header} tabBottomPad={bottomPad} onChoose={(e) => router.push(`/exercise/${e.id}`)} />
       </View>
-      <View style={view === 'sports' ? { gap: S.lg } : { display: 'none' }}>
-        <SportsList />
-      </View>
-      <View style={view === 'guide' ? { gap: S.lg } : { display: 'none' }}>
-        <GuideList />
-      </View>
-    </TabScreen>
+      {view !== 'exercises' ? (
+        <TabScreen>
+          {header}
+          {view === 'sports' ? <SportsList /> : <GuideList />}
+        </TabScreen>
+      ) : null}
+    </>
   );
 }
 
