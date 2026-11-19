@@ -230,7 +230,7 @@ Notes on both:
 | Gym workouts | Unchanged: the upper and lower warm-ups and ramp-up sets. Workouts you build get the one that matches their muscles. | New, about 3–4 min: upper days chest, lats, triceps and cross-body shoulder; lower days quads, hamstrings, hip flexors and calves | Sets, as now |
 
 - The new drafts are general guidance. They are written in full in phase 4 and shown to you to approve before they ship, like the example plans were.
-- Photo loops: the public-domain photo set has 123 stretches, all with a photo pair, and drills such as arm circles, carioca, skipping, walking lunges, inchworm and World's Greatest Stretch. These were matched by name; each pair gets a look when it is built. There is nothing for high knees, and the four shoulder-care drills stay text, as before.
+- Photo loops: verify each pair against the exercise technique and use photos with documented reuse rights. The text remains available for drills and stretches without a suitable pair.
 - Warm-ups and cool-downs are checklists you tick or skip. They are not logged as sets; the finished session records whether you did them.
 
 ## 8. Exercise library
@@ -252,7 +252,7 @@ Notes on both:
 | Other | 3 | Wrist curl, farmer's walk, kettlebell swing |
 | Warm-up drills and stretches | about 30 | The drills and stretches used by the warm-ups and cool-downs of section 7. They never count as hard sets. |
 
-- **Where the additions come from:** `yuhonas/free-exercise-db`, a public-domain set (Unlicense) of 876 exercises, each with muscles, equipment, how-to steps and a start and an end photo. All 68 lifts were found in it by name.
+- **Catalog reference:** `yuhonas/free-exercise-db` provides candidate exercise names, equipment and muscle classifications. Verify each variant and write Hybrid's technique copy. The dataset maintainer could not confirm where the bundled photos came from or whether they can be reused. [Maintainer’s licensing note](https://github.com/yuhonas/free-exercise-db/issues/2)
 - **When they arrive:** the six lifts the example plans need come in phase 3, the drills and stretches in phase 4 (as text), and everything else, with all photo loops, in phase 5.
 - **Each added exercise gets:** name, main and helper muscles, equipment, weight step, a short how-to adapted from the set, and its photo loop. The 49 existing exercises keep their hand-written technique text.
 - **Your own exercises:** name, main muscle, helper muscles, equipment, how it is logged (weight and reps, or reps only), weight step and notes. They appear everywhere built-in ones do. Deleting one hides it from the library but keeps your history.
@@ -387,8 +387,8 @@ You get: 117 lifts and about 30 warm-up drills and stretches you can search and 
 
 Work:
 - Split `src/data/exercises.ts` into `src/data/exercises/` by muscle group and add the remaining lifts of section 8. `Equipment` gains `barbell` and `kettlebell`. `MuscleGroup` gains `forearms`. `kind` becomes `standard`, `care`, `drill` or `stretch`. Ids added in phases 3 and 4 stay the same.
-- `scripts/build-library.mjs` drafts name, muscles, equipment and how-to steps for the additions from the photo set's data. The result is reviewed and committed as data; the app never fetches it.
-- `scripts/build-exercise-media.mjs` crops each photo pair, resizes it to 480 px and converts it to greyscale WebP (about 20 KB a frame, roughly 5 to 6 MB in total) in `public/media/`. The phone caches them in the background after install, exercises in your plans first.
+- `scripts/build-library.mjs` drafts catalog entries from the exercise reference. The reviewed names, muscles, equipment and technique copy are committed as data. The app never fetches the reference.
+- `scripts/build-exercise-media.mjs` crops each photo pair with documented reuse rights, resizes it to 480 px and converts it to greyscale WebP (about 20 KB a frame, roughly 5 to 6 MB in total) in `public/media/`. The phone caches them in the background after install, exercises in your plans first.
 - `MovementLoop` component: cross-fades the two frames, pauses on tap, and stays still when the phone asks for reduced motion. Used in the library, the exercise page, the warm-up and cool-down checklists, and later the workout screen.
 - Your own exercises: `customExercises` in the store and a form (canvas screen "Library", "New exercise"), with a new data version. `getExercise(id)` looks in built-in then custom, and every screen uses it instead of reading `EXERCISE_BY_ID`. An id that no longer exists shows as "Removed exercise", so old workouts never break.
 - Library tab: search, muscle chips, equipment filter, sections for "In your plans" and "Recent", and the exercise page with loop, how-to, history and records. The same list is the picker for workouts and plans, with several picks at once.

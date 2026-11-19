@@ -1,0 +1,522 @@
+import type { ExerciseDef } from '@/lib/types';
+
+export const quadsExercises: ExerciseDef[] = [
+  {
+    id: 'legpress',
+    name: 'Leg press or hack squat',
+    muscles: 'Quads, glutes',
+    primary: 'quads',
+    secondary: ['glutes'],
+    equipment: 'machine',
+    isolation: false,
+    tracking: 'weight_reps',
+    increment: 5,
+    kind: 'main',
+    swaps: ['alt_gobletsquat'],
+    sections: [
+      {
+        label: 'SETUP',
+        items: [
+          'Leg press: back and hips flat on the pad. Feet shoulder-width in the middle of the platform, toes slightly out.',
+          'Hack squat: shoulders under the pads, feet in the middle of the platform.',
+        ],
+      },
+      {
+        label: 'DO IT',
+        items: [
+          'Take a big breath into your belly and brace before each rep.',
+          'Lower in 2–3 s with your knees moving in line with your toes. Go as deep as you can while your hips and lower back stay on the pad — usually knees at 90° or deeper.',
+          'Push through your whole foot. Stop just before your knees lock.',
+        ],
+      },
+      {
+        label: 'AVOID',
+        items: [
+          'Hips curling off the pad at the bottom — that rounds your lower back.',
+          'Knees caving inward, or bouncing off the bottom.',
+        ],
+      },
+      {
+        label: 'IF IT HURTS',
+        items: [
+          'Knees: put your feet a little higher on the platform and use a slightly shorter range.',
+          'No machine? Heel-elevated goblet squat: hold a dumbbell at your chest, heels on a small plate.',
+        ],
+      },
+      {
+        label: 'WHY NOT BARBELL SQUATS?',
+        items: [
+          'Holding a bar on your back forces sore shoulders and elbows into a tight position. Machines let you load your legs hard without that.',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'bss',
+    name: 'Bulgarian split squat',
+    muscles: 'Quads, glutes — one leg at a time, great for jumping',
+    primary: 'quads',
+    secondary: ['glutes'],
+    equipment: 'dumbbell',
+    isolation: false,
+    tracking: 'weight_reps',
+    increment: 2,
+    kind: 'main',
+    perSide: true,
+    swaps: ['alt_reverselunge'],
+    sections: [
+      {
+        label: 'SETUP',
+        items: [
+          'Put the top of your back foot on a bench. Front foot a big step forward.',
+          'Dumbbells at your sides. Learn it with bodyweight first, holding onto something for balance.',
+        ],
+      },
+      {
+        label: 'DO IT',
+        items: [
+          'Drop your back knee straight down until it’s just above the floor.',
+          'Push up through the middle of your front foot.',
+          'Do all reps on your weaker leg first, then the same number on the other leg.',
+          'Upright body = more quads. Small forward lean = more glutes.',
+        ],
+      },
+      {
+        label: 'AVOID',
+        items: ['Front knee caving inward.', 'Pushing off with the back leg — it’s only there for balance.'],
+      },
+      {
+        label: 'IF IT HURTS',
+        items: ['Knee: do reverse lunges instead (step back, then return).'],
+      },
+    ],
+  },
+  {
+    id: 'alt_gobletsquat',
+    name: 'Heel-elevated goblet squat',
+    muscles: 'Quads, glutes',
+    primary: 'quads',
+    secondary: ['glutes'],
+    equipment: 'dumbbell',
+    isolation: false,
+    tracking: 'weight_reps',
+    increment: 2,
+    kind: 'alternative',
+    swaps: ['legpress'],
+    sections: [
+      {
+        label: 'DO IT',
+        items: [
+          'Hold a dumbbell upright at your chest, heels on a small plate.',
+          'Sit straight down between your knees, chest up, knees moving over your toes.',
+          'Stand up through your whole foot. Lower in 2–3 s.',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'alt_reverselunge',
+    name: 'Reverse lunge',
+    muscles: 'Quads, glutes',
+    primary: 'quads',
+    secondary: ['glutes'],
+    equipment: 'dumbbell',
+    isolation: false,
+    tracking: 'weight_reps',
+    increment: 2,
+    kind: 'alternative',
+    perSide: true,
+    swaps: ['bss'],
+    sections: [
+      {
+        label: 'DO IT',
+        items: [
+          'Dumbbells at your sides. Step one foot back.',
+          'Drop the back knee toward the floor, front knee over the middle of your foot.',
+          'Push through the front foot to return. Do all reps on one leg, then the other.',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'backsquat',
+    name: 'Barbell back squat',
+    muscles: 'Quads, glutes, lower back',
+    primary: 'quads',
+    secondary: ['glutes'],
+    equipment: 'barbell',
+    isolation: false,
+    tracking: 'weight_reps',
+    increment: 2.5,
+    kind: 'main',
+    swaps: ['legpress', 'alt_gobletsquat'],
+    sections: [
+      {
+        label: 'SETUP',
+        items: [
+          'Set the bar in the rack at about chest height, with safety arms just below the bottom of your squat.',
+          'Get under the bar so it rests on your upper back, not on your neck. Hands just outside your shoulders. Stand up to unrack and take two small steps back.',
+          'Feet about shoulder-width apart, toes turned slightly out.',
+        ],
+      },
+      {
+        label: 'DO IT',
+        items: [
+          'Take a big breath into your belly and brace before each rep.',
+          'Sit down and slightly back, knees moving in line with your toes. Go as deep as you can while your back stays flat.',
+          'Push through your whole foot to stand up. Keep your chest up.',
+        ],
+      },
+      {
+        label: 'AVOID',
+        items: [
+          'Knees caving inward, or heels lifting off the floor.',
+          'Rounding your lower back at the bottom, or bouncing out of the hole.',
+        ],
+      },
+      {
+        label: 'IF IT HURTS',
+        items: [
+          'Shoulders or elbows: take a wider grip, or use the leg press.',
+          'Knees: use a shorter range, or try the heel-elevated goblet squat.',
+        ],
+      },
+    ],
+    warning: 'Always use the safety arms. If you get stuck, lower the bar onto them instead of fighting it.',
+  },
+  {
+    id: 'legext',
+    name: 'Leg extension',
+    muscles: 'Quads',
+    primary: 'quads',
+    equipment: 'machine',
+    isolation: true,
+    tracking: 'weight_reps',
+    increment: 2.5,
+    kind: 'main',
+    swaps: ['legpress', 'alt_gobletsquat'],
+    sections: [
+      {
+        label: 'SETUP',
+        items: [
+          'Set the seat so your knees line up with the machine’s pivot and your back is flat against the pad.',
+          'The pad rests on your lower shins, just above your ankles.',
+        ],
+      },
+      {
+        label: 'DO IT',
+        items: [
+          'Straighten your legs and squeeze your quads for 1 s at the top.',
+          'Lower in 2–3 s until your knees are bent at about 90°.',
+        ],
+      },
+      {
+        label: 'AVOID',
+        items: ['Swinging the weight up, or lifting your hips off the seat.', 'Locking your knees hard at the top.'],
+      },
+      {
+        label: 'IF IT HURTS',
+        items: ['Knee pain: use lighter weight and skip the last few degrees at the top, or do leg presses instead.'],
+      },
+    ],
+  },
+  {
+    id: 'd_jog',
+    name: 'Easy jog',
+    muscles: 'Whole body — raises your heart rate and warms the legs',
+    primary: 'quads',
+    secondary: ['calves', 'glutes'],
+    equipment: 'bodyweight',
+    isolation: false,
+    tracking: 'reps',
+    increment: 0,
+    kind: 'drill',
+    dose: '2–3 min',
+    swaps: [],
+    sections: [
+      {
+        label: 'HOW',
+        items: [
+          'Jog at a pace where you could still hold a conversation.',
+          'Stay tall, arms relaxed, and land softly under your hips.',
+        ],
+      },
+      {
+        label: 'IF IT HURTS',
+        items: ['Pain in a joint: slow to a walk and stop if it doesn’t ease.'],
+      },
+    ],
+  },
+  {
+    id: 'd_walklunge',
+    name: 'Walking lunge',
+    muscles: 'Quads, glutes, hips',
+    primary: 'quads',
+    secondary: ['glutes'],
+    equipment: 'bodyweight',
+    isolation: false,
+    tracking: 'reps',
+    increment: 0,
+    kind: 'drill',
+    dose: '8 per leg',
+    perSide: true,
+    swaps: [],
+    sections: [
+      {
+        label: 'HOW',
+        items: [
+          'Step forward into a long stride. Lower until both knees are bent to about 90°, with your front knee over your toes.',
+          'Push through the front foot and step into the next lunge with the other leg.',
+          'Keep your chest tall and your steps steady.',
+        ],
+      },
+      {
+        label: 'IF IT HURTS',
+        items: ['Knee pain: take a shorter step and lower only part of the way.'],
+      },
+    ],
+  },
+  {
+    id: 'd_accel',
+    name: 'Accelerations',
+    muscles: 'Legs — short runs that build from easy to quick',
+    primary: 'quads',
+    secondary: ['hamstrings', 'calves'],
+    equipment: 'bodyweight',
+    isolation: false,
+    tracking: 'reps',
+    increment: 0,
+    kind: 'drill',
+    dose: '3 × 20 m',
+    swaps: [],
+    sections: [
+      {
+        label: 'HOW',
+        items: [
+          'Start with an easy run and build your speed gradually over the distance. By the end you are running fast but still smooth, not at a sprint.',
+          'Walk back to the start to recover between runs.',
+        ],
+      },
+      {
+        label: 'IF IT HURTS',
+        items: ['Any sharp pain in a leg: stop. Keep them smooth rather than all-out.'],
+      },
+    ],
+  },
+  {
+    id: 'd_strides',
+    name: 'Strides',
+    muscles: 'Legs — relaxed, quick runs for a run warm-up',
+    primary: 'quads',
+    secondary: ['hamstrings', 'calves'],
+    equipment: 'bodyweight',
+    isolation: false,
+    tracking: 'reps',
+    increment: 0,
+    kind: 'drill',
+    dose: '3 × 15–20 s',
+    swaps: [],
+    sections: [
+      {
+        label: 'HOW',
+        items: [
+          'Run at a quick but relaxed pace, about 80–90% of your top speed, with a smooth, quick stride.',
+          'Walk or jog easily until you feel ready to go again. Do 3 or 4.',
+        ],
+      },
+      {
+        label: 'IF IT HURTS',
+        items: ['Sharp pain in a calf or hamstring: stop and walk it off.'],
+      },
+    ],
+  },
+  {
+    id: 'd_passing',
+    name: 'Passing',
+    muscles: 'Legs and coordination — passing a ball back and forth',
+    primary: 'quads',
+    secondary: ['calves'],
+    equipment: 'bodyweight',
+    isolation: false,
+    tracking: 'reps',
+    increment: 0,
+    kind: 'drill',
+    dose: '2–3 min',
+    swaps: [],
+    sections: [
+      {
+        label: 'HOW',
+        items: [
+          'Pass a ball with a partner or against a wall, starting close together.',
+          'Move further apart every minute or so and use a little more power each time.',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'd_layups',
+    name: 'Layups and shots',
+    muscles: 'Legs, shoulders and coordination — basketball',
+    primary: 'quads',
+    secondary: ['calves', 'shoulders'],
+    equipment: 'bodyweight',
+    isolation: false,
+    tracking: 'reps',
+    increment: 0,
+    kind: 'drill',
+    dose: '2–3 min',
+    swaps: [],
+    sections: [
+      {
+        label: 'HOW',
+        items: [
+          'Start with easy layups and close shots. Build up to full speed and your usual shots over a few minutes.',
+          'Land softly on both feet.',
+        ],
+      },
+      {
+        label: 'IF IT HURTS',
+        items: ['Ankle or knee pain: slow down and take lower jumps.'],
+      },
+    ],
+  },
+  {
+    id: 'd_jumpbuild',
+    name: 'Jump build-up',
+    muscles: 'Legs — jumps that build from half effort to full',
+    primary: 'quads',
+    secondary: ['calves', 'glutes'],
+    equipment: 'bodyweight',
+    isolation: false,
+    tracking: 'reps',
+    increment: 0,
+    kind: 'drill',
+    dose: '5 + 5 + 3',
+    swaps: [],
+    sections: [
+      {
+        label: 'HOW',
+        items: [
+          'Do 5 jumps at half effort, 5 at three-quarters, then 3 at full effort.',
+          'Land softly with your knees bent, then reset between jumps.',
+        ],
+      },
+      {
+        label: 'IF IT HURTS',
+        items: ['Pain in a knee, ankle or the Achilles: stop, or stay at the lower effort.'],
+      },
+    ],
+  },
+  {
+    id: 'd_highknees',
+    name: 'High knees',
+    muscles: 'Hip flexors, calves, quads',
+    primary: 'quads',
+    secondary: ['calves'],
+    equipment: 'bodyweight',
+    isolation: false,
+    tracking: 'reps',
+    increment: 0,
+    kind: 'drill',
+    dose: '2 × 15 m',
+    swaps: [],
+    sections: [
+      {
+        label: 'HOW',
+        items: [
+          'Run on the spot or forward, lifting each knee to about hip height.',
+          'Pump your arms, stay tall and land on the balls of your feet.',
+        ],
+      },
+      {
+        label: 'IF IT HURTS',
+        items: ['Pain at the front of the hip: lift your knees lower.'],
+      },
+    ],
+  },
+  {
+    id: 'd_squat',
+    name: 'Bodyweight squat',
+    muscles: 'Quads, glutes',
+    primary: 'quads',
+    secondary: ['glutes'],
+    equipment: 'bodyweight',
+    isolation: false,
+    tracking: 'reps',
+    increment: 0,
+    kind: 'drill',
+    dose: '10',
+    swaps: [],
+    sections: [
+      {
+        label: 'HOW',
+        items: [
+          'Stand with your feet about shoulder-width apart, toes turned out a little.',
+          'Sit your hips back and down as far as you comfortably can, keeping your heels on the floor and your chest up.',
+          'Push through your whole foot to stand up.',
+        ],
+      },
+      {
+        label: 'IF IT HURTS',
+        items: ['Knee pain: squat to a shallower depth.'],
+      },
+    ],
+  },
+  {
+    id: 'd_hopstick',
+    name: 'Hop and stick',
+    muscles: 'Legs — landing control for the knees and ankles',
+    primary: 'quads',
+    secondary: ['glutes', 'calves'],
+    equipment: 'bodyweight',
+    isolation: false,
+    tracking: 'reps',
+    increment: 0,
+    kind: 'drill',
+    dose: '5 per leg, hold 2 s',
+    perSide: true,
+    swaps: [],
+    sections: [
+      {
+        label: 'HOW',
+        items: [
+          'Do a small hop forward or up off one leg.',
+          'Land softly on that same leg with your knee bent and over your toes. Hold still for 2 s.',
+          'Keep your hips level and your knee from falling inward.',
+        ],
+      },
+      {
+        label: 'IF IT HURTS',
+        items: ['Knee or ankle pain: make the hop smaller, or just balance on one leg.'],
+      },
+    ],
+  },
+  {
+    id: 's_quad',
+    name: 'Quad stretch',
+    muscles: 'Front of the thigh',
+    primary: 'quads',
+    equipment: 'bodyweight',
+    isolation: false,
+    tracking: 'reps',
+    increment: 0,
+    kind: 'stretch',
+    dose: '30 s per leg',
+    perSide: true,
+    swaps: [],
+    sections: [
+      {
+        label: 'HOW',
+        items: [
+          'Stand tall, holding a wall for balance. Bend one knee and hold that foot behind you.',
+          'Keep your knees close together and your hips pushed slightly forward.',
+          'Hold, then switch legs.',
+        ],
+      },
+      {
+        label: 'IF IT HURTS',
+        items: ['Knee pain: don’t pull the heel in as far.'],
+      },
+    ],
+  },
+];
