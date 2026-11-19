@@ -4,23 +4,22 @@ export type MuscleGroup =
   | 'shoulders'
   | 'biceps'
   | 'triceps'
+  | 'forearms'
   | 'quads'
   | 'hamstrings'
   | 'glutes'
+  | 'adductors'
   | 'calves'
   | 'core'
   | 'mobility';
 
-export type Equipment = 'dumbbell' | 'barbell' | 'cable' | 'machine' | 'bodyweight' | 'band';
+export type Equipment = 'dumbbell' | 'barbell' | 'kettlebell' | 'ab_wheel' | 'cable' | 'machine' | 'bodyweight' | 'band';
 
 /** weight_reps: log kg × reps. reps: bodyweight/band moves, reps only. */
 export type TrackingType = 'weight_reps' | 'reps';
 
-/**
- * main: in the plan's routines. care: shoulder-care drills. alternative: a swap option.
- * drill, stretch: warm-up and cool-down moves (phase 4). They never count as hard sets.
- */
-export type ExerciseKind = 'main' | 'care' | 'alternative' | 'drill' | 'stretch';
+/** Standard exercises count toward hard sets. Care, drills and stretches do not. */
+export type ExerciseKind = 'standard' | 'care' | 'drill' | 'stretch';
 
 export interface TechniqueSection {
   label: string;
@@ -36,14 +35,18 @@ export interface ExerciseDef {
   equipment: Equipment;
   isolation: boolean;
   tracking: TrackingType;
+  /** False for a loaded carry: each rep denotes a distance, so Epley's formula does not apply. */
+  estimate1RM?: false;
   /** Weight step in kg when it's time to go up. */
   increment: number;
   kind: ExerciseKind;
+  /** One of the guide's curated alternatives shown by the Swaps filter. */
+  swapOption?: boolean;
   sections: TechniqueSection[];
   warning?: string;
   /** Ids of exercises you can swap to. */
   swaps: string[];
-  /** Care drills: prescribed dose, e.g. "15 per side". */
+  /** A prescribed dose or a cue explaining what to log as one rep. */
   dose?: string;
   perSide?: boolean;
 }

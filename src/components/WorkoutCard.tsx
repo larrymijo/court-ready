@@ -86,8 +86,10 @@ export function WorkoutCard({ w }: { w: Workout }) {
         {w.exercises.slice(0, 5).map((e) => {
           const ex = EXERCISE_BY_ID[e.exerciseId];
           const working = e.sets.filter(isWorkingSet);
+          const score = (set: (typeof working)[number]) =>
+            ex?.estimate1RM === false ? (set.weight ?? 0) : e1rm(set.weight ?? 0, set.reps ?? 0);
           const best = working.reduce<(typeof working)[number] | null>(
-            (b, s) => (!b || e1rm(s.weight ?? 0, s.reps ?? 0) > e1rm(b.weight ?? 0, b.reps ?? 0) ? s : b),
+            (b, s) => (!b || score(s) > score(b) ? s : b),
             null,
           );
           return (

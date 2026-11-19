@@ -40,8 +40,8 @@ describe('plannedMuscleSets', () => {
 
   // Made-up exercises, to check each rule on its own.
   const defs: Record<string, ExerciseDef> = {
-    press: { id: 'press', primary: 'chest', secondary: ['triceps'], kind: 'main', isolation: false } as ExerciseDef,
-    curl: { id: 'curl', primary: 'biceps', kind: 'main', isolation: true } as ExerciseDef,
+    press: { id: 'press', primary: 'chest', secondary: ['triceps'], kind: 'standard', isolation: false } as ExerciseDef,
+    curl: { id: 'curl', primary: 'biceps', kind: 'standard', isolation: true } as ExerciseDef,
     drill: { id: 'drill', primary: 'shoulders', kind: 'care', isolation: true } as ExerciseDef,
   };
   const item = (key: string, exerciseId: string, sets: number) => ({

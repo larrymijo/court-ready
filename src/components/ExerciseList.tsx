@@ -11,7 +11,7 @@ import { useStore } from '@/store/useStore';
 import { C, R, S, SIZE, T } from '@/theme';
 
 /** Gym exercises: everything but the warm-up drills and cool-down stretches. */
-export function isLift(e: ExerciseDef): boolean {
+function isLift(e: ExerciseDef): boolean {
   return e.kind !== 'drill' && e.kind !== 'stretch';
 }
 
@@ -31,9 +31,11 @@ const MUSCLE_CODE: Record<string, string> = {
   shoulders: 'Sh',
   biceps: 'Bi',
   triceps: 'Tr',
+  forearms: 'Fo',
   quads: 'Qu',
   hamstrings: 'Ha',
   glutes: 'Gl',
+  adductors: 'Ad',
   calves: 'Ca',
   core: 'Co',
   mobility: 'Mo',
@@ -64,11 +66,10 @@ export function ExerciseList({
 
   const q = query.trim().toLowerCase();
   let list: ExerciseDef[] = EXERCISES.filter((e) => {
-    // Drills and stretches belong to the warm-up and cool-down checklists, not to a workout.
-    if (!isLift(e)) return false;
-    if (filter === 'plan' && !(e.kind === 'main' && inPlan.has(e.id))) return false;
+    if (adds && !isLift(e)) return false;
+    if (filter === 'plan' && !inPlan.has(e.id)) return false;
     if (filter === 'care' && e.kind !== 'care') return false;
-    if (filter === 'swaps' && e.kind !== 'alternative') return false;
+    if (filter === 'swaps' && !e.swapOption) return false;
     if (q && !`${e.name} ${e.muscles} ${e.primary}`.toLowerCase().includes(q)) return false;
     return true;
   });

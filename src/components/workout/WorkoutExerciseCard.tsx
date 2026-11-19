@@ -123,6 +123,7 @@ export function WorkoutExerciseCard({
         <IconButton icon="ellipsis-horizontal" size={20} label={`Options for ${ex.name}`} onPress={() => setMenu(true)} />
       </Row>
 
+      {ex.kind === 'standard' && ex.dose ? <Txt v="small">{ex.dose}</Txt> : null}
       {cue ? (
         <Txt v="small">
           <Text style={styles.cueLabel}>Key: </Text>

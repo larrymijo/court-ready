@@ -178,7 +178,7 @@ describe('the Sports section of the workout list', () => {
 describe('stats with sport records', () => {
   const ex = (kind: ExerciseDef['kind']): ExerciseDef =>
     ({ id: kind, name: kind, kind, primary: 'quads', secondary: ['glutes'], isolation: false, tracking: 'weightReps' }) as unknown as ExerciseDef;
-  const defs: Record<string, ExerciseDef> = { main: ex('main'), drill: ex('drill'), stretch: ex('stretch'), care: ex('care') };
+  const defs: Record<string, ExerciseDef> = { main: ex('standard'), drill: ex('drill'), stretch: ex('stretch'), care: ex('care') };
   const ids = ['main', 'drill', 'stretch', 'care'];
   const lifting: Workout = {
     ...gym(MON, 'court-ready', 'lower'),

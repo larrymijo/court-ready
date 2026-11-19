@@ -10,7 +10,7 @@ export const shouldersExercises: ExerciseDef[] = [
     isolation: true,
     tracking: 'weight_reps',
     increment: 1,
-    kind: 'main',
+    kind: 'standard',
     swaps: [],
     sections: [
       {
@@ -53,7 +53,7 @@ export const shouldersExercises: ExerciseDef[] = [
     isolation: true,
     tracking: 'weight_reps',
     increment: 2.5,
-    kind: 'main',
+    kind: 'standard',
     swaps: ['alt_bandfacepull', 'revpec'],
     sections: [
       {
@@ -93,7 +93,7 @@ export const shouldersExercises: ExerciseDef[] = [
     isolation: true,
     tracking: 'weight_reps',
     increment: 2.5,
-    kind: 'main',
+    kind: 'standard',
     swaps: ['alt_reardeltfly', 'c_pullapart'],
     sections: [
       {
@@ -243,7 +243,8 @@ export const shouldersExercises: ExerciseDef[] = [
     isolation: true,
     tracking: 'reps',
     increment: 0,
-    kind: 'alternative',
+    kind: 'standard',
+    swapOption: true,
     swaps: ['facepull'],
     sections: [
       {
@@ -266,7 +267,8 @@ export const shouldersExercises: ExerciseDef[] = [
     isolation: true,
     tracking: 'weight_reps',
     increment: 2.5,
-    kind: 'alternative',
+    kind: 'standard',
+    swapOption: true,
     swaps: ['revpec'],
     sections: [
       {
@@ -289,7 +291,7 @@ export const shouldersExercises: ExerciseDef[] = [
     isolation: false,
     tracking: 'weight_reps',
     increment: 2,
-    kind: 'main',
+    kind: 'standard',
     swaps: ['alt_inclinemachine'],
     sections: [
       {
@@ -347,6 +349,159 @@ export const shouldersExercises: ExerciseDef[] = [
       {
         label: 'IF IT HURTS',
         items: ['Pinching in the shoulder: keep the circles small and below shoulder height.'],
+      },
+    ],
+  },
+  {
+    id: 'barbell_overhead_press',
+    name: 'Standing barbell overhead press',
+    muscles: 'Front and side shoulders, triceps and core',
+    primary: 'shoulders',
+    secondary: ['triceps', 'core'],
+    equipment: 'barbell',
+    isolation: false,
+    tracking: 'weight_reps',
+    increment: 2.5,
+    kind: 'standard',
+    swaps: ['shoulderpress', 'machine_shoulder_press'],
+    sections: [
+      {
+        label: 'HOW',
+        items: [
+          'Take the bar from a rack at upper-chest height. Stand with your feet planted, elbows slightly ahead of the bar and wrists over your forearms.',
+          'Brace and move your chin back just enough to press the bar past your face. Finish with the bar above your shoulders, then guide it back to your upper chest.',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'arnold_press',
+    name: 'Arnold press',
+    muscles: 'Front and side shoulders and triceps',
+    primary: 'shoulders',
+    secondary: ['triceps'],
+    equipment: 'dumbbell',
+    isolation: false,
+    tracking: 'weight_reps',
+    increment: 2,
+    kind: 'standard',
+    swaps: ['shoulderpress', 'machine_shoulder_press'],
+    sections: [
+      {
+        label: 'HOW',
+        items: [
+          'Sit against an upright bench with dumbbells in front of your shoulders, elbows bent and palms toward you.',
+          'Open your elbows and turn your palms forward as you press overhead in one smooth motion. Reverse the turn as the weights return to shoulder height.',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'machine_shoulder_press',
+    name: 'Machine shoulder press',
+    muscles: 'Front and side shoulders and triceps',
+    primary: 'shoulders',
+    secondary: ['triceps'],
+    equipment: 'machine',
+    isolation: false,
+    tracking: 'weight_reps',
+    increment: 2.5,
+    kind: 'standard',
+    swaps: ['shoulderpress', 'barbell_overhead_press'],
+    sections: [
+      {
+        label: 'HOW',
+        items: [
+          'Adjust the seat so the handles start around shoulder height. Set your feet flat and keep your upper back against the pad.',
+          'Press the handles overhead with your wrists in line with your forearms. Lower them with control to your starting height.',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'single_arm_cable_lateral_raise',
+    name: 'Single-arm cable lateral raise',
+    muscles: 'Side shoulders',
+    primary: 'shoulders',
+    equipment: 'cable',
+    isolation: true,
+    tracking: 'weight_reps',
+    increment: 1,
+    kind: 'standard',
+    perSide: true,
+    swaps: ['lateral'],
+    sections: [
+      {
+        label: 'HOW',
+        items: [
+          'Stand sideways to a low pulley and hold its handle with the hand farther from the stack. Begin with your hand in front of the opposite thigh.',
+          'Lead with your elbow and lift the handle out to the side, slightly forward of your shoulder. Pause around shoulder height, then lower slowly.',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'dumbbell_front_raise',
+    name: 'Dumbbell front raise',
+    muscles: 'Front shoulders',
+    primary: 'shoulders',
+    equipment: 'dumbbell',
+    isolation: true,
+    tracking: 'weight_reps',
+    increment: 1,
+    kind: 'standard',
+    swaps: ['shoulderpress'],
+    sections: [
+      {
+        label: 'HOW',
+        items: [
+          'Stand with a light dumbbell in each hand just in front of your thighs. Keep your knees soft and your ribs over your hips.',
+          'Lift the weights forward to about shoulder height with a slight bend at the elbows. Lower them slowly without swinging your torso.',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'dumbbell_rear_delt_fly',
+    name: 'Seated dumbbell rear-delt fly',
+    muscles: 'Rear shoulders and upper back',
+    primary: 'shoulders',
+    secondary: ['back'],
+    equipment: 'dumbbell',
+    isolation: true,
+    tracking: 'weight_reps',
+    increment: 1,
+    kind: 'standard',
+    swaps: ['revpec', 'alt_reardeltfly'],
+    sections: [
+      {
+        label: 'HOW',
+        items: [
+          'Sit near the end of a bench with a dumbbell in each hand and your feet planted. Hinge forward and let the weights hang beside your lower legs, palms facing each other.',
+          'Keep your chest still as you open both arms out to the sides. Stop when your upper arms are roughly level with your torso, then lower the weights together.',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'barbell_upright_row',
+    name: 'Barbell upright row',
+    muscles: 'Side shoulders and upper trapezius',
+    primary: 'shoulders',
+    secondary: ['back'],
+    equipment: 'barbell',
+    isolation: false,
+    tracking: 'weight_reps',
+    increment: 2.5,
+    kind: 'standard',
+    swaps: ['lateral', 'facepull'],
+    sections: [
+      {
+        label: 'HOW',
+        items: [
+          'Hold a light barbell in front of your thighs with an overhand grip around shoulder width. Stand tall with the bar close to your body.',
+          'Lead with your elbows to lift the bar to a comfortable height, keeping elbows at or below shoulder level. Lower along the same path.',
+        ],
       },
     ],
   },

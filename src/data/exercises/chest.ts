@@ -11,7 +11,7 @@ export const chestExercises: ExerciseDef[] = [
     isolation: false,
     tracking: 'weight_reps',
     increment: 2,
-    kind: 'main',
+    kind: 'standard',
     swaps: ['alt_inclinemachine', 'pushup'],
     sections: [
       {
@@ -56,7 +56,7 @@ export const chestExercises: ExerciseDef[] = [
     isolation: true,
     tracking: 'weight_reps',
     increment: 2.5,
-    kind: 'main',
+    kind: 'standard',
     swaps: ['alt_pecdeck'],
     sections: [
       {
@@ -97,7 +97,7 @@ export const chestExercises: ExerciseDef[] = [
     isolation: false,
     tracking: 'weight_reps',
     increment: 2,
-    kind: 'main',
+    kind: 'standard',
     swaps: ['alt_machinepress', 'alt_floorpress', 'pushup'],
     sections: [
       {
@@ -135,7 +135,7 @@ export const chestExercises: ExerciseDef[] = [
     isolation: true,
     tracking: 'weight_reps',
     increment: 2.5,
-    kind: 'main',
+    kind: 'standard',
     swaps: ['alt_pecdeck'],
     sections: [
       {
@@ -171,7 +171,7 @@ export const chestExercises: ExerciseDef[] = [
     isolation: false,
     tracking: 'reps',
     increment: 0,
-    kind: 'main',
+    kind: 'standard',
     swaps: ['alt_machinepress'],
     sections: [
       {
@@ -208,7 +208,8 @@ export const chestExercises: ExerciseDef[] = [
     isolation: false,
     tracking: 'weight_reps',
     increment: 2.5,
-    kind: 'alternative',
+    kind: 'standard',
+    swapOption: true,
     swaps: ['incline'],
     sections: [
       {
@@ -235,7 +236,8 @@ export const chestExercises: ExerciseDef[] = [
     isolation: false,
     tracking: 'weight_reps',
     increment: 2.5,
-    kind: 'alternative',
+    kind: 'standard',
+    swapOption: true,
     swaps: ['pushup', 'flatpress'],
     sections: [
       {
@@ -258,7 +260,8 @@ export const chestExercises: ExerciseDef[] = [
     isolation: false,
     tracking: 'weight_reps',
     increment: 2,
-    kind: 'alternative',
+    kind: 'standard',
+    swapOption: true,
     swaps: ['flatpress'],
     sections: [
       {
@@ -280,7 +283,8 @@ export const chestExercises: ExerciseDef[] = [
     isolation: true,
     tracking: 'weight_reps',
     increment: 2.5,
-    kind: 'alternative',
+    kind: 'standard',
+    swapOption: true,
     swaps: ['cablefly'],
     sections: [
       {
@@ -307,7 +311,7 @@ export const chestExercises: ExerciseDef[] = [
     isolation: false,
     tracking: 'weight_reps',
     increment: 2.5,
-    kind: 'main',
+    kind: 'standard',
     swaps: ['flatpress', 'alt_machinepress'],
     sections: [
       {
@@ -367,6 +371,182 @@ export const chestExercises: ExerciseDef[] = [
       {
         label: 'IF IT HURTS',
         items: ['Pinching at the front of the shoulder: lower your elbow.'],
+      },
+    ],
+  },
+  {
+    id: 'incline_barbell_bench_press',
+    name: 'Incline barbell bench press',
+    muscles: 'Upper chest, front shoulders, triceps',
+    primary: 'chest',
+    secondary: ['shoulders', 'triceps'],
+    equipment: 'barbell',
+    isolation: false,
+    tracking: 'weight_reps',
+    increment: 2.5,
+    kind: 'standard',
+    swaps: ['incline', 'alt_inclinemachine'],
+    sections: [
+      {
+        label: 'HOW',
+        items: [
+          'Set a bench to a low incline inside the rack. Plant your feet and take a grip that keeps your wrists over your elbows at the bottom.',
+          'Unrack the bar over your shoulders. Bring it down to your upper chest with your shoulder blades against the bench, then press back up.',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'decline_barbell_bench_press',
+    name: 'Decline barbell bench press',
+    muscles: 'Chest, front shoulders, triceps',
+    primary: 'chest',
+    secondary: ['shoulders', 'triceps'],
+    equipment: 'barbell',
+    isolation: false,
+    tracking: 'weight_reps',
+    increment: 2.5,
+    kind: 'standard',
+    swaps: ['benchpress', 'alt_machinepress'],
+    sections: [
+      {
+        label: 'HOW',
+        items: [
+          'Use a decline bench with leg pads and have a spotter help with the handoff. Hook your legs under the pads before taking the bar.',
+          'Hold the bar over your shoulders, lower it toward the bottom of your chest, then press up. Keep the bar stacked over your wrists and your upper back on the pad.',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'dumbbell_bench_press',
+    name: 'Dumbbell bench press (overhand grip)',
+    muscles: 'Chest, front shoulders, triceps',
+    primary: 'chest',
+    secondary: ['shoulders', 'triceps'],
+    equipment: 'dumbbell',
+    isolation: false,
+    tracking: 'weight_reps',
+    increment: 2,
+    kind: 'standard',
+    swaps: ['flatpress', 'alt_machinepress'],
+    sections: [
+      {
+        label: 'HOW',
+        items: [
+          'Lie on a flat bench with your feet planted. Hold one dumbbell above each shoulder with palms facing your feet.',
+          'Lower the weights to either side of your chest with your forearms upright. Press them back up and finish with your wrists over your shoulders.',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'dumbbell_fly',
+    name: 'Flat dumbbell fly',
+    muscles: 'Chest and front shoulders',
+    primary: 'chest',
+    secondary: ['shoulders'],
+    equipment: 'dumbbell',
+    isolation: true,
+    tracking: 'weight_reps',
+    increment: 1,
+    kind: 'standard',
+    swaps: ['cablefly', 'alt_pecdeck'],
+    sections: [
+      {
+        label: 'HOW',
+        items: [
+          'Lie on a flat bench with light dumbbells above your chest, palms facing each other. Soften both elbows.',
+          'Keeping that elbow angle, open your arms in a wide arc to a comfortable chest stretch. Bring the weights together along the same arc.',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'incline_dumbbell_fly',
+    name: 'Incline dumbbell fly',
+    muscles: 'Upper chest and front shoulders',
+    primary: 'chest',
+    secondary: ['shoulders'],
+    equipment: 'dumbbell',
+    isolation: true,
+    tracking: 'weight_reps',
+    increment: 1,
+    kind: 'standard',
+    swaps: ['lowhighfly', 'dumbbell_fly'],
+    sections: [
+      {
+        label: 'HOW',
+        items: [
+          'Set the bench to a low incline. Rest your head on the pad and hold the dumbbells over your upper chest with palms facing in.',
+          'Keep a slight bend in your elbows as you open your arms to the sides. Reverse the arc when you feel a gentle stretch across your chest.',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'chest_dip',
+    name: 'Chest dip (forward lean)',
+    muscles: 'Chest, triceps, front shoulders',
+    primary: 'chest',
+    secondary: ['triceps', 'shoulders'],
+    equipment: 'bodyweight',
+    isolation: false,
+    tracking: 'weight_reps',
+    increment: 2.5,
+    kind: 'standard',
+    swaps: ['alt_machinepress', 'pushup'],
+    sections: [
+      {
+        label: 'HOW',
+        items: [
+          'Support yourself on parallel bars. Lean your chest slightly forward and keep that angle as you bend your elbows.',
+          'Lower only as far as your shoulders feel comfortable, then press into both bars to rise. Use the assist machine if you cannot control the descent.',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'smith_bench_press',
+    name: 'Smith machine bench press',
+    muscles: 'Chest, front shoulders, triceps',
+    primary: 'chest',
+    secondary: ['shoulders', 'triceps'],
+    equipment: 'machine',
+    isolation: false,
+    tracking: 'weight_reps',
+    increment: 2.5,
+    kind: 'standard',
+    swaps: ['benchpress', 'alt_machinepress'],
+    sections: [
+      {
+        label: 'HOW',
+        items: [
+          'Center a flat bench under the Smith bar. With the empty bar, check that the path reaches your chest with upright forearms and set the safety stops.',
+          'Plant your feet and release the hooks. Lower the bar with control, press up along the rails, then rehook the bar at the end of the set.',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'dumbbell_pullover',
+    name: 'Dumbbell pullover',
+    muscles: 'Chest and lats',
+    primary: 'chest',
+    secondary: ['back'],
+    equipment: 'dumbbell',
+    isolation: true,
+    tracking: 'weight_reps',
+    increment: 2,
+    kind: 'standard',
+    swaps: ['straight_arm_pulldown', 'cablefly'],
+    sections: [
+      {
+        label: 'HOW',
+        items: [
+          'Lie along a flat bench with both feet planted. Hold one fixed-head dumbbell securely in both hands over your chest.',
+          'Keep your ribs down and your elbows slightly bent. Take the weight back over your head only as far as your upper back stays on the bench, then bring it back over your chest.',
+        ],
       },
     ],
   },

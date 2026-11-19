@@ -1,3 +1,4 @@
+import { EXERCISE_BY_ID } from '@/data/exercises';
 import { mondayOfISO, isoFromTimestamp } from '@/lib/dates';
 import { isNonHardKind, plannedGymWorkouts, prescribeItem } from '@/lib/plans';
 import type { ExerciseDef, MuscleGroup, PhaseId, Plan, PR, PRKind, Workout, WorkoutSet } from '@/lib/types';
@@ -55,7 +56,7 @@ function consider(bests: ExerciseBests, kind: PRKind, value: number, s: WorkoutS
 }
 
 /** Best sets for one exercise across finished workouts (optionally only those before a time). */
-export function exerciseBests(exerciseId: string, workouts: Workout[], before?: number): ExerciseBests {
+export function exerciseBests(exerciseId: string, workouts: Workout[], before?: number, def = EXERCISE_BY_ID[exerciseId]): ExerciseBests {
   const bests: ExerciseBests = {};
   for (const w of workouts) {
     if (!w.finishedAt) continue;
@@ -64,7 +65,7 @@ export function exerciseBests(exerciseId: string, workouts: Workout[], before?: 
       if (ex.exerciseId !== exerciseId) continue;
       for (const s of ex.sets.filter(isWorkingSet)) {
         consider(bests, 'weight', s.weight ?? 0, s, w.startedAt);
-        consider(bests, 'e1rm', e1rm(s.weight ?? 0, s.reps ?? 0), s, w.startedAt);
+        if (def?.estimate1RM !== false) consider(bests, 'e1rm', e1rm(s.weight ?? 0, s.reps ?? 0), s, w.startedAt);
         consider(bests, 'volume', setVolume(s), s, w.startedAt);
         consider(bests, 'reps', s.reps ?? 0, s, w.startedAt);
       }
@@ -89,7 +90,7 @@ export function detectPRs(
     if (seen.has(ex.exerciseId)) continue;
     seen.add(ex.exerciseId);
     const def = getExercise(ex.exerciseId);
-    const before = exerciseBests(ex.exerciseId, earlier, workout.startedAt);
+    const before = exerciseBests(ex.exerciseId, earlier, workout.startedAt, def);
     if (!before.reps) continue;
     const sets = workout.exercises
       .filter((e) => e.exerciseId === ex.exerciseId)
@@ -97,7 +98,7 @@ export function detectPRs(
     const now: ExerciseBests = {};
     for (const s of sets) {
       consider(now, 'weight', s.weight ?? 0, s, workout.startedAt);
-      consider(now, 'e1rm', e1rm(s.weight ?? 0, s.reps ?? 0), s, workout.startedAt);
+      if (def?.estimate1RM !== false) consider(now, 'e1rm', e1rm(s.weight ?? 0, s.reps ?? 0), s, workout.startedAt);
       consider(now, 'volume', setVolume(s), s, workout.startedAt);
       consider(now, 'reps', s.reps ?? 0, s, workout.startedAt);
     }
@@ -124,6 +125,7 @@ export interface SeriesPoint {
 /** One point per workout for an exercise, oldest first. */
 export function exerciseSeries(exerciseId: string, workouts: Workout[]): SeriesPoint[] {
   const points: SeriesPoint[] = [];
+  const estimateMax = EXERCISE_BY_ID[exerciseId]?.estimate1RM !== false;
   for (const w of workouts) {
     if (!w.finishedAt) continue;
     const sets = w.exercises.filter((e) => e.exerciseId === exerciseId).flatMap((e) => e.sets.filter(isWorkingSet));
@@ -131,7 +133,7 @@ export function exerciseSeries(exerciseId: string, workouts: Workout[]): SeriesP
     points.push({
       date: w.startedAt,
       topWeight: Math.max(...sets.map((s) => s.weight ?? 0)),
-      bestE1rm: Math.max(...sets.map((s) => e1rm(s.weight ?? 0, s.reps ?? 0))),
+      bestE1rm: estimateMax ? Math.max(...sets.map((s) => e1rm(s.weight ?? 0, s.reps ?? 0))) : 0,
       bestReps: Math.max(...sets.map((s) => s.reps ?? 0)),
       volume: sets.reduce((a, s) => a + setVolume(s), 0),
     });

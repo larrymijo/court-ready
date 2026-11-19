@@ -1,10 +1,12 @@
 import type { ExerciseDef } from '@/lib/types';
 
+import { adductorsExercises } from './exercises/adductors';
 import { backExercises } from './exercises/back';
 import { bicepsExercises } from './exercises/biceps';
 import { calvesExercises } from './exercises/calves';
 import { chestExercises } from './exercises/chest';
 import { coreExercises } from './exercises/core';
+import { forearmsExercises } from './exercises/forearms';
 import { glutesExercises } from './exercises/glutes';
 import { hamstringsExercises } from './exercises/hamstrings';
 import { mobilityExercises } from './exercises/mobility';
@@ -33,11 +35,13 @@ const catalogOrder = [
 const positionById = new Map(catalogOrder.map((id, index) => [id, index]));
 
 export const EXERCISES: ExerciseDef[] = [
+  ...adductorsExercises,
   ...backExercises,
   ...bicepsExercises,
   ...calvesExercises,
   ...chestExercises,
   ...coreExercises,
+  ...forearmsExercises,
   ...glutesExercises,
   ...hamstringsExercises,
   ...mobilityExercises,

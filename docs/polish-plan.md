@@ -2,7 +2,7 @@
 
 This is the Court-Ready polish plan (first written 9 Nov 2026), revised on 11 Nov 2026 for a broader direction: the app becomes **Hybrid**, one place for sport and gym training in the same weekly plan. The file keeps its name so existing links still work.
 
-**Status on 15 Nov:** this revision was approved on 11 Nov, keeping the current web address. Phases 0 to 3 are live in your main app: the app has been called Hybrid since 11 Nov, and plans and weekly splits have been live since 15 Nov. Sports sessions are not built yet.
+**Status on 19 Nov 2026.** Phases 0 to 4 are live in Hybrid. The owner tested sports sessions on beta before the 19 Nov release to the main app. Phase 5 is in development on local beta.
 
 Design reference: [Court-Ready Monochrome canvas](https://claude.ai/artifact/2C6G8CAQJLNT8wrDwTv3LU) with eight screens. The new screens (plan list, week view, week editor, sport session) are drawn there at the start of their phase and agreed before they are built.
 
@@ -357,7 +357,7 @@ Data checks:
 - The rehearsal with your real backup on the beta copy (section 11).
 - "Go back to that copy" returns the data from before the update.
 
-### Phase 4. Sports sessions
+### Phase 4. Sports sessions (live since 19 Nov)
 
 You get: volleyball, basketball, football and running as sessions you start, warm up for, log and cool down from, in any plan's week and from the workout list; and a cool-down after gym workouts.
 

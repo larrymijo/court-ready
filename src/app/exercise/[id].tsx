@@ -18,7 +18,7 @@ type Tab = 'how' | 'history' | 'records';
 
 /** "dumbbell" → "Dumbbell" */
 function capitalise(word: string): string {
-  return word.charAt(0).toUpperCase() + word.slice(1);
+  return word.charAt(0).toUpperCase() + word.slice(1).replace(/_/g, ' ');
 }
 
 export default function ExerciseScreen() {
@@ -53,6 +53,7 @@ export default function ExerciseScreen() {
 
   const usedIn = exerciseUsage(plan, ex.id);
   const weight = ex.tracking === 'weight_reps';
+  const showEstimatedMax = weight && ex.estimate1RM !== false;
   // A drill or a stretch is read, never lifted or logged: how-to only, no lift tag, tabs or tempo line.
   const readOnly = ex.kind === 'drill' || ex.kind === 'stretch';
 
@@ -64,13 +65,13 @@ export default function ExerciseScreen() {
           <View style={{ gap: 2 }}>
             <Txt v="label">{ex.kind === 'care'
                 ? 'Shoulder care'
-                : ex.kind === 'alternative'
+                : ex.swapOption
                   ? 'Swap option'
                   : ex.kind === 'drill'
                     ? 'Warm-up drill'
                     : ex.kind === 'stretch'
                       ? 'Stretch'
-                      : 'In your plan'}</Txt>
+                      : usedIn.length ? 'In your plan' : 'Exercise'}</Txt>
             <Txt v="title">{ex.name}</Txt>
           </View>
           <Txt color={C.textMuted}>{ex.muscles}</Txt>
@@ -145,7 +146,7 @@ export default function ExerciseScreen() {
             {readOnly ? null : (
               <Button
                 variant="ghost"
-                title="Every rep: 2–3 s down, a short pause in the stretch, controlled up. See the rules"
+                title="Technique guide"
                 iconRight="chevron-forward"
                 onPress={() => router.push('/guide/technique')}
               />
@@ -187,23 +188,25 @@ export default function ExerciseScreen() {
                 {weight ? (
                   <>
                     <StatTile label="Heaviest" value={`${formatKg(bests.weight?.value ?? 0)} kg`} />
-                    <StatTile label="Best est. 1RM" value={`${formatKg(Math.round((bests.e1rm?.value ?? 0) * 10) / 10)} kg`} />
+                    {showEstimatedMax ? <StatTile label="Best est. 1RM" value={`${formatKg(Math.round((bests.e1rm?.value ?? 0) * 10) / 10)} kg`} /> : null}
                     <StatTile label="Best set" value={`${Math.round(bests.volume?.value ?? 0)} kg`} caption="weight × reps" />
                   </>
                 ) : (
                   <StatTile label="Most reps in a set" value={String(bests.reps?.value ?? 0)} />
                 )}
               </Row>
-              <Card>
-                <Txt v="label">{weight ? 'Estimated 1RM' : 'Best set (reps)'}</Txt>
-                <LineChart
-                  points={series.map((p) => ({ x: p.date, y: weight ? p.bestE1rm : p.bestReps }))}
-                  formatY={(v) => (weight ? `${formatKg(Math.round(v * 10) / 10)}` : String(Math.round(v)))}
-                />
-                {weight ? (
-                  <Txt v="caption">Estimated from your best set each session (weight × reps). Going up means getting stronger.</Txt>
-                ) : null}
-              </Card>
+              {showEstimatedMax || !weight ? (
+                <Card>
+                  <Txt v="label">{weight ? 'Estimated 1RM' : 'Best set (reps)'}</Txt>
+                  <LineChart
+                    points={series.map((p) => ({ x: p.date, y: weight ? p.bestE1rm : p.bestReps }))}
+                    formatY={(v) => (weight ? `${formatKg(Math.round(v * 10) / 10)}` : String(Math.round(v)))}
+                  />
+                  {weight ? (
+                    <Txt v="caption">Estimated from your best set each session (weight × reps). Going up means getting stronger.</Txt>
+                  ) : null}
+                </Card>
+              ) : null}
               {weight ? (
                 <Card>
                   <Txt v="label">Top weight</Txt>

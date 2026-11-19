@@ -11,7 +11,7 @@ export const hamstringsExercises: ExerciseDef[] = [
     isolation: false,
     tracking: 'weight_reps',
     increment: 2,
-    kind: 'main',
+    kind: 'standard',
     swaps: ['alt_backext'],
     sections: [
       {
@@ -48,7 +48,7 @@ export const hamstringsExercises: ExerciseDef[] = [
     isolation: true,
     tracking: 'weight_reps',
     increment: 2.5,
-    kind: 'main',
+    kind: 'standard',
     swaps: ['alt_lyinglegcurl'],
     sections: [
       {
@@ -82,7 +82,8 @@ export const hamstringsExercises: ExerciseDef[] = [
     isolation: false,
     tracking: 'weight_reps',
     increment: 2.5,
-    kind: 'alternative',
+    kind: 'standard',
+    swapOption: true,
     swaps: ['rdl'],
     sections: [
       {
@@ -104,7 +105,8 @@ export const hamstringsExercises: ExerciseDef[] = [
     isolation: true,
     tracking: 'weight_reps',
     increment: 2.5,
-    kind: 'alternative',
+    kind: 'standard',
+    swapOption: true,
     swaps: ['legcurl'],
     sections: [
       {
@@ -126,7 +128,7 @@ export const hamstringsExercises: ExerciseDef[] = [
     isolation: false,
     tracking: 'weight_reps',
     increment: 2.5,
-    kind: 'main',
+    kind: 'standard',
     swaps: ['rdl', 'alt_backext'],
     sections: [
       {
@@ -182,6 +184,50 @@ export const hamstringsExercises: ExerciseDef[] = [
       {
         label: 'IF IT HURTS',
         items: ['Pain behind the knee or a pulling at the sit bone: ease off.'],
+      },
+    ],
+  },
+  {
+    id: 'good_morning',
+    name: 'Barbell good morning',
+    muscles: 'Hamstrings, glutes and spinal erectors',
+    primary: 'hamstrings',
+    secondary: ['glutes', 'back'],
+    equipment: 'barbell',
+    isolation: false,
+    tracking: 'weight_reps',
+    increment: 2.5,
+    kind: 'standard',
+    swaps: ['barbellrdl', 'alt_backext'],
+    sections: [
+      {
+        label: 'HOW',
+        items: [
+          'Rest a light bar across your upper back and stand with a small bend in your knees. Brace before each rep.',
+          'Move your hips back and tip your torso forward as one unit. When you reach the end of your hip hinge, drive your hips forward to stand.',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'glute_ham_raise',
+    name: 'Glute-ham raise',
+    muscles: 'Hamstrings and glutes',
+    primary: 'hamstrings',
+    secondary: ['glutes'],
+    equipment: 'machine',
+    isolation: false,
+    tracking: 'reps',
+    increment: 0,
+    kind: 'standard',
+    swaps: ['legcurl', 'alt_lyinglegcurl'],
+    sections: [
+      {
+        label: 'HOW',
+        items: [
+          'Adjust the glute-ham developer so your feet are secure and your knees are supported by the pad. Start upright with your hips extended.',
+          'Slowly extend your knees to lower your torso toward horizontal. Bend your knees to pull yourself upright, keeping your shoulders, hips and knees in line.',
+        ],
       },
     ],
   },

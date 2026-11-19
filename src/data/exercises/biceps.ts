@@ -10,7 +10,7 @@ export const bicepsExercises: ExerciseDef[] = [
     isolation: true,
     tracking: 'weight_reps',
     increment: 2,
-    kind: 'main',
+    kind: 'standard',
     swaps: ['alt_cablecurl', 'hammer'],
     sections: [
       {
@@ -52,7 +52,7 @@ export const bicepsExercises: ExerciseDef[] = [
     isolation: true,
     tracking: 'weight_reps',
     increment: 2,
-    kind: 'main',
+    kind: 'standard',
     swaps: ['alt_ropecurl', 'curl'],
     sections: [
       {
@@ -82,7 +82,8 @@ export const bicepsExercises: ExerciseDef[] = [
     isolation: true,
     tracking: 'weight_reps',
     increment: 2.5,
-    kind: 'alternative',
+    kind: 'standard',
+    swapOption: true,
     swaps: ['curl'],
     sections: [
       {
@@ -103,7 +104,8 @@ export const bicepsExercises: ExerciseDef[] = [
     isolation: true,
     tracking: 'weight_reps',
     increment: 2.5,
-    kind: 'alternative',
+    kind: 'standard',
+    swapOption: true,
     swaps: ['hammer'],
     sections: [
       {
@@ -111,6 +113,115 @@ export const bicepsExercises: ExerciseDef[] = [
         items: [
           'Rope on a low pulley, palms facing each other.',
           'Elbows stay by your sides. Curl up, squeeze, lower in 2–3 s.',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'barbell_curl',
+    name: 'Standing barbell curl',
+    muscles: 'Biceps and forearms',
+    primary: 'biceps',
+    secondary: ['forearms'],
+    equipment: 'barbell',
+    isolation: true,
+    tracking: 'weight_reps',
+    increment: 2.5,
+    kind: 'standard',
+    swaps: ['curl', 'ez_bar_curl'],
+    sections: [
+      {
+        label: 'HOW',
+        items: [
+          'Stand with an underhand grip on the bar, hands about shoulder width apart. Let it hang in front of your thighs.',
+          'Bend your elbows to curl the bar up while your upper arms stay beside your ribs. Lower to straight arms with your wrists in line with your forearms.',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'ez_bar_curl',
+    name: 'EZ-bar curl',
+    muscles: 'Biceps and forearms',
+    primary: 'biceps',
+    secondary: ['forearms'],
+    equipment: 'barbell',
+    isolation: true,
+    tracking: 'weight_reps',
+    increment: 2.5,
+    kind: 'standard',
+    swaps: ['barbell_curl', 'alt_cablecurl'],
+    sections: [
+      {
+        label: 'HOW',
+        items: [
+          'Hold the angled grips of an EZ bar so your palms turn slightly inward. Stand with the bar at your thighs and elbows close to your body.',
+          'Curl the bar up without leaning back. Lower through the same arc until your elbows straighten.',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'incline_dumbbell_curl',
+    name: 'Incline dumbbell curl',
+    muscles: 'Biceps',
+    primary: 'biceps',
+    equipment: 'dumbbell',
+    isolation: true,
+    tracking: 'weight_reps',
+    increment: 1,
+    kind: 'standard',
+    swaps: ['curl', 'alt_cablecurl'],
+    sections: [
+      {
+        label: 'HOW',
+        items: [
+          'Sit on an incline bench with your head and back supported. Let a dumbbell hang from each hand at your sides with palms facing forward.',
+          'Curl the weights while your upper arms hang still. Lower slowly until your arms are long again, keeping your back against the pad.',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'preacher_curl',
+    name: 'EZ-bar preacher curl',
+    muscles: 'Biceps and forearms',
+    primary: 'biceps',
+    secondary: ['forearms'],
+    equipment: 'barbell',
+    isolation: true,
+    tracking: 'weight_reps',
+    increment: 2.5,
+    kind: 'standard',
+    swaps: ['concentration_curl', 'alt_cablecurl'],
+    sections: [
+      {
+        label: 'HOW',
+        items: [
+          'Adjust the preacher seat until the tops of your upper arms rest securely on the pad. Take an underhand grip on the angled parts of the EZ bar.',
+          'Curl toward your shoulders while keeping your upper arms in contact with the pad. Lower slowly to a comfortable stretch before the next curl.',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'concentration_curl',
+    name: 'Dumbbell concentration curl',
+    muscles: 'Biceps',
+    primary: 'biceps',
+    equipment: 'dumbbell',
+    isolation: true,
+    tracking: 'weight_reps',
+    increment: 1,
+    kind: 'standard',
+    perSide: true,
+    swaps: ['curl', 'preacher_curl'],
+    sections: [
+      {
+        label: 'HOW',
+        items: [
+          'Sit on a bench with your feet apart. Hold a dumbbell in one hand and brace the back of that upper arm against your inner thigh.',
+          'Turn your palm up, curl the weight toward your shoulder and lower slowly. Finish the reps on one side before switching arms.',
         ],
       },
     ],

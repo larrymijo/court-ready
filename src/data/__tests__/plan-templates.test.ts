@@ -162,6 +162,29 @@ describe.each(Object.entries(TABLES))('example plan %s', (planId, { plan, workou
 });
 
 describe('exercise library', () => {
+  it('contains the 117 gym exercises and 28 warm-up drills and stretches', () => {
+    const lifts = EXERCISES.filter((ex) => ex.kind === 'standard' || ex.kind === 'care');
+    expect(lifts).toHaveLength(117);
+    expect(EXERCISES.length - lifts.length).toBe(28);
+  });
+
+  it('provides logging defaults, technique instructions and valid swap targets for every exercise', () => {
+    for (const ex of EXERCISES) {
+      expect(ex.id).toMatch(/^[a-z][a-z0-9_]*$/);
+      expect(ex.name.trim()).toBeTruthy();
+      expect(ex.muscles.trim()).toBeTruthy();
+      expect(ex.sections.length).toBeGreaterThan(0);
+      for (const section of ex.sections) {
+        expect(section.label.trim()).toBeTruthy();
+        expect(section.items.length).toBeGreaterThan(0);
+        expect(section.items.every((line) => line.trim().length > 0)).toBe(true);
+      }
+      if (ex.tracking === 'reps') expect(ex.increment).toBe(0);
+      else expect(ex.increment).toBeGreaterThan(0);
+      for (const id of ex.swaps) expect(getExercise(id).id).toBe(id);
+    }
+  });
+
   it('has unique ids', () => {
     const ids = EXERCISES.map((e) => e.id);
     expect(new Set(ids).size).toBe(ids.length);
@@ -183,7 +206,7 @@ describe('exercise library', () => {
       expect(ex.primary).toBe(primary);
       expect(ex.secondary).toEqual(secondary);
       expect(ex.isolation).toBe(isolation);
-      expect(ex.kind).toBe('main');
+      expect(ex.kind).toBe('standard');
       expect(ex.tracking).toBe('weight_reps');
       expect(ex.increment).toBeGreaterThan(0);
       expect(ex.sections.length).toBeGreaterThan(0);

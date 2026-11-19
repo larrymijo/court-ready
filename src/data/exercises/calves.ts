@@ -10,7 +10,7 @@ export const calvesExercises: ExerciseDef[] = [
     isolation: true,
     tracking: 'weight_reps',
     increment: 5,
-    kind: 'main',
+    kind: 'standard',
     swaps: ['alt_lpcalf'],
     sections: [
       {
@@ -43,7 +43,8 @@ export const calvesExercises: ExerciseDef[] = [
     isolation: true,
     tracking: 'weight_reps',
     increment: 5,
-    kind: 'alternative',
+    kind: 'standard',
+    swapOption: true,
     swaps: ['calf'],
     sections: [
       {
@@ -107,6 +108,27 @@ export const calvesExercises: ExerciseDef[] = [
       {
         label: 'IF IT HURTS',
         items: ['Pain at the heel or Achilles: ease off, and stop if it stays.'],
+      },
+    ],
+  },
+  {
+    id: 'seated_calf_raise',
+    name: 'Seated calf raise',
+    muscles: 'Calves (especially soleus)',
+    primary: 'calves',
+    equipment: 'machine',
+    isolation: true,
+    tracking: 'weight_reps',
+    increment: 2.5,
+    kind: 'standard',
+    swaps: ['calf', 'alt_lpcalf'],
+    sections: [
+      {
+        label: 'HOW',
+        items: [
+          'Put the balls of your feet on the ledge and adjust the thigh pad to sit just above your knees. Lift the pad and release the stop.',
+          'Lower your heels slowly, then rise onto your toes. Pause at the top of each rep and return the stop before getting out.',
+        ],
       },
     ],
   },

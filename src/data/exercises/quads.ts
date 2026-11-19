@@ -11,7 +11,7 @@ export const quadsExercises: ExerciseDef[] = [
     isolation: false,
     tracking: 'weight_reps',
     increment: 5,
-    kind: 'main',
+    kind: 'standard',
     swaps: ['alt_gobletsquat'],
     sections: [
       {
@@ -61,7 +61,7 @@ export const quadsExercises: ExerciseDef[] = [
     isolation: false,
     tracking: 'weight_reps',
     increment: 2,
-    kind: 'main',
+    kind: 'standard',
     perSide: true,
     swaps: ['alt_reverselunge'],
     sections: [
@@ -101,7 +101,8 @@ export const quadsExercises: ExerciseDef[] = [
     isolation: false,
     tracking: 'weight_reps',
     increment: 2,
-    kind: 'alternative',
+    kind: 'standard',
+    swapOption: true,
     swaps: ['legpress'],
     sections: [
       {
@@ -124,7 +125,8 @@ export const quadsExercises: ExerciseDef[] = [
     isolation: false,
     tracking: 'weight_reps',
     increment: 2,
-    kind: 'alternative',
+    kind: 'standard',
+    swapOption: true,
     perSide: true,
     swaps: ['bss'],
     sections: [
@@ -148,7 +150,7 @@ export const quadsExercises: ExerciseDef[] = [
     isolation: false,
     tracking: 'weight_reps',
     increment: 2.5,
-    kind: 'main',
+    kind: 'standard',
     swaps: ['legpress', 'alt_gobletsquat'],
     sections: [
       {
@@ -193,7 +195,7 @@ export const quadsExercises: ExerciseDef[] = [
     isolation: true,
     tracking: 'weight_reps',
     increment: 2.5,
-    kind: 'main',
+    kind: 'standard',
     swaps: ['legpress', 'alt_gobletsquat'],
     sections: [
       {
@@ -516,6 +518,118 @@ export const quadsExercises: ExerciseDef[] = [
       {
         label: 'IF IT HURTS',
         items: ['Knee pain: don’t pull the heel in as far.'],
+      },
+    ],
+  },
+  {
+    id: 'front_squat',
+    name: 'Barbell front squat',
+    muscles: 'Quads, glutes and core',
+    primary: 'quads',
+    secondary: ['glutes', 'core'],
+    equipment: 'barbell',
+    isolation: false,
+    tracking: 'weight_reps',
+    increment: 2.5,
+    kind: 'standard',
+    swaps: ['backsquat', 'alt_gobletsquat'],
+    sections: [
+      {
+        label: 'HOW',
+        items: [
+          'Rest the bar across the fronts of your shoulders with your elbows lifted. Step back from the rack and brace.',
+          'Bend at your knees and hips, keeping the bar over the middle of your feet. Drive up with your elbows still high.',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'hack_squat',
+    name: 'Machine hack squat',
+    muscles: 'Quads and glutes',
+    primary: 'quads',
+    secondary: ['glutes'],
+    equipment: 'machine',
+    isolation: false,
+    tracking: 'weight_reps',
+    increment: 5,
+    kind: 'standard',
+    swaps: ['legpress', 'smith_squat'],
+    sections: [
+      {
+        label: 'HOW',
+        items: [
+          'Set the sled stops for your range. Place your feet on the platform with your back and shoulders against the pads.',
+          'Release the handles and bend your knees as the sled descends. Keep your heels planted and press the platform away to stand. Re-engage the handles before stepping out.',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'walking_lunge',
+    name: 'Dumbbell walking lunge',
+    muscles: 'Quads and glutes',
+    primary: 'quads',
+    secondary: ['glutes'],
+    equipment: 'dumbbell',
+    isolation: false,
+    tracking: 'weight_reps',
+    increment: 2,
+    kind: 'standard',
+    perSide: true,
+    swaps: ['alt_reverselunge', 'bss'],
+    sections: [
+      {
+        label: 'HOW',
+        items: [
+          'Hold a dumbbell beside each hip and take a stride forward. Bend both knees until the back knee approaches the floor.',
+          'Push through your front foot and bring the back leg through into the next stride. Log reps per leg.',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'step_up',
+    name: 'Dumbbell step-up',
+    muscles: 'Quads and glutes',
+    primary: 'quads',
+    secondary: ['glutes'],
+    equipment: 'dumbbell',
+    isolation: false,
+    tracking: 'weight_reps',
+    increment: 2,
+    kind: 'standard',
+    perSide: true,
+    swaps: ['walking_lunge', 'bss'],
+    sections: [
+      {
+        label: 'HOW',
+        items: [
+          'Stand in front of a stable step holding dumbbells by your sides. Place one whole foot on the step.',
+          'Press through that foot to stand tall on the step. Lower the trailing foot slowly to the floor. Finish the reps on one leg, then switch.',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'smith_squat',
+    name: 'Smith machine squat',
+    muscles: 'Quads and glutes',
+    primary: 'quads',
+    secondary: ['glutes'],
+    equipment: 'machine',
+    isolation: false,
+    tracking: 'weight_reps',
+    increment: 2.5,
+    kind: 'standard',
+    swaps: ['hack_squat', 'backsquat'],
+    sections: [
+      {
+        label: 'HOW',
+        items: [
+          'Set the safety stops just below your squat depth. Settle the bar across your upper back and turn it free of the hooks.',
+          'Bend your hips and knees together while keeping both heels down. Stand up along the rails and rehook the bar at the end of the set.',
+        ],
       },
     ],
   },

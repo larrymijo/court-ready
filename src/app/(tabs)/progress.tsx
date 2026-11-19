@@ -39,9 +39,11 @@ const MUSCLES: { key: MuscleGroup; label: string }[] = [
   { key: 'shoulders', label: 'Shoulders' },
   { key: 'biceps', label: 'Biceps' },
   { key: 'triceps', label: 'Triceps' },
+  { key: 'forearms', label: 'Forearms' },
   { key: 'quads', label: 'Quads' },
   { key: 'hamstrings', label: 'Hamstrings' },
   { key: 'glutes', label: 'Glutes' },
+  { key: 'adductors', label: 'Adductors' },
   { key: 'calves', label: 'Calves' },
   { key: 'core', label: 'Core' },
 ];

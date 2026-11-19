@@ -12,7 +12,7 @@ import {
   plural,
   setLabels,
 } from '@/lib/format';
-import { detectPRs, e1rm, exerciseSeries, muscleSets, workoutSetCount, workoutVolume } from '@/lib/stats';
+import { detectPRs, e1rm, exerciseBests, exerciseSeries, muscleSets, workoutSetCount, workoutVolume } from '@/lib/stats';
 import type { Workout } from '@/lib/types';
 
 const get = (id: string) => EXERCISE_BY_ID[id];
@@ -63,6 +63,15 @@ describe('stats', () => {
   it('builds an exercise series oldest first', () => {
     const s = exerciseSeries('incline', [w('b', 2000, 'incline', [[22, 8]]), w('a', 1000, 'incline', [[20, 10]])]);
     expect(s.map((p) => p.topWeight)).toEqual([20, 22]);
+  });
+
+  it('keeps measured carry records and skips the one-rep max estimate', () => {
+    const first = w('a', 1000, 'farmers_walk', [[20, 2]]);
+    const second = w('b', 2000, 'farmers_walk', [[24, 3]]);
+    const workouts = [second, first];
+    expect(detectPRs(second, [first], get).map((pr) => pr.kind)).toEqual(['weight', 'volume']);
+    expect(exerciseBests('farmers_walk', workouts).e1rm).toBeUndefined();
+    expect(exerciseSeries('farmers_walk', workouts)[1]).toMatchObject({ topWeight: 24, bestE1rm: 0 });
   });
 
   it('counts hard sets per muscle (helpers count half)', () => {

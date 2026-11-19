@@ -11,7 +11,7 @@ export const backExercises: ExerciseDef[] = [
     isolation: false,
     tracking: 'weight_reps',
     increment: 2,
-    kind: 'main',
+    kind: 'standard',
     swaps: ['alt_machinerow', 'alt_dbrow'],
     sections: [
       {
@@ -52,7 +52,7 @@ export const backExercises: ExerciseDef[] = [
     isolation: false,
     tracking: 'weight_reps',
     increment: 2.5,
-    kind: 'main',
+    kind: 'standard',
     swaps: ['alt_assistedpullup', 'pullup'],
     sections: [
       {
@@ -90,7 +90,7 @@ export const backExercises: ExerciseDef[] = [
     isolation: false,
     tracking: 'weight_reps',
     increment: 2.5,
-    kind: 'main',
+    kind: 'standard',
     swaps: ['pulldown', 'alt_assistedpullup'],
     sections: [
       {
@@ -131,7 +131,7 @@ export const backExercises: ExerciseDef[] = [
     isolation: false,
     tracking: 'weight_reps',
     increment: 2.5,
-    kind: 'main',
+    kind: 'standard',
     swaps: ['alt_machinerow', 'alt_dbrow'],
     sections: [
       {
@@ -165,7 +165,8 @@ export const backExercises: ExerciseDef[] = [
     isolation: false,
     tracking: 'weight_reps',
     increment: 2.5,
-    kind: 'alternative',
+    kind: 'standard',
+    swapOption: true,
     swaps: ['csrow', 'cablerow'],
     sections: [
       {
@@ -188,7 +189,8 @@ export const backExercises: ExerciseDef[] = [
     isolation: false,
     tracking: 'weight_reps',
     increment: 2,
-    kind: 'alternative',
+    kind: 'standard',
+    swapOption: true,
     swaps: ['csrow'],
     sections: [
       {
@@ -211,7 +213,8 @@ export const backExercises: ExerciseDef[] = [
     isolation: false,
     tracking: 'weight_reps',
     increment: 2.5,
-    kind: 'alternative',
+    kind: 'standard',
+    swapOption: true,
     swaps: ['pullup', 'pulldown'],
     sections: [
       {
@@ -234,7 +237,7 @@ export const backExercises: ExerciseDef[] = [
     isolation: false,
     tracking: 'weight_reps',
     increment: 2.5,
-    kind: 'main',
+    kind: 'standard',
     swaps: ['pulldown', 'alt_assistedpullup', 'pullup'],
     sections: [
       {
@@ -292,6 +295,245 @@ export const backExercises: ExerciseDef[] = [
       {
         label: 'IF IT HURTS',
         items: ['Pinching in the shoulder: raise your hand a little.'],
+      },
+    ],
+  },
+  {
+    id: 'overhand_pull_up',
+    name: 'Pull-up (overhand grip)',
+    muscles: 'Lats, upper back, biceps',
+    primary: 'back',
+    secondary: ['biceps'],
+    equipment: 'bodyweight',
+    isolation: false,
+    tracking: 'weight_reps',
+    increment: 2.5,
+    kind: 'standard',
+    swaps: ['pullup', 'latpulldown'],
+    sections: [
+      {
+        label: 'HOW',
+        items: [
+          'Hold the bar with palms facing away and hands a little wider than your shoulders. Start with straight arms and quiet legs.',
+          'Draw your elbows down toward your sides and lift your chin past the bar without reaching your neck forward. Lower until your arms straighten again.',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'chin_up',
+    name: 'Chin-up (underhand grip)',
+    muscles: 'Lats and biceps',
+    primary: 'back',
+    secondary: ['biceps'],
+    equipment: 'bodyweight',
+    isolation: false,
+    tracking: 'weight_reps',
+    increment: 2.5,
+    kind: 'standard',
+    swaps: ['pullup', 'close_grip_lat_pulldown'],
+    sections: [
+      {
+        label: 'HOW',
+        items: [
+          'Hang from a straight bar with palms facing you and hands about shoulder-width apart. Let your elbows straighten.',
+          'Pull your elbows toward your ribs to raise your chin past the bar. Pause, then lower yourself with your legs still.',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'close_grip_lat_pulldown',
+    name: 'Close-grip lat pulldown (overhand)',
+    muscles: 'Lats and biceps',
+    primary: 'back',
+    secondary: ['biceps'],
+    equipment: 'cable',
+    isolation: false,
+    tracking: 'weight_reps',
+    increment: 2.5,
+    kind: 'standard',
+    swaps: ['pulldown', 'latpulldown'],
+    sections: [
+      {
+        label: 'HOW',
+        items: [
+          'Sit securely under the thigh pad. Take the straight bar with palms forward and hands just inside shoulder width. Lean back slightly to give the bar a clear path.',
+          'Bring your elbows down close to your sides until the bar approaches your upper chest. Return it slowly until your arms straighten.',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'barbell_row',
+    name: 'Bent-over barbell row',
+    muscles: 'Lats, upper back, rear shoulders and biceps',
+    primary: 'back',
+    secondary: ['shoulders', 'biceps'],
+    equipment: 'barbell',
+    isolation: false,
+    tracking: 'weight_reps',
+    increment: 2.5,
+    kind: 'standard',
+    swaps: ['csrow', 'cablerow'],
+    sections: [
+      {
+        label: 'HOW',
+        items: [
+          'Stand with the bar in an overhand grip. Soften your knees and hinge at the hips until the bar hangs under your shoulders.',
+          'Keep your torso angle steady as you row the bar toward your lower ribs. Lower it to straight arms before the next rep.',
+        ],
+      },
+    ],
+  },
+  {
+    id: 't_bar_row',
+    name: 'T-bar row',
+    muscles: 'Lats, upper back and biceps',
+    primary: 'back',
+    secondary: ['biceps'],
+    equipment: 'barbell',
+    isolation: false,
+    tracking: 'weight_reps',
+    increment: 2.5,
+    kind: 'standard',
+    swaps: ['cablerow', 'csrow'],
+    sections: [
+      {
+        label: 'HOW',
+        items: [
+          'Secure the unloaded end of a barbell in a landmine and fit a row handle behind the plates. Straddle the bar, hinge at the hips and take the handle.',
+          'Hold your back steady and bring the handle toward your lower ribs. Lower the plates smoothly until your arms straighten.',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'straight_arm_pulldown',
+    name: 'Straight-arm cable pulldown',
+    muscles: 'Lats',
+    primary: 'back',
+    equipment: 'cable',
+    isolation: true,
+    tracking: 'weight_reps',
+    increment: 2.5,
+    kind: 'standard',
+    swaps: ['dumbbell_pullover', 'latpulldown'],
+    sections: [
+      {
+        label: 'HOW',
+        items: [
+          'Face a high pulley with a straight bar. Step back, hinge slightly and reach forward with a small bend in both elbows.',
+          'Keep that bend as you sweep the bar toward your thighs. Let it travel up and forward again while your torso stays still.',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'inverted_row',
+    name: 'Inverted row',
+    muscles: 'Upper back, lats, biceps and core',
+    primary: 'back',
+    secondary: ['biceps', 'core'],
+    equipment: 'bodyweight',
+    isolation: false,
+    tracking: 'reps',
+    increment: 0,
+    kind: 'standard',
+    swaps: ['cablerow', 'csrow'],
+    sections: [
+      {
+        label: 'HOW',
+        items: [
+          'Use a fixed horizontal bar or a securely locked Smith bar. Lie beneath it, grip slightly wider than your shoulders and plant your heels.',
+          'Hold a straight line from shoulders to heels and pull your chest toward the bar. Lower to straight arms. Bend your knees or raise the bar to make the row easier.',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'conventional_deadlift',
+    name: 'Conventional barbell deadlift',
+    muscles: 'Back extensors, glutes, hamstrings and quads',
+    primary: 'back',
+    secondary: ['glutes', 'hamstrings', 'quads'],
+    equipment: 'barbell',
+    isolation: false,
+    tracking: 'weight_reps',
+    increment: 2.5,
+    kind: 'standard',
+    swaps: ['barbellrdl', 'rack_pull'],
+    sections: [
+      {
+        label: 'HOW',
+        items: [
+          'Stand with the bar over midfoot. Hinge and bend your knees to grip just outside your shins. Brace your trunk and take the slack out of the bar.',
+          'Push the floor away and keep the bar close as you stand tall. Move your hips back to guide the bar past your knees, then bend your knees to return it to the floor.',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'rack_pull',
+    name: 'Barbell rack pull',
+    muscles: 'Back extensors, upper back, glutes and hamstrings',
+    primary: 'back',
+    secondary: ['glutes', 'hamstrings'],
+    equipment: 'barbell',
+    isolation: false,
+    tracking: 'weight_reps',
+    increment: 2.5,
+    kind: 'standard',
+    swaps: ['conventional_deadlift', 'barbellrdl'],
+    sections: [
+      {
+        label: 'HOW',
+        items: [
+          'Set both rack safeties to the same height just below your knees. Stand close to the bar, hinge at your hips and grip outside your legs.',
+          'Brace and stand tall with the bar against your thighs. Hinge back and settle the bar on both safeties before starting the next rep.',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'barbell_shrug',
+    name: 'Barbell shrug',
+    muscles: 'Upper trapezius',
+    primary: 'back',
+    equipment: 'barbell',
+    isolation: true,
+    tracking: 'weight_reps',
+    increment: 2.5,
+    kind: 'standard',
+    swaps: ['dumbbell_shrug'],
+    sections: [
+      {
+        label: 'HOW',
+        items: [
+          'Stand tall with a barbell in front of your thighs. Hold it just outside your legs with palms facing you and let your arms hang straight.',
+          'Raise your shoulders toward your ears, pause, then lower them along the same path. Keep the rest of your body still.',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'dumbbell_shrug',
+    name: 'Dumbbell shrug',
+    muscles: 'Upper trapezius',
+    primary: 'back',
+    equipment: 'dumbbell',
+    isolation: true,
+    tracking: 'weight_reps',
+    increment: 2,
+    kind: 'standard',
+    swaps: ['barbell_shrug'],
+    sections: [
+      {
+        label: 'HOW',
+        items: [
+          'Stand with a dumbbell at each side and palms facing your legs. Let your arms hang and look straight ahead.',
+          'Lift both shoulders straight up while the weights hang beside you. Pause at the top, then lower fully before the next rep.',
+        ],
       },
     ],
   },

@@ -2,7 +2,7 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { View } from 'react-native';
 
-import { ExerciseList, isLift } from '@/components/ExerciseList';
+import { ExerciseList } from '@/components/ExerciseList';
 import { SportRing } from '@/components/WorkoutCard';
 import { TabScreen } from '@/components/TabScreen';
 import { Card, ListRow, PageHeader, RowBadge, SectionTitle, Segmented, Txt, type IconName } from '@/components/ui';
@@ -46,7 +46,7 @@ export default function LibraryScreen() {
 
   return (
     <TabScreen>
-      <PageHeader subtitle={`${EXERCISES.filter(isLift).length} exercises · ${guideCount} guide pages`} title="Library" />
+      <PageHeader subtitle={`${EXERCISES.length} exercises · ${guideCount} guide pages`} title="Library" />
       <Segmented<View_>
         value={view}
         onChange={setView}
