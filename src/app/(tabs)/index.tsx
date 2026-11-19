@@ -5,7 +5,7 @@ import { View } from 'react-native';
 
 import { ChooseWorkoutSheet } from '@/components/plan/ChooseWorkoutSheet';
 import { NumInput } from '@/components/NumInput';
-import { logPastSession, SportMark, SportSessionCard, startPlannedSport } from '@/components/today/SportSessionCard';
+import { logPastSession, SportMark, SportPrepLinks, SportSessionCard, startPlannedSport } from '@/components/today/SportSessionCard';
 import { TabScreen } from '@/components/TabScreen';
 import {
   Button,
@@ -378,7 +378,7 @@ function GymCard({
 
 /**
  * A day with no required gym session: sport, optional sessions or rest. Says what is planned and
- * still lets you train. A planned sport session gets Start, "Log a past session" and the game warm-up.
+ * still lets you train. A planned sport session gets Start, "Log a past session" and its checklists.
  */
 function OffDayCard({ plan, day, onTrainAnyway }: { plan: Plan; day: WeekDayView; onTrainAnyway: () => void }) {
   const sports = day.sessions.filter((s) => s.kind === 'sport');
@@ -386,11 +386,7 @@ function OffDayCard({ plan, day, onTrainAnyway }: { plan: Plan; day: WeekDayView
   const requiredSport = sports.some((s) => !s.optional);
   const optionalGym = day.sessions.find((s) => s.kind === 'gym');
   const allDone = sport && sports.every((s) => s.done);
-  const body =
-    day.note ??
-    (requiredSport
-      ? 'No gym today. Warm up properly, and stretch your hitting arm after playing.'
-      : 'Nothing planned today. Rest, or train if you feel like it.');
+  const body = day.note ?? (requiredSport ? 'No gym today.' : 'Nothing planned today. Rest, or train if you feel like it.');
   return (
     <Card variant="hero">
       <Txt v="label">
@@ -408,14 +404,16 @@ function OffDayCard({ plan, day, onTrainAnyway }: { plan: Plan; day: WeekDayView
       {sport ? (
         <>
           {sports.map((s, i) => (
-            <Button
-              key={s.id}
-              size="large"
-              variant={i === 0 && !s.done ? 'primary' : 'secondary'}
-              icon="play"
-              title={s.done ? 'Start again' : sports.length > 1 ? `Start ${s.name}` : 'Start'}
-              onPress={() => startPlannedSport(plan, s)}
-            />
+            <View key={s.id} style={{ gap: S.md }}>
+              <Button
+                size="large"
+                variant={i === 0 && !s.done ? 'primary' : 'secondary'}
+                icon="play"
+                title={s.done ? 'Start again' : sports.length > 1 ? `Start ${s.name}` : 'Start'}
+                onPress={() => startPlannedSport(plan, s)}
+              />
+              <SportPrepLinks plan={plan} session={s} />
+            </View>
           ))}
           <Row style={{ justifyContent: 'center', flexWrap: 'wrap', marginVertical: -8 }}>
             <Button variant="ghost" title="Log a past session" onPress={() => logPastSession(sports[0].sport)} />
@@ -428,7 +426,6 @@ function OffDayCard({ plan, day, onTrainAnyway }: { plan: Plan; day: WeekDayView
       )}
       {sport || optionalGym ? (
         <Row style={{ justifyContent: 'space-between', marginTop: -6, marginBottom: -10, marginHorizontal: -S.sm }}>
-          {sport ? <Button variant="ghost" title="Game warm-up" onPress={() => router.push('/guide/warmups')} /> : <View />}
           {optionalGym ? (
             <Button
               variant="ghost"

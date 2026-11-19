@@ -130,12 +130,12 @@ function WarmupStage({ active, onDiscard }: { active: ActiveSport; onDiscard: ()
         {warmup ? (
           <ChecklistCard checklist={warmup} checked={active.warmupChecked} onToggle={(i) => toggle('warmup', i)} />
         ) : (
-          <Txt v="small">This warm-up isn’t in this version of the app. You can still start playing.</Txt>
+          <Txt v="small">This warm-up isn’t in this version of the app. You can still start the session.</Txt>
         )}
         <DiscardLink onPress={onDiscard} />
       </Body>
       <SessionBar>
-        <Button title="Start playing" icon="play" onPress={() => startPlaying()} />
+        <Button title={active.sport === 'running' ? 'Start run' : 'Start playing'} icon="play" onPress={() => startPlaying()} />
         <Button title="Skip warm-up" variant="ghost" onPress={() => startPlaying({ skippedWarmup: true })} />
       </SessionBar>
     </>
@@ -216,7 +216,7 @@ function LogStage({
           // Each field is saved as it changes, so a reload keeps what was typed.
           onChange={(patch) => update(patch)}
           errors={errors}
-          minutesTitle="Time played"
+          minutesTitle={active.sport === 'running' ? 'Time' : 'Time played'}
           minutesHint={clockRangeText(active.playStartedAt, active.playEndedAt) ?? undefined}
         />
         <DiscardLink onPress={onDiscard} />

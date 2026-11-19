@@ -2,9 +2,11 @@ import { router } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 
 import { Button, Card, Row, Txt } from '@/components/ui';
+import { checklist } from '@/data/checklists';
 import type { WeekSessionView } from '@/lib/planView';
 import { startSportFlow } from '@/lib/startWorkout';
 import type { Plan } from '@/lib/types';
+import { resolveSportStart } from '@/store/sportData';
 import { C, S } from '@/theme';
 
 /** The marker of a sport day: a ring, where a gym day's is a filled dot (docs/design.md). `size` 10 is the hero card's. */
@@ -23,9 +25,32 @@ export function logPastSession(sport: WeekSessionView['sport']): void {
   router.push({ pathname: '/log-sport', params: sport ? { sport } : {} });
 }
 
+/** Preview the same checklists that Start will open, including plan-session overrides. */
+export function SportPrepLinks({ plan, session }: { plan: Plan; session: WeekSessionView }) {
+  const prep = session.sport
+    ? resolveSportStart([plan], { sport: session.sport, planId: plan.id, sessionId: session.id })
+    : null;
+  if (!prep) return null;
+
+  return (
+    <Row style={[styles.links, { flexWrap: 'wrap' }]}>
+      {[checklist(prep.warmup), checklist(prep.cooldown)].map((list) =>
+        list ? (
+          <Button
+            key={list.kind}
+            variant="ghost"
+            title={list.title}
+            onPress={() => router.push(`/checklists/${list.id}`)}
+          />
+        ) : null,
+      )}
+    </Row>
+  );
+}
+
 /**
  * A sport session planned for a day that also has a gym workout: a small card under the workout
- * with Start, "Log a past session" and the game warm-up. Optional sessions are offered the same way.
+ * with Start, "Log a past session" and its checklists. Optional sessions are offered the same way.
  */
 export function SportSessionCard({ plan, session }: { plan: Plan; session: WeekSessionView }) {
   return (
@@ -52,8 +77,8 @@ export function SportSessionCard({ plan, session }: { plan: Plan; session: WeekS
       </Row>
       <Row style={styles.links}>
         <Button variant="ghost" title="Log a past session" onPress={() => logPastSession(session.sport)} />
-        <Button variant="ghost" title="Game warm-up" iconRight="chevron-forward" onPress={() => router.push('/guide/warmups')} />
       </Row>
+      <SportPrepLinks plan={plan} session={session} />
     </Card>
   );
 }

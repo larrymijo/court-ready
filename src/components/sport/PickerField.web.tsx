@@ -15,7 +15,7 @@ const style: CSSProperties = {
   background: C.control,
   color: C.text,
   colorScheme: 'dark',
-  font: 'inherit',
+  fontFamily: 'system-ui, sans-serif',
   fontSize: 17,
   fontWeight: 600,
   fontVariantNumeric: 'tabular-nums',

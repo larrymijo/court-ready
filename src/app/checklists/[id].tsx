@@ -23,7 +23,7 @@ export default function ChecklistScreen() {
 
   return (
     <Screen edgesTop={false}>
-      <Stack.Screen options={{ title: list.title }} />
+      <Stack.Screen options={{ title: '' }} />
       <View style={{ gap: 2 }}>
         <Txt v="label">{checklistKindLabel(list)}</Txt>
         <Txt v="title">{list.title}</Txt>
