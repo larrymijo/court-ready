@@ -2,6 +2,7 @@ import { router } from 'expo-router';
 import { useState, type ReactNode } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { ChecklistMovementPreviews } from '@/components/MovementLoop';
 import { Check, IconButton, Sheet, Txt } from '@/components/ui';
 import { findExercise, getExercise } from '@/lib/exerciseCatalog';
 import type { Checklist, ChecklistStep } from '@/lib/types';
@@ -60,27 +61,30 @@ export function ChecklistCard({
         const on = checked.includes(i);
         const linked = linkedIds(step).length > 0;
         return (
-          <View key={i} style={styles.step}>
-            <Pressable
-              accessibilityRole="checkbox"
-              accessibilityState={{ checked: on }}
-              accessibilityLabel={step.text}
-              onPress={() => onToggle(i)}
-              style={styles.stepMain}>
-              <Check done={on} size={24} />
-              <Text style={[styles.text, on && styles.textOn]}>{step.text}</Text>
-            </Pressable>
-            {linked ? (
-              <IconButton
-                plain
-                icon="information-circle-outline"
-                color={C.textFaint}
-                label={`How to do it: ${shortName(step)}`}
-                onPress={() => openHowTo(step)}
-              />
-            ) : (
-              <View style={styles.noLink} />
-            )}
+          <View key={i}>
+            <View style={styles.step}>
+              <Pressable
+                accessibilityRole="checkbox"
+                accessibilityState={{ checked: on }}
+                accessibilityLabel={step.text}
+                onPress={() => onToggle(i)}
+                style={styles.stepMain}>
+                <Check done={on} size={24} />
+                <Text style={[styles.text, on && styles.textOn]}>{step.text}</Text>
+              </Pressable>
+              {linked ? (
+                <IconButton
+                  plain
+                  icon="information-circle-outline"
+                  color={C.textFaint}
+                  label={`How to do it: ${shortName(step)}`}
+                  onPress={() => openHowTo(step)}
+                />
+              ) : (
+                <View style={styles.noLink} />
+              )}
+            </View>
+            <ChecklistMovementPreviews ids={step.exerciseIds} />
           </View>
         );
       })}

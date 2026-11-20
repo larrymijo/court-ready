@@ -1,0 +1,364 @@
+{
+  "alt_dbrow": {
+    "title": "Dumbbell bent-over row",
+    "author": "George Stepanek (model: Emily)",
+    "source": "https://commons.wikimedia.org/wiki/File:DumbbellBentOverRow.JPG",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
+    "frames": [
+      {
+        "title": "Dumbbell bent-over row",
+        "source": "https://commons.wikimedia.org/wiki/File:DumbbellBentOverRow.JPG",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/6/67/DumbbellBentOverRow.JPG",
+        "sha256": "a464752345cf963b5dccbaef0a182feba08870b21794ced522f1d0a8e15b04fa",
+        "crop": [
+          0,
+          0,
+          256,
+          364
+        ]
+      },
+      {
+        "title": "Dumbbell bent-over row",
+        "source": "https://commons.wikimedia.org/wiki/File:DumbbellBentOverRow.JPG",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/6/67/DumbbellBentOverRow.JPG",
+        "sha256": "a464752345cf963b5dccbaef0a182feba08870b21794ced522f1d0a8e15b04fa",
+        "crop": [
+          256,
+          0,
+          512,
+          364
+        ]
+      }
+    ]
+  },
+  "alt_lyinglegcurl": {
+    "title": "Lying leg curl machine",
+    "author": "George Stepanek (model: Emily)",
+    "source": "https://commons.wikimedia.org/wiki/File:LyingLegCurlMachineExercise.JPG",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
+    "frames": [
+      {
+        "title": "Lying leg curl machine",
+        "source": "https://commons.wikimedia.org/wiki/File:LyingLegCurlMachineExercise.JPG",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/c/c6/LyingLegCurlMachineExercise.JPG",
+        "sha256": "875d8860b54971a87fce7ec770b418e260feda052f73a3d3fddc1a0101790011",
+        "crop": [
+          0,
+          0,
+          384,
+          384
+        ]
+      },
+      {
+        "title": "Lying leg curl machine",
+        "source": "https://commons.wikimedia.org/wiki/File:LyingLegCurlMachineExercise.JPG",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/c/c6/LyingLegCurlMachineExercise.JPG",
+        "sha256": "875d8860b54971a87fce7ec770b418e260feda052f73a3d3fddc1a0101790011",
+        "crop": [
+          384,
+          0,
+          768,
+          384
+        ]
+      }
+    ]
+  },
+  "calf": {
+    "title": "Standing calf raise with a dumbbell",
+    "author": "George Stepanek (model: Emily)",
+    "source": "https://commons.wikimedia.org/wiki/File:DumbbellStandingCalfRaise.JPG",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
+    "frames": [
+      {
+        "title": "Standing calf raise with a dumbbell",
+        "source": "https://commons.wikimedia.org/wiki/File:DumbbellStandingCalfRaise.JPG",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/6/68/DumbbellStandingCalfRaise.JPG",
+        "sha256": "b45d32e962ac4789e3f822857cdcbe4a730737d81e640fa8d9f57c6c05bb9229",
+        "crop": [
+          0,
+          0,
+          192,
+          448
+        ]
+      },
+      {
+        "title": "Standing calf raise with a dumbbell",
+        "source": "https://commons.wikimedia.org/wiki/File:DumbbellStandingCalfRaise.JPG",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/6/68/DumbbellStandingCalfRaise.JPG",
+        "sha256": "b45d32e962ac4789e3f822857cdcbe4a730737d81e640fa8d9f57c6c05bb9229",
+        "crop": [
+          192,
+          0,
+          384,
+          448
+        ]
+      }
+    ]
+  },
+  "d_squat": {
+    "title": "Bodyweight Squats",
+    "source": "https://commons.wikimedia.org/wiki/File:Bodyweight_Squats.gif",
+    "author": "Danielflefil",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "frames": [
+      {
+        "title": "Bodyweight Squats",
+        "source": "https://commons.wikimedia.org/wiki/File:Bodyweight_Squats.gif",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/d/df/Bodyweight_Squats.gif",
+        "sha256": "cd88dedbb9d897b31ddcad466bd9dcb57f7e69a53ab30a06ec63c8235cdaf12b",
+        "index": 0
+      },
+      {
+        "title": "Bodyweight Squats",
+        "source": "https://commons.wikimedia.org/wiki/File:Bodyweight_Squats.gif",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/d/df/Bodyweight_Squats.gif",
+        "sha256": "cd88dedbb9d897b31ddcad466bd9dcb57f7e69a53ab30a06ec63c8235cdaf12b",
+        "index": 30
+      }
+    ]
+  },
+  "dumbbell_fly": {
+    "title": "Dumbbell flye",
+    "author": "George Stepanek (model: Emily)",
+    "source": "https://commons.wikimedia.org/wiki/File:DumbbellFlye.JPG",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
+    "frames": [
+      {
+        "title": "Dumbbell flye",
+        "source": "https://commons.wikimedia.org/wiki/File:DumbbellFlye.JPG",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/7/7e/DumbbellFlye.JPG",
+        "sha256": "41c03cd8bfc66691b79569beb8f0fdda5f38f2ccc7afd9988a53c9df66c46889",
+        "crop": [
+          320,
+          0,
+          640,
+          384
+        ]
+      },
+      {
+        "title": "Dumbbell flye",
+        "source": "https://commons.wikimedia.org/wiki/File:DumbbellFlye.JPG",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/7/7e/DumbbellFlye.JPG",
+        "sha256": "41c03cd8bfc66691b79569beb8f0fdda5f38f2ccc7afd9988a53c9df66c46889",
+        "crop": [
+          0,
+          0,
+          320,
+          384
+        ]
+      }
+    ]
+  },
+  "hack_squat": {
+    "title": "Hack squat machine",
+    "author": "George Stepanek (model: Emily)",
+    "source": "https://commons.wikimedia.org/wiki/File:HackSquatMachineExercise.JPG",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
+    "frames": [
+      {
+        "title": "Hack squat machine",
+        "source": "https://commons.wikimedia.org/wiki/File:HackSquatMachineExercise.JPG",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/d/dd/HackSquatMachineExercise.JPG",
+        "sha256": "7833ac54eb5af19edafc54cac26f9b2ccbe635d5556c91aa8a828d226b4c653f",
+        "crop": [
+          384,
+          0,
+          768,
+          449
+        ]
+      },
+      {
+        "title": "Hack squat machine",
+        "source": "https://commons.wikimedia.org/wiki/File:HackSquatMachineExercise.JPG",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/d/dd/HackSquatMachineExercise.JPG",
+        "sha256": "7833ac54eb5af19edafc54cac26f9b2ccbe635d5556c91aa8a828d226b4c653f",
+        "crop": [
+          0,
+          0,
+          384,
+          449
+        ]
+      }
+    ]
+  },
+  "lateral": {
+    "title": "Dumbbell lateral raise",
+    "author": "George Stepanek (model: Emily)",
+    "source": "https://commons.wikimedia.org/wiki/File:DumbbellLateralRaise.JPG",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
+    "frames": [
+      {
+        "title": "Dumbbell lateral raise",
+        "source": "https://commons.wikimedia.org/wiki/File:DumbbellLateralRaise.JPG",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/d/d8/DumbbellLateralRaise.JPG",
+        "sha256": "2bb17c3874121835619996d487cfab558a64684ec55d7dedfcffa0a83af52104",
+        "crop": [
+          0,
+          0,
+          292,
+          472
+        ]
+      },
+      {
+        "title": "Dumbbell lateral raise",
+        "source": "https://commons.wikimedia.org/wiki/File:DumbbellLateralRaise.JPG",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/d/d8/DumbbellLateralRaise.JPG",
+        "sha256": "2bb17c3874121835619996d487cfab558a64684ec55d7dedfcffa0a83af52104",
+        "crop": [
+          292,
+          0,
+          576,
+          472
+        ]
+      }
+    ]
+  },
+  "legext": {
+    "title": "Leg extension machine",
+    "author": "George Stepanek (model: Emily)",
+    "source": "https://commons.wikimedia.org/wiki/File:LegExtensionMachineExercise.JPG",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
+    "frames": [
+      {
+        "title": "Leg extension machine",
+        "source": "https://commons.wikimedia.org/wiki/File:LegExtensionMachineExercise.JPG",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/3/36/LegExtensionMachineExercise.JPG",
+        "sha256": "f3b1ecbfc1af0398f411cd35f5631d5ac704da2eadc5ba0c0683d3748557973c",
+        "crop": [
+          0,
+          0,
+          256,
+          384
+        ]
+      },
+      {
+        "title": "Leg extension machine",
+        "source": "https://commons.wikimedia.org/wiki/File:LegExtensionMachineExercise.JPG",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/3/36/LegExtensionMachineExercise.JPG",
+        "sha256": "f3b1ecbfc1af0398f411cd35f5631d5ac704da2eadc5ba0c0683d3748557973c",
+        "crop": [
+          256,
+          0,
+          512,
+          384
+        ]
+      }
+    ]
+  },
+  "machine_shoulder_press": {
+    "title": "Shoulder press machine",
+    "author": "George Stepanek (model: Emily)",
+    "source": "https://commons.wikimedia.org/wiki/File:ShoulderPressMachineExercise.JPG",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
+    "frames": [
+      {
+        "title": "Shoulder press machine",
+        "source": "https://commons.wikimedia.org/wiki/File:ShoulderPressMachineExercise.JPG",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/1/1f/ShoulderPressMachineExercise.JPG",
+        "sha256": "537dd9550c81cd05bb269fc4e14daa6c694d1d64abca1511f9c41197ef66c3ea",
+        "crop": [
+          0,
+          0,
+          288,
+          400
+        ]
+      },
+      {
+        "title": "Shoulder press machine",
+        "source": "https://commons.wikimedia.org/wiki/File:ShoulderPressMachineExercise.JPG",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/1/1f/ShoulderPressMachineExercise.JPG",
+        "sha256": "537dd9550c81cd05bb269fc4e14daa6c694d1d64abca1511f9c41197ef66c3ea",
+        "crop": [
+          288,
+          0,
+          576,
+          400
+        ]
+      }
+    ]
+  },
+  "s_calf": {
+    "title": "Standing calf stretch",
+    "author": "Manuel Albornoz-Cabello, Cristo J. Barrios-Quinta, Ana M. Barrios-Quinta, Isabel Escobio-Prieto, María de los Angeles Cardero-Durán and Luis Espejo-Antunez",
+    "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7908506/#ijerph-18-01048-t001",
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+    "frames": [
+      {
+        "title": "Standing calf and quadriceps stretches (Table 1)",
+        "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7908506/#ijerph-18-01048-t001",
+        "url": "https://mdpi-res.com/ijerph/ijerph-18-01048/article_deploy/html/images/ijerph-18-01048-i017.png",
+        "sha256": "ab6ceadbdd19867c31d1c2d75715aea3f0bce0a90e02bf0ca2b477bced9bd7ae"
+      },
+      {
+        "title": "Standing calf and quadriceps stretches (Table 1)",
+        "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7908506/#ijerph-18-01048-t001",
+        "url": "https://mdpi-res.com/ijerph/ijerph-18-01048/article_deploy/html/images/ijerph-18-01048-i018.png",
+        "sha256": "73df8a270e88478a64a96e9a6f05ec3c6bbe3242eded4ade5c92326ed9df1c81"
+      }
+    ]
+  },
+  "s_quad": {
+    "title": "Standing quadriceps stretch",
+    "author": "Manuel Albornoz-Cabello, Cristo J. Barrios-Quinta, Ana M. Barrios-Quinta, Isabel Escobio-Prieto, María de los Angeles Cardero-Durán and Luis Espejo-Antunez",
+    "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7908506/#ijerph-18-01048-t001",
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+    "frames": [
+      {
+        "title": "Standing calf and quadriceps stretches (Table 1)",
+        "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7908506/#ijerph-18-01048-t001",
+        "url": "https://mdpi-res.com/ijerph/ijerph-18-01048/article_deploy/html/images/ijerph-18-01048-i013.png",
+        "sha256": "9bb0dc752c221970bb60e877aaf016aa6a36b7e25a188100bf4f9f6c833890f5"
+      },
+      {
+        "title": "Standing calf and quadriceps stretches (Table 1)",
+        "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7908506/#ijerph-18-01048-t001",
+        "url": "https://mdpi-res.com/ijerph/ijerph-18-01048/article_deploy/html/images/ijerph-18-01048-i014.png",
+        "sha256": "d9f505077743bd59e5b7b1b9154213dea1a0855d95ba05ae9578a1bd58de05a3"
+      }
+    ]
+  },
+  "seated_calf_raise": {
+    "title": "Seated calf raise machine",
+    "author": "George Stepanek (model: Emily)",
+    "source": "https://commons.wikimedia.org/wiki/File:SeatedCalfRaiseMachineExercise.JPG",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
+    "frames": [
+      {
+        "title": "Seated calf raise machine",
+        "source": "https://commons.wikimedia.org/wiki/File:SeatedCalfRaiseMachineExercise.JPG",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/e/e7/SeatedCalfRaiseMachineExercise.JPG",
+        "sha256": "4d61fa351957165fe9f5843f4df75df4a4c2700080710ff518ca3e686b6f96a0",
+        "crop": [
+          0,
+          0,
+          320,
+          384
+        ]
+      },
+      {
+        "title": "Seated calf raise machine",
+        "source": "https://commons.wikimedia.org/wiki/File:SeatedCalfRaiseMachineExercise.JPG",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/e/e7/SeatedCalfRaiseMachineExercise.JPG",
+        "sha256": "4d61fa351957165fe9f5843f4df75df4a4c2700080710ff518ca3e686b6f96a0",
+        "crop": [
+          320,
+          0,
+          640,
+          384
+        ]
+      }
+    ]
+  }
+}

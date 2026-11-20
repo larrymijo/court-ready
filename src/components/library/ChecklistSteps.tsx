@@ -1,6 +1,7 @@
 import { router } from 'expo-router';
 import { View } from 'react-native';
 
+import { ChecklistMovementPreviews } from '@/components/MovementLoop';
 import { Chip, Divider, Row, RowBadge, Txt } from '@/components/ui';
 import { findExercise } from '@/lib/exerciseCatalog';
 import type { Checklist } from '@/lib/types';
@@ -22,6 +23,7 @@ export function ChecklistSteps({ list }: { list: Checklist }) {
               <RowBadge label={String(i + 1)} />
               <View style={{ flex: 1, gap: S.sm }}>
                 <Txt style={{ paddingTop: 7 }}>{step.text}</Txt>
+                <ChecklistMovementPreviews ids={step.exerciseIds} />
                 {links.length > 0 ? (
                   <Row gap={S.sm} style={{ flexWrap: 'wrap' }}>
                     {links.map((ex) => (

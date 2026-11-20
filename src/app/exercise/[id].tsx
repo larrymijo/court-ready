@@ -1,12 +1,14 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
-import { useMemo, useState } from 'react';
-import { View } from 'react-native';
+import { useMemo, useRef, useState } from 'react';
+import { View, type ScrollViewProps } from 'react-native';
 
 import { LineChart } from '@/components/LineChart';
+import { MovementLoop } from '@/components/MovementLoop';
 import { Bullet, Button, Card, Chip, EmptyState, Row, Screen, Segmented, StatTile, Tag, Txt } from '@/components/ui';
 import { painTone } from '@/components/workout/PainPicker';
 import { exerciseLabel, findExercise, getExercise } from '@/lib/exerciseCatalog';
+import { getMovementPair } from '@/lib/exerciseMedia';
 import { formatDate, formatKg, formatSet } from '@/lib/format';
 import { exerciseUsage } from '@/lib/planView';
 import { confirm } from '@/lib/platform';
@@ -37,6 +39,22 @@ export default function ExerciseScreen() {
   const workouts = useStore((s) => s.workouts);
   const plan = useStore((s) => s.plans.find((p) => p.id === s.activePlanId));
   const [tab, setTab] = useState<Tab>('how');
+  const pair = getMovementPair(id);
+  const photoBounds = useRef({ top: 0, bottom: 0 });
+  const viewport = useRef({ top: 0, height: 0 });
+  const [photoVisible, setPhotoVisible] = useState(false);
+  const updatePhotoVisibility = () => {
+    const { top, bottom } = photoBounds.current;
+    setPhotoVisible(bottom > viewport.current.top && top < viewport.current.top + viewport.current.height);
+  };
+  const onViewportLayout: ScrollViewProps['onLayout'] = ({ nativeEvent }) => {
+    viewport.current.height = nativeEvent.layout.height;
+    updatePhotoVisibility();
+  };
+  const onScroll: ScrollViewProps['onScroll'] = ({ nativeEvent }) => {
+    viewport.current = { top: nativeEvent.contentOffset.y, height: nativeEvent.layoutMeasurement.height };
+    updatePhotoVisibility();
+  };
 
   const sessions = useMemo(
     () =>
@@ -75,7 +93,7 @@ export default function ExerciseScreen() {
   return (
     <>
       <Stack.Screen options={{ title: '' }} />
-      <Screen edgesTop={false}>
+      <Screen edgesTop={false} onViewportLayout={pair ? onViewportLayout : undefined} onScroll={pair ? onScroll : undefined}>
         <View style={{ gap: S.sm }}>
           <View style={{ gap: 2 }}>
             <Txt v="label">{exerciseCategory(ex, !!custom, usedIn.length > 0)}</Txt>
@@ -123,6 +141,14 @@ export default function ExerciseScreen() {
 
         {readOnly || showSections || tab === 'how' ? (
           <>
+            {pair ? (
+              <View onLayout={({ nativeEvent: { layout } }) => {
+                photoBounds.current = { top: layout.y, bottom: layout.y + layout.height };
+                updatePhotoVisibility();
+              }}>
+                <MovementLoop key={id} name={ex.name} pair={pair} visible={photoVisible} />
+              </View>
+            ) : null}
             {ex.warning ? (
               <Card>
                 <Row gap={S.md} align="flex-start">

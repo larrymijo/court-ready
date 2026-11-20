@@ -8,6 +8,7 @@ import {
   StyleSheet,
   Text,
   View,
+  type ScrollViewProps,
   type StyleProp,
   type TextProps,
   type TextStyle,
@@ -61,6 +62,8 @@ export function Screen({
   edgesTop = true,
   edgesBottom = true,
   contentStyle,
+  onViewportLayout,
+  onScroll,
 }: {
   children: ReactNode;
   scroll?: boolean;
@@ -69,6 +72,8 @@ export function Screen({
   /** False under the tab bar, which already keeps clear of the home indicator. */
   edgesBottom?: boolean;
   contentStyle?: StyleProp<ViewStyle>;
+  onViewportLayout?: ScrollViewProps['onLayout'];
+  onScroll?: ScrollViewProps['onScroll'];
 }) {
   const insets = useSafeAreaInsets();
   const pad: ViewStyle = {
@@ -81,6 +86,9 @@ export function Screen({
   return (
     <ScrollView
       style={styles.screen}
+      onLayout={onViewportLayout}
+      onScroll={onScroll}
+      scrollEventThrottle={onScroll ? 64 : undefined}
       contentContainerStyle={[pad, contentStyle]}
       automaticallyAdjustKeyboardInsets
       keyboardShouldPersistTaps="handled"
@@ -559,6 +567,7 @@ export function ListRow({
   subtitle,
   caption,
   leading,
+  leadingAction,
   trailing,
   onPress,
   chevron,
@@ -573,6 +582,8 @@ export function ListRow({
   /** A third, fainter line. */
   caption?: string;
   leading?: ReactNode;
+  /** An independent button before the row's navigation target. */
+  leadingAction?: ReactNode;
   trailing?: ReactNode;
   onPress?: () => void;
   chevron?: boolean;
@@ -611,6 +622,7 @@ export function ListRow({
   );
   return (
     <View style={[styles.listRow, divider && styles.listRowDivider]}>
+      {leadingAction}
       {onPress ? (
         <Pressable
           accessibilityRole="button"
@@ -662,12 +674,11 @@ export function Sheet({
   const insets = useSafeAreaInsets();
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
-      <Pressable style={styles.scrim} onPress={onClose} accessibilityLabel="Close">
-        {/* The empty handler keeps a tap on the sheet itself from closing it. */}
-        <Pressable
+      <View style={styles.scrim}>
+        <Pressable style={StyleSheet.absoluteFill} onPress={onClose} accessible={false} tabIndex={-1} />
+        <View
           accessibilityViewIsModal
-          style={[styles.sheet, { paddingBottom: Math.max(insets.bottom, S.lg) }]}
-          onPress={() => {}}>
+          style={[styles.sheet, { paddingBottom: Math.max(insets.bottom, S.lg) }]}>
           <View style={styles.sheetGrabber} />
           {title ? (
             <View style={styles.sheetHeader}>
@@ -707,8 +718,8 @@ export function Sheet({
             ))}
           </ScrollView>
           <Button title={closeLabel} variant="secondary" onPress={onClose} style={{ marginTop: S.sm }} />
-        </Pressable>
-      </Pressable>
+        </View>
+      </View>
     </Modal>
   );
 }

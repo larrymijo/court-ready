@@ -3,19 +3,12 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { ChecklistMovementPreviews } from '@/components/MovementLoop';
 import { Check, IconButton, Txt } from '@/components/ui';
 import { checklist } from '@/data/checklists';
 import { findExercise } from '@/lib/exerciseCatalog';
 import { useStore } from '@/store/useStore';
 import { C, R, S, SIZE, T } from '@/theme';
-
-/**
- * The how-to this step opens: its first care drill. Other drills get their place here with the photo
- * loops in phase 5, so this card shows the same links as before.
- */
-function linkedId(ids?: string[]): string | undefined {
-  return ids?.find((id) => findExercise(id)?.kind === 'care');
-}
 
 /** The warm-up checklist at the top of a workout. Folds away once every step is ticked. */
 export function WarmupCard({ kind }: { kind: 'upper' | 'lower' }) {
@@ -44,26 +37,30 @@ export function WarmupCard({ kind }: { kind: 'upper' | 'lower' }) {
       {open
         ? w.steps.map((step, i) => {
             const on = checked.includes(i);
+            const howTo = step.exerciseIds?.map((id) => findExercise(id)).find((ex) => ex !== undefined);
             return (
-              <View key={i} style={styles.step}>
-                <Pressable
-                  accessibilityRole="checkbox"
-                  accessibilityState={{ checked: on }}
-                  accessibilityLabel={step.text}
-                  onPress={() => toggle(i)}
-                  style={styles.stepMain}>
-                  <Check done={on} size={24} />
-                  <Text style={[styles.text, on && styles.textOn]}>{step.text}</Text>
-                </Pressable>
-                {linkedId(step.exerciseIds) ? (
-                  <IconButton
-                    plain
-                    icon="information-circle-outline"
-                    color={C.textFaint}
-                    label="How to do it"
-                    onPress={() => router.push(`/exercise/${linkedId(step.exerciseIds)}`)}
-                  />
-                ) : null}
+              <View key={i}>
+                <View style={styles.step}>
+                  <Pressable
+                    accessibilityRole="checkbox"
+                    accessibilityState={{ checked: on }}
+                    accessibilityLabel={step.text}
+                    onPress={() => toggle(i)}
+                    style={styles.stepMain}>
+                    <Check done={on} size={24} />
+                    <Text style={[styles.text, on && styles.textOn]}>{step.text}</Text>
+                  </Pressable>
+                  {howTo ? (
+                    <IconButton
+                      plain
+                      icon="information-circle-outline"
+                      color={C.textFaint}
+                      label={`How to do ${howTo.name}`}
+                      onPress={() => router.push(`/exercise/${howTo.id}`)}
+                    />
+                  ) : null}
+                </View>
+                <ChecklistMovementPreviews ids={step.exerciseIds} />
               </View>
             );
           })

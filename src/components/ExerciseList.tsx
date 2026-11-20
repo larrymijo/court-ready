@@ -3,10 +3,13 @@ import { useMemo, useState, type ReactNode } from 'react';
 import { Pressable, ScrollView, SectionList, StyleSheet, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { MovementPreview } from '@/components/MovementLoop';
+import { MovementCredits } from '@/components/library/MovementCredits';
 import { Button, Chip, ListRow, RowBadge, SectionTitle, Sheet, Txt } from '@/components/ui';
 import { EXERCISES } from '@/data/exercises';
 import { exerciseCategory, filterExercises, recentExercises } from '@/lib/browseExercises';
 import { EQUIPMENT, exerciseLabel, MUSCLE_GROUPS } from '@/lib/exerciseCatalog';
+import { getMovementPair } from '@/lib/exerciseMedia';
 import { planExerciseIds } from '@/lib/planView';
 import type { Equipment, ExerciseDef, MuscleGroup } from '@/lib/types';
 import { useStore } from '@/store/useStore';
@@ -110,9 +113,12 @@ export function ExerciseList({ header, tabBottomPad, bottomPad = S.xl, pick, swa
                   <Chip key={group} label={exerciseLabel(group)} selected={muscle === group} onPress={() => setMuscle(group)} />
                 ))}
               </ScrollView>
-              <Button title={equipment ? exerciseLabel(equipment) : 'Equipment'} icon="options-outline" iconRight="chevron-down"
-                accessibilityLabel={`Equipment filter, ${equipment ? exerciseLabel(equipment) : 'all equipment'}`}
-                variant="ghost" onPress={() => setShowEquipment(true)} style={styles.equipment} />
+              <View style={styles.filterActions}>
+                {!pick ? <MovementCredits /> : null}
+                <Button title={equipment ? exerciseLabel(equipment) : 'Equipment'} icon="options-outline" iconRight="chevron-down"
+                  accessibilityLabel={`Equipment filter, ${equipment ? exerciseLabel(equipment) : 'all equipment'}`}
+                  variant="ghost" onPress={() => setShowEquipment(true)} style={styles.equipment} />
+              </View>
             </View>
           </View>
         }
@@ -126,12 +132,14 @@ export function ExerciseList({ header, tabBottomPad, bottomPad = S.xl, pick, swa
         renderItem={({ item, index, section }) => {
           const last = index === section.data.length - 1;
           const selected = selectedIds?.includes(item.id);
+          const pair = !pick && getMovementPair(item.id);
           const icon = item.kind === 'drill' ? 'walk-outline' : item.kind === 'stretch' ? 'body-outline' : 'barbell-outline';
           const subtitle = `${exerciseCategory(item)} · ${exerciseLabel(item.equipment)}`;
           return (
             <View style={[styles.row, index === 0 && styles.first, last && styles.last]}>
               <ListRow
-                leading={<RowBadge icon={icon} />} title={item.name} subtitle={subtitle}
+                leadingAction={pair ? <MovementPreview exercise={item} pair={pair} /> : undefined}
+                leading={pair ? undefined : <RowBadge icon={icon} />} title={item.name} subtitle={subtitle}
                 onPress={() => onChoose(item)} chevron={!selectedIds}
                 endIcon={selectedIds ? selected ? 'checkmark-circle' : 'ellipse-outline' : undefined}
                 accessibilityLabel={selectedIds ? `${item.name}, ${subtitle}, ${selected ? 'selected' : 'not selected'}` : undefined}
@@ -155,7 +163,8 @@ const styles = StyleSheet.create({
   clear: { width: SIZE.touch, height: 48, alignItems: 'center', justifyContent: 'center' },
   filters: { marginHorizontal: -S.gutter, flexGrow: 0 },
   chips: { paddingHorizontal: S.gutter, gap: S.sm },
-  equipment: { alignSelf: 'flex-end', paddingRight: 0 },
+  filterActions: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', columnGap: S.sm },
+  equipment: { marginLeft: 'auto', paddingRight: 0 },
   sectionHeader: { paddingTop: S.sm, paddingBottom: S.sm },
   row: { backgroundColor: C.surface, paddingHorizontal: S.lg },
   first: { borderTopLeftRadius: R.card, borderTopRightRadius: R.card },

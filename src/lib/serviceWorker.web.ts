@@ -1,4 +1,5 @@
 import { isNewerBuild, markUpdateReady } from '@/lib/appUpdate';
+import { planMediaOrder } from '@/lib/serviceWorkerMedia';
 import { useStore } from '@/store/useStore';
 
 /** How often, at most, the app asks the server for a newer version when it comes back on screen. */
@@ -20,11 +21,32 @@ export function registerServiceWorker(): void {
   const register = () => {
     navigator.serviceWorker
       .register(`${base}/sw.js`, { scope: `${base}/` })
-      .then(watchForNewVersion)
+      .then((registration) => {
+        watchForNewVersion(registration);
+        cachePlanMedia(registration);
+      })
       .catch(() => {});
   };
   if (document.readyState === 'complete') register();
   else window.addEventListener('load', register, { once: true });
+}
+
+function cachePlanMedia(registration: ServiceWorkerRegistration): void {
+  const queue = () => {
+    // The parent main worker may still control a first visit to beta. Address this registration
+    // directly so the two copies never send their plan order to each other's workers.
+    const worker = registration.active;
+    if (!worker || !navigator.onLine || !useStore.persist.hasHydrated()) return;
+    const { plans, activePlanId } = useStore.getState();
+    worker.postMessage({ type: 'court-ready:cache-media', exerciseIds: planMediaOrder(plans, activePlanId) });
+  };
+  useStore.persist.onFinishHydration(queue);
+  useStore.subscribe((state, previous) => {
+    if (state.plans !== previous.plans || state.activePlanId !== previous.activePlanId) queue();
+  });
+  navigator.serviceWorker.addEventListener('controllerchange', queue);
+  window.addEventListener('online', queue);
+  queue();
 }
 
 /** Asks a service worker which build it has cached. Resolves to undefined if it doesn't say. */
